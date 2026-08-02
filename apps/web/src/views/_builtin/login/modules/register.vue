@@ -119,7 +119,7 @@ handleFetchCaptchaCode();
 <template>
   <div>
     <div class="mb-5px text-32px text-black font-600 sm:text-30px dark:text-white">注册新账户</div>
-    <div class="pb-18px text-16px text-#858585">欢迎注册！请输入您的账户信息</div>
+    <div class="pb-18px text-16px text-[#858585]">欢迎注册！请输入您的账户信息</div>
     <NForm
       ref="formRef"
       :model="model"
@@ -168,11 +168,11 @@ handleFetchCaptchaCode();
       </NSpace>
     </NForm>
 
-    <div class="mt-24px w-full text-center text-18px text-#858585">
+    <div class="mt-24px w-full text-center text-18px text-[#858585]">
       您已有账户？
-      <NA type="primary" class="text-18px" @click="toggleLoginModule('pwd-login')">
+      <NButton text type="primary" class="text-18px" @click="toggleLoginModule('pwd-login')">
         {{ $t('common.login') }}
-      </NA>
+      </NButton>
     </div>
   </div>
 </template>

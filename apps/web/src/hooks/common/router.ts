@@ -97,6 +97,11 @@ export function useRouterPush(inSetup = true) {
     const redirect = route.value.query?.redirect as string;
 
     if (needRedirect && redirect) {
+      // 避免 redirect 指向登录页自身，导致跳回登录
+      if (redirect.startsWith('/login')) {
+        await toHome();
+        return;
+      }
       await routerPush(redirect);
     } else {
       await toHome();

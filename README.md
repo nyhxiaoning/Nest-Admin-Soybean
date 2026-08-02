@@ -1,5 +1,14 @@
 # Nest-Admin-Soybean
 
+## sudo docker-compose -f docker-compose-postgres.yml up -d
+
+##  启动命令；
+sudo docker-compose -f docker-compose-postgres.yml up -d
+
+
+
+
+
 <div align="center">
 
 **Language / 语言** 

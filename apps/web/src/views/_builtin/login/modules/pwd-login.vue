@@ -21,7 +21,7 @@ const { loading: tenantLoading, startLoading: startTenantLoading, endLoading: en
 
 const codeUrl = ref<string>();
 const captchaEnabled = ref<boolean>(false);
-const registerEnabled = ref<boolean>(false);
+const registerEnabled = ref<boolean>(true);
 const remberMe = ref<boolean>(false);
 
 const tenantEnabled = ref<boolean>(false);
@@ -42,15 +42,20 @@ const model: PwdLoginForm = reactive({
   password: ''
 });
 
-// 演示账户快速填充
-function handleDemoLogin() {
+// 演示账户一键登录
+async function handleDemoLogin() {
   model.tenantId = '000000';
   model.username = 'demo';
   model.password = 'demo123';
   if (captchaEnabled.value) {
     model.code = '';
   }
+  // 填充后直接触发登录，无需手动点登录按钮
+  await handleSubmit();
 }
+
+// 是否显示演示账户卡片：初始显示，填写过用户名后隐藏
+const showDemoCard = computed(() => model.username === '');
 
 type RuleKey = Extract<keyof PwdLoginForm, 'username' | 'password' | 'code' | 'tenantId'>;
 
@@ -175,21 +180,21 @@ async function handleSocialLogin(type: Api.System.SocialSource) {
 <template>
   <div>
     <div class="mb-5px text-32px text-black font-600 dark:text-white">登录到您的账户</div>
-    <div class="pb-18px text-16px text-#858585">欢迎回来！请输入您的账户信息</div>
+    <div class="pb-18px text-16px text-[#858585]">欢迎回来！请输入您的账户信息</div>
 
-    <!-- 演示账户提示卡片 -->
-    <div v-if="model.username !== 'demo'" class="demo-account-card mb-16px" @click="handleDemoLogin">
-      <div class="flex items-center">
-        <div class="demo-icon">
-          <icon-carbon:user-avatar class="text-24px" />
-        </div>
-        <div class="ml-12px flex-1">
-          <div class="mb-2px text-16px font-600">演示账户快速体验</div>
-          <div class="text-12px opacity-70">账号: demo / 密码: demo123 (仅查看权限)</div>
-        </div>
-        <icon-carbon:arrow-right class="text-20px opacity-60" />
+    <!-- 演示账户一键登录 -->
+    <NButton v-if="showDemoCard" text block class="demo-card-btn" @click="handleDemoLogin">
+      <template #icon>
+        <icon-carbon:user-avatar class="text-24px" />
+      </template>
+      <div class="flex-col gap-4px text-left">
+        <div class="text-16px font-600">演示账户一键登录</div>
+        <div class="text-12px opacity-70">点击即可以 demo / demo123 进入系统</div>
       </div>
-    </div>
+      <template #suffix>
+        <icon-carbon:arrow-right class="text-20px opacity-60" />
+      </template>
+    </NButton>
 
     <NForm
       ref="formRef"
@@ -269,11 +274,11 @@ async function handleSocialLogin(type: Api.System.SocialSource) {
 </div> 
 -->
 
-    <div class="mt-24px w-full text-center text-18px text-#858585">
+    <div class="mt-24px w-full text-center text-18px text-[#858585]">
       您还没有账户？
-      <NA type="primary" class="text-18px" @click="toggleLoginModule('register')">
+      <NButton text type="primary" class="text-18px" @click="toggleLoginModule('register')">
         {{ $t('page.login.common.register') }}
-      </NA>
+      </NButton>
     </div>
   </div>
 </template>
