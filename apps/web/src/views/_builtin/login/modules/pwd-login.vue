@@ -7,6 +7,7 @@ import { fetchSocialAuthBinding } from '@/service/api/system';
 import { useAuthStore } from '@/store/modules/auth';
 import { useRouterPush } from '@/hooks/common/router';
 import { useFormRules, useNaiveForm } from '@/hooks/common/form';
+import { useCaptcha } from '@/hooks/business/captcha';
 import { localStg } from '@/utils/storage';
 import { $t } from '@/locales';
 
@@ -29,20 +30,29 @@ const tenantEnabled = ref<boolean>(false);
 const tenantOption = ref<SelectOption[]>([]);
 const quickLoginLoading = ref<Record<string, boolean>>({});
 
+// 登录模式：password（密码登录）| sms-code（验证码登录）
+type LoginMode = 'password' | 'sms-code';
+const loginMode = ref<LoginMode>('password');
+
+// 验证码登录倒计时 hooks
+const { label: smsLabel, isCounting: smsCounting, loading: codeSmsLoading, getCaptcha: getSmsCaptcha } = useCaptcha();
+
 interface PwdLoginForm {
   tenantId: string;
   username: string;
   password: string;
   code?: string;
   uuid?: string;
+  phone?: string;
 }
 
 // 标记 reactive 对象为原始对象，避免被 Vue 代理包装导致的无限递归
-const model = markRaw(reactive<PwdLoginForm>({
+const model = markRaw(reactive<PwdLoginForm & { phone: string }>({
   tenantId: '000000',
   username: '',
   password: '',
-  code: ''
+  code: '',
+  phone: ''
 }));
 
 // 标记 defaultAccounts 为原始对象
@@ -108,6 +118,15 @@ const rules = computed<Record<RuleKey, App.Global.FormRule[]>>(() => {
   };
 
   return loginRules;
+});
+
+// 验证码登录表单校验规则
+const smsCodeRules = computed<Record<'phone' | 'code', App.Global.FormRule[]>>(() => {
+  const { formRules } = useFormRules();
+  return {
+    phone: formRules.phone,
+    code: formRules.code
+  };
 });
 
 async function handleFetchTenantList() {
@@ -198,6 +217,12 @@ async function handleSubmit() {
   }
 }
 
+// 验证码登录提交
+async function handleSmsCodeSubmit() {
+  await validate();
+  window.$message?.success($t('page.login.common.validateSuccess'));
+}
+
 async function handleFetchCaptchaCode() {
   startCodeLoading();
   try {
@@ -250,23 +275,33 @@ function handleLoginRember() {
 }
 
 handleLoginRember();
-
-async function handleSocialLogin(type: Api.System.SocialSource) {
-  try {
-    const { data } = await fetchSocialAuthBinding(type, model.tenantId);
-    if (data) {
-      window.location.href = data;
-    }
-  } catch (error) {
-    // error handled by request interceptor
-  }
-}
 </script>
 
 <template>
   <div class="login-pwd-module">
     <div class="mb-8px text-28px text-black font-600 dark:text-white">登录账户</div>
     <div class="pb-16px text-14px text-[#858585]">欢迎回来！请输入您的账号和密码</div>
+
+    <!-- 登录模式切换：密码登录 / 验证码登录 -->
+    <div class="login-mode-tabs mb-20px flex rounded-8px bg-gray-100 dark:bg-gray-800 p-1">
+      <div
+        class="login-mode-tab flex-1 cursor-pointer rounded-6px px-16px py-10px text-center text-14px font-500 transition-all"
+        :class="loginMode === 'password' ? 'bg-white dark:bg-gray-700 text-primary shadow-sm dark:text-white' : 'text-gray-500 dark:text-gray-400'"
+        @click="loginMode = 'password'"
+      >
+        密码登录
+      </div>
+      <div
+        class="login-mode-tab flex-1 cursor-pointer rounded-6px px-16px py-10px text-center text-14px font-500 transition-all"
+        :class="loginMode === 'sms-code' ? 'bg-white dark:bg-gray-700 text-primary shadow-sm dark:text-white' : 'text-gray-500 dark:text-gray-400'"
+        @click="loginMode = 'sms-code'"
+      >
+        验证码登录
+      </div>
+    </div>
+
+    <!-- 密码登录表单 -->
+    <template v-if="loginMode === 'password'">
 
     <!-- 预设默认账号快捷填充面板 -->
     <div class="demo-card mb-20px p-12px rounded-8px border border-primary/20 bg-primary/5">
@@ -404,7 +439,46 @@ async function handleSocialLogin(type: Api.System.SocialSource) {
         {{ $t('page.login.common.register') }}
       </NButton>
     </div>
-  </div>
+  </template>
+
+  <!-- 验证码登录表单 -->
+  <template v-else>
+    <NForm
+      ref="formRef"
+      :model="model"
+      :rules="smsCodeRules"
+      size="large"
+      :show-label="false"
+      class="login-form"
+      @keyup.enter="() => !codeSmsLoading && handleSmsCodeSubmit()"
+    >
+      <NFormItem path="phone">
+        <NInput v-model:value="model.phone" :placeholder="$t('page.login.common.phonePlaceholder')" />
+      </NFormItem>
+      <NFormItem path="code">
+        <div class="w-full flex-y-center gap-16px">
+          <NInput v-model:value="model.code" :placeholder="$t('page.login.common.codePlaceholder')" />
+          <NButton
+            size="large"
+            :disabled="smsCounting"
+            :loading="codeSmsLoading"
+            @click="getSmsCaptcha(model.phone)"
+          >
+            {{ smsLabel }}
+          </NButton>
+        </div>
+      </NFormItem>
+      <NSpace vertical :size="20" class="w-full">
+        <NButton type="primary" size="large" block :loading="codeSmsLoading" @click="handleSmsCodeSubmit">
+          {{ $t('page.login.codeLogin.login') }}
+        </NButton>
+        <NButton size="large" block @click="loginMode = 'password'">
+          {{ $t('page.login.common.back') }}
+        </NButton>
+      </NSpace>
+    </NForm>
+  </template>
+</div>
 </template>
 
 <style scoped>
@@ -419,6 +493,11 @@ async function handleSocialLogin(type: Api.System.SocialSource) {
     height: 42px;
     width: 100%;
   }
+}
+
+/* 登录模式切换 Tab */
+.login-mode-tab {
+  user-select: none;
 }
 
 :deep(.n-form-item .n-form-item-label) {
