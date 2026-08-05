@@ -9,6 +9,12 @@ pnpm --filter @nest-admin/server prisma:generate 2>&1
 
 sudo docker-compose -f docker-compose-postgres.yml up -d
 
+## postgres账号密码
+数据库名称：nest_admin
+账号 (username)：postgres
+密码 (password)：postgres
+端口：5432
+
 
 ## 1. 项目简介
 

@@ -98,7 +98,12 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
       throw new Error('PostgreSQL configuration (db.postgresql) is missing.');
     }
 
+    // 调试日志：输出完整配置（密码隐藏）
+    this.logger.debug(`[DEBUG] PostgreSQL Config - host: ${pgConfig.host}, port: ${pgConfig.port}, database: ${pgConfig.database}, user: ${pgConfig.username}, ssl: ${pgConfig.ssl}, schema: ${pgConfig.schema}`);
+
     const connectionString = PrismaService.buildConnectionString(pgConfig);
+    this.logger.debug(`[DEBUG] Prisma 连接字符串（密码已隐藏）: ${connectionString.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')}`);
+
     this._client = createExtendedPrismaClient(connectionString, this.slowQueryLogs);
   }
 
@@ -331,8 +336,12 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
       params.set('schema', schema);
     }
 
+    // 明确设置 SSL 模式，避免 PostgreSQL 默认行为导致 TLS 握手失败
     if (ssl) {
       params.set('sslmode', 'require');
+    } else {
+      // 即使禁用 SSL，也要明确设置，防止客户端自动尝试 TLS
+      params.set('sslmode', 'disable');
     }
 
     const query = params.toString();

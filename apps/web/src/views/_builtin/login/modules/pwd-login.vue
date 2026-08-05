@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref, nextTick } from 'vue';
+import { computed, reactive, ref, nextTick, markRaw } from 'vue';
 import type { SelectOption, InputInst } from 'naive-ui';
 import { useLoading } from '@sa/hooks';
 import { fetchAuthGetCaptcha, fetchAuthGetTenantList } from '@/service/api';
@@ -27,6 +27,7 @@ const registerEnabled = ref<boolean>(true);
 const remberMe = ref<boolean>(false);
 const tenantEnabled = ref<boolean>(false);
 const tenantOption = ref<SelectOption[]>([]);
+const quickLoginLoading = ref<Record<string, boolean>>({});
 
 interface PwdLoginForm {
   tenantId: string;
@@ -36,40 +37,62 @@ interface PwdLoginForm {
   uuid?: string;
 }
 
-const model: PwdLoginForm = reactive({
+// 标记 reactive 对象为原始对象，避免被 Vue 代理包装导致的无限递归
+const model = markRaw(reactive<PwdLoginForm>({
   tenantId: '000000',
   username: '',
   password: '',
   code: ''
-});
+}));
 
-// 系统预设默认测试账号
-const defaultAccounts = [
+// 标记 defaultAccounts 为原始对象
+const defaultAccounts = markRaw([
   { label: '管理员', username: 'admin', password: 'admin123', desc: '系统全权管理' },
   { label: '测试员', username: 'test', password: 'admin123', desc: '测试业务功能' },
   { label: '演示员', username: 'demo', password: 'demo123', desc: '演示体验账号' }
-];
+]);
 
 // 填入指定账户
 function handleQuickFill(acc: { username: string; password: string }) {
   model.tenantId = '000000';
   model.username = acc.username;
   model.password = acc.password;
+
+  // 填入后聚焦到第一个输入框
+  nextTick(() => {
+    const usernameInput = document.querySelector('.login-form .n-input') as HTMLElement;
+    usernameInput?.click();
+  });
 }
 
 // 快速一键登录指定账户
 async function handleQuickLogin(acc: { username: string; password: string }) {
-  handleQuickFill(acc);
-
-  // 如果启用了验证码且尚未填写，提示用户输入验证码并聚焦
-  if (captchaEnabled.value && !model.code) {
-    window.$message?.info(`已填入账号【${acc.username}】，请输入验证码后登录`);
-    await nextTick();
-    codeInputRef.value?.focus();
+  // 防止重复点击
+  if (quickLoginLoading.value[acc.username]) {
     return;
   }
 
-  await handleSubmit();
+  quickLoginLoading.value[acc.username] = true;
+
+  try {
+    handleQuickFill(acc);
+
+    // 如果启用了验证码且尚未填写，提示用户输入验证码并聚焦
+    if (captchaEnabled.value && !model.code) {
+      window.$message?.info(`已填入账号【${acc.username}】，请输入验证码后登录`);
+      await nextTick();
+      codeInputRef.value?.focus();
+      return;
+    }
+
+    await handleSubmit();
+  } catch (error) {
+    // 捕获任何未处理的错误
+    console.error('快捷登录失败:', error);
+    window.$message?.error('登录失败，请重试');
+  } finally {
+    quickLoginLoading.value[acc.username] = false;
+  }
 }
 
 type RuleKey = Extract<keyof PwdLoginForm, 'username' | 'password' | 'code' | 'tenantId'>;
@@ -116,6 +139,8 @@ async function handleSubmit() {
   try {
     await validate();
   } catch (err) {
+    // 验证失败，显示提示
+    window.$message?.warning('请填写完整的登录信息');
     return;
   }
 
@@ -135,6 +160,40 @@ async function handleSubmit() {
       uuid: model.uuid
     });
   } catch (error) {
+    // 处理不同类型的登录错误，给出详细提示
+    const err = error as any;
+    const errMsg = err?.message || String(error) || '登录失败，请检查后重试';
+
+    // 账号相关错误
+    if (errMsg.includes('账号') || errMsg.includes('用户名') || errMsg.includes('user')) {
+      window.$message?.error('账号不存在或已被禁用，请检查用户名是否正确');
+    }
+    // 密码相关错误
+    else if (errMsg.includes('密码') || errMsg.includes('password') || errMsg.includes('凭据')) {
+      window.$message?.error('密码错误，请检查密码是否正确');
+    }
+    // 验证码相关错误
+    else if (errMsg.includes('验证码') || errMsg.includes('code') || errMsg.includes('captcha')) {
+      window.$message?.error('验证码错误或已过期，请重新输入验证码');
+    }
+    // 租户相关错误
+    else if (errMsg.includes('租户') || errMsg.includes('tenant')) {
+      window.$message?.error('租户选择无效，请确认租户编号是否正确');
+    }
+    // 账号锁定/禁用
+    else if (errMsg.includes('锁定') || errMsg.includes('禁用') || errMsg.includes('locked') || errMsg.includes('disabled')) {
+      window.$message?.error('账号已被锁定或禁用，请联系管理员');
+    }
+    // 网络错误
+    else if (errMsg.includes('Network Error') || errMsg.includes('ECONNREFUSED') || errMsg.includes('Failed to fetch')) {
+      window.$message?.error('无法连接到后端服务器 (127.0.0.1:8080)，请在终端运行 pnpm dev 启动后端！');
+    }
+    // 其他错误，显示原始错误信息
+    else {
+      window.$message?.error(errMsg);
+    }
+
+    // 刷新验证码
     handleFetchCaptchaCode();
   }
 }
@@ -155,14 +214,33 @@ async function handleFetchCaptchaCode() {
         codeUrl.value = `data:image/gif;base64,${data.img}`;
       }
     }
-  } catch (error) {
-    // error handled by request interceptor
+  } catch (error: any) {
+    // 详细错误处理
+    console.error('获取验证码失败:', error);
+    const errMsg = error?.message || String(error) || '';
+
+    if (errMsg.includes('Network Error') || errMsg.includes('ECONNREFUSED')) {
+      window.$message?.error('无法连接到服务器，请确保后端服务已启动');
+    } else {
+      window.$message?.error('获取验证码失败，请刷新重试');
+    }
   } finally {
     endCodeLoading();
   }
 }
 
 handleFetchCaptchaCode();
+
+// 全局错误处理器 - 防止栈溢出崩溃
+window.addEventListener('error', (event) => {
+  if (event.message?.includes('Maximum call stack size exceeded')) {
+    console.error('检测到栈溢出错误，已阻止崩溃');
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    window.$message?.error('页面发生错误，请刷新重试');
+    return false;
+  }
+});
 
 function handleLoginRember() {
   const loginRember = localStg.get('loginRember');
@@ -212,10 +290,23 @@ async function handleSocialLogin(type: Api.System.SocialSource) {
             <div class="text-11px text-gray-400 truncate">{{ acc.username }}</div>
           </div>
           <div class="mt-8px flex items-center gap-4px">
-            <NButton size="tiny" secondary type="primary" class="flex-1" @click.stop="handleQuickFill(acc)">
+            <NButton
+              size="tiny"
+              secondary
+              type="primary"
+              class="flex-1"
+              :loading="quickLoginLoading[acc.username]"
+              @click.stop="handleQuickFill(acc)"
+            >
               填入
             </NButton>
-            <NButton size="tiny" type="primary" class="flex-1" :loading="authStore.loginLoading" @click.stop="handleQuickLogin(acc)">
+            <NButton
+              size="tiny"
+              type="primary"
+              class="flex-1"
+              :loading="quickLoginLoading[acc.username] || authStore.loginLoading"
+              @click.stop="handleQuickLogin(acc)"
+            >
               登录
             </NButton>
           </div>
@@ -351,5 +442,10 @@ async function handleSocialLogin(type: Api.System.SocialSource) {
 
 .demo-card {
   transition: all 0.2s ease-in-out;
+}
+
+.demo-card:hover {
+  border-color: var(--n-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 </style>

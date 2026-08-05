@@ -217,6 +217,7 @@ async function bootstrap() {
   //服务端口
   const port = config.app.port || 8080;
   await app.listen(port);
+  console.log('port接口地址',port,'portporttttt')
 
   // 使用 Logger 而不是 console.log
   const logger = new Logger('Bootstrap');
