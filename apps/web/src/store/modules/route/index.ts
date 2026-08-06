@@ -120,7 +120,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     }
 
     if (route.meta.icon?.startsWith('local-icon-')) {
-      route.meta.localIcon = route.meta.icon.replace('local-icon-', 'menu-');
+      route.meta.localIcon = route.meta.icon.replace('local-icon-', '');
       delete route.meta.icon;
     } else if (!isNotNull(route.meta.icon)) {
       route.meta.icon = defaultIcon;
@@ -332,6 +332,13 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     addRoutesToVueRouter(vueRoutes);
 
     getGlobalMenus(sortRoutes);
+
+    // DEBUG: 检查生成的 menus
+    console.log('DEBUG: menus after getGlobalMenus:', menus.value.map(m => ({
+      key: m.key,
+      label: m.label,
+      children: m.children?.length || 0
+    })));
 
     getCacheRoutes(vueRoutes);
   }

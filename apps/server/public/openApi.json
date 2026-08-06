@@ -1596,736 +1596,6 @@
         ]
       }
     },
-    "/api/v1/common/upload": {
-      "post": {
-        "description": "上传单个文件",
-        "operationId": "UploadController_singleFileUpload_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "上传的文件"
-                  }
-                },
-                "required": [
-                  "file"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "操作成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Result"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "additionalProperties": true,
-                          "description": "响应数据"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "未登录或登录已过期",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 401
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "请先登录"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "无权限访问",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 403
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "没有操作权限"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "服务器内部错误",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 500
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "系统异常"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Authorization": []
-          }
-        ],
-        "summary": "文件上传",
-        "tags": [
-          "通用-文件上传"
-        ]
-      }
-    },
-    "/api/v1/common/upload/chunk/uploadId": {
-      "get": {
-        "description": "初始化切片上传，获取任务ID",
-        "operationId": "UploadController_getChunkUploadId_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "操作成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Result"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "additionalProperties": true,
-                          "description": "响应数据"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "未登录或登录已过期",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 401
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "请先登录"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "无权限访问",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 403
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "没有操作权限"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "服务器内部错误",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 500
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "系统异常"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Authorization": []
-          }
-        ],
-        "summary": "获取切片上传任务Id",
-        "tags": [
-          "通用-文件上传"
-        ]
-      }
-    },
-    "/api/v1/common/upload/chunk": {
-      "post": {
-        "description": "上传文件分片",
-        "operationId": "UploadController_chunkFileUpload_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "文件分片数据"
-                  }
-                },
-                "required": [
-                  "file"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "操作成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Result"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "additionalProperties": true,
-                          "description": "响应数据"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "未登录或登录已过期",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 401
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "请先登录"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "无权限访问",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 403
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "没有操作权限"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "服务器内部错误",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 500
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "系统异常"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Authorization": []
-          }
-        ],
-        "summary": "文件分片上传",
-        "tags": [
-          "通用-文件上传"
-        ]
-      }
-    },
-    "/api/v1/common/upload/chunk/merge": {
-      "post": {
-        "description": "合并所有分片为完整文件",
-        "operationId": "UploadController_chunkMergeFile_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChunkMergeFileDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "操作成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Result"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "additionalProperties": true,
-                          "description": "响应数据"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "未登录或登录已过期",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 401
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "请先登录"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "无权限访问",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 403
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "没有操作权限"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "服务器内部错误",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 500
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "系统异常"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Authorization": []
-          }
-        ],
-        "summary": "文件分片合并",
-        "tags": [
-          "通用-文件上传"
-        ]
-      }
-    },
-    "/api/v1/common/upload/chunk/result": {
-      "get": {
-        "description": "查询切片上传任务的状态",
-        "operationId": "UploadController_getChunkUploadResult_v1",
-        "parameters": [
-          {
-            "name": "uploadId",
-            "required": true,
-            "in": "query",
-            "description": "上传任务ID",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "操作成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Result"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "additionalProperties": true,
-                          "description": "响应数据"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "未登录或登录已过期",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 401
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "请先登录"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "无权限访问",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 403
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "没有操作权限"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "服务器内部错误",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 500
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "系统异常"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Authorization": []
-          }
-        ],
-        "summary": "获取切片上传任务结果",
-        "tags": [
-          "通用-文件上传"
-        ]
-      }
-    },
-    "/api/v1/common/upload/cos/authorization": {
-      "get": {
-        "description": "获取腾讯云COS上传临时授权密钥",
-        "operationId": "UploadController_getAuthorization_v1",
-        "parameters": [
-          {
-            "name": "key",
-            "required": true,
-            "in": "query",
-            "description": "文件对象路径",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "操作成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Result"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "additionalProperties": true,
-                          "description": "响应数据"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "未登录或登录已过期",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 401
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "请先登录"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "无权限访问",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 403
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "没有操作权限"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "服务器内部错误",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "code": {
-                      "type": "number",
-                      "example": 500
-                    },
-                    "msg": {
-                      "type": "string",
-                      "example": "系统异常"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Authorization": []
-          }
-        ],
-        "summary": "获取cos授权",
-        "tags": [
-          "通用-文件上传"
-        ]
-      }
-    },
     "/api/v1/system/client": {
       "post": {
         "description": "创建客户端",
@@ -16480,6 +15750,33 @@
             "schema": {
               "$ref": "#/components/schemas/DateRangeDto"
             }
+          },
+          {
+            "name": "tableName",
+            "required": false,
+            "in": "query",
+            "description": "表名称（模糊查询）",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tableComment",
+            "required": false,
+            "in": "query",
+            "description": "表描述（模糊查询）",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataSourceId",
+            "required": false,
+            "in": "query",
+            "description": "数据源ID",
+            "schema": {
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -16647,12 +15944,30 @@
             }
           },
           {
-            "name": "dataName",
+            "name": "tableName",
             "required": false,
             "in": "query",
-            "description": "数据源名称",
+            "description": "表名称（模糊查询）",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "tableComment",
+            "required": false,
+            "in": "query",
+            "description": "表描述（模糊查询）",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dataSourceId",
+            "required": false,
+            "in": "query",
+            "description": "数据源ID",
+            "schema": {
+              "type": "number"
             }
           }
         ],
@@ -16881,7 +16196,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TableName"
+                "$ref": "#/components/schemas/ImportTablesDto"
               }
             }
           }
@@ -17362,7 +16677,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/GenTableUpdate"
+                "$ref": "#/components/schemas/UpdateGenTableDto"
               }
             }
           }
@@ -19735,7 +19050,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateProfileDto"
+                "$ref": "#/components/schemas/UpdateProfileRequestDto"
               }
             }
           }
@@ -19986,7 +19301,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdatePwdDto"
+                "$ref": "#/components/schemas/UpdatePwdRequestDto"
               }
             }
           }
@@ -20106,7 +19421,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateUserDto"
+                "$ref": "#/components/schemas/CreateUserRequestDto"
               }
             }
           }
@@ -20333,7 +19648,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
+                "$ref": "#/components/schemas/UpdateUserRequestDto"
               }
             }
           }
@@ -20453,7 +19768,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BatchCreateUserDto"
+                "$ref": "#/components/schemas/BatchCreateUserRequestDto"
               }
             }
           }
@@ -20471,7 +19786,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/BatchResultDto"
+                          "$ref": "#/components/schemas/BatchResultResponseDto"
                         }
                       }
                     }
@@ -20572,7 +19887,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BatchDeleteUserDto"
+                "$ref": "#/components/schemas/BatchDeleteUserRequestDto"
               }
             }
           }
@@ -20590,7 +19905,7 @@
                     {
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/BatchResultDto"
+                          "$ref": "#/components/schemas/BatchResultResponseDto"
                         }
                       }
                     }
@@ -21620,7 +20935,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangeUserStatusDto"
+                "$ref": "#/components/schemas/ChangeUserStatusRequestDto"
               }
             }
           }
@@ -21740,7 +21055,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResetPwdDto"
+                "$ref": "#/components/schemas/ResetPwdRequestDto"
               }
             }
           }
@@ -21980,7 +21295,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ListUserDto"
+                "$ref": "#/components/schemas/ListUserRequestDto"
               }
             }
           }
@@ -22690,6 +22005,60 @@
         "operationId": "FileManagerController_listFiles_v1",
         "parameters": [
           {
+            "name": "pageNum",
+            "required": false,
+            "in": "query",
+            "description": "页码（从1开始）",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "orderByColumn",
+            "required": false,
+            "in": "query",
+            "description": "排序字段",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isAsc",
+            "required": false,
+            "in": "query",
+            "description": "排序方向",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "params",
+            "required": false,
+            "in": "query",
+            "description": "时间范围",
+            "schema": {
+              "$ref": "#/components/schemas/DateRangeDto"
+            }
+          },
+          {
             "name": "folderId",
             "required": false,
             "in": "query",
@@ -22732,26 +22101,6 @@
             "description": "存储类型",
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "pageNum",
-            "required": false,
-            "in": "query",
-            "description": "页码",
-            "schema": {
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "pageSize",
-            "required": false,
-            "in": "query",
-            "description": "每页数量",
-            "schema": {
-              "default": 10,
-              "type": "number"
             }
           }
         ],
@@ -23918,6 +23267,60 @@
         "operationId": "FileManagerController_getRecycleList_v1",
         "parameters": [
           {
+            "name": "pageNum",
+            "required": false,
+            "in": "query",
+            "description": "页码（从1开始）",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "orderByColumn",
+            "required": false,
+            "in": "query",
+            "description": "排序字段",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isAsc",
+            "required": false,
+            "in": "query",
+            "description": "排序方向",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "params",
+            "required": false,
+            "in": "query",
+            "description": "时间范围",
+            "schema": {
+              "$ref": "#/components/schemas/DateRangeDto"
+            }
+          },
+          {
             "name": "folderId",
             "required": false,
             "in": "query",
@@ -23960,26 +23363,6 @@
             "description": "存储类型",
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "pageNum",
-            "required": false,
-            "in": "query",
-            "description": "页码",
-            "schema": {
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "pageSize",
-            "required": false,
-            "in": "query",
-            "description": "每页数量",
-            "schema": {
-              "default": 10,
-              "type": "number"
             }
           }
         ],
@@ -31980,7 +31363,7 @@
     "/api/v1/monitor/job/list": {
       "get": {
         "description": "分页查询定时任务列表",
-        "operationId": "JobController_list_v1",
+        "operationId": "JobController_findAll_v1",
         "parameters": [
           {
             "name": "pageNum",
@@ -32858,7 +32241,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ListJobDto"
+                "$ref": "#/components/schemas/ListJobRequestDto"
               }
             }
           }
@@ -32974,7 +32357,7 @@
     "/api/v1/monitor/jobLog/list": {
       "get": {
         "description": "分页查询定时任务执行日志",
-        "operationId": "JobLogController_list_v1",
+        "operationId": "JobLogController_findAll_v1",
         "parameters": [
           {
             "name": "pageNum",
@@ -33281,7 +32664,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ListJobLogDto"
+                "$ref": "#/components/schemas/ListJobLogRequestDto"
               }
             }
           }
@@ -34854,7 +34237,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ListLoginlogDto"
+                "$ref": "#/components/schemas/ListLoginlogRequestDto"
               }
             }
           }
@@ -35906,7 +35289,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/QueryOperLogDto"
+                "$ref": "#/components/schemas/ListOperLogRequestDto"
               }
             }
           }
@@ -39321,28 +38704,6 @@
         },
         "required": [
           "publicKey"
-        ]
-      },
-      "ChunkMergeFileDto": {
-        "type": "object",
-        "properties": {
-          "uploadId": {
-            "type": "string",
-            "description": "上传标识ID"
-          },
-          "fileName": {
-            "type": "string",
-            "description": "文件名称"
-          },
-          "folderId": {
-            "type": "number",
-            "description": "文件夹ID",
-            "default": 0
-          }
-        },
-        "required": [
-          "uploadId",
-          "fileName"
         ]
       },
       "DeviceTypeEnum": {
@@ -43614,24 +42975,215 @@
           }
         }
       },
-      "TableName": {
+      "ImportTablesDto": {
         "type": "object",
         "properties": {
           "tableNames": {
             "type": "string",
-            "description": "表名称列表"
+            "description": "表名称列表（逗号分隔）",
+            "example": "sys_user,sys_role"
+          },
+          "dataSourceId": {
+            "type": "number",
+            "description": "数据源ID"
+          },
+          "templateGroupId": {
+            "type": "number",
+            "description": "模板组ID"
           }
         },
         "required": [
           "tableNames"
         ]
       },
-      "GenTableUpdate": {
+      "GenTableColumnUpdateDto": {
+        "type": "object",
+        "properties": {
+          "columnId": {
+            "type": "number",
+            "description": "列ID"
+          },
+          "columnComment": {
+            "type": "string",
+            "description": "列描述"
+          },
+          "javaType": {
+            "type": "string",
+            "description": "Java 类型"
+          },
+          "javaField": {
+            "type": "string",
+            "description": "Java 字段名"
+          },
+          "isInsert": {
+            "type": "string",
+            "description": "是否为插入字段（1是）"
+          },
+          "isEdit": {
+            "type": "string",
+            "description": "是否编辑字段（1是）"
+          },
+          "isList": {
+            "type": "string",
+            "description": "是否列表字段（1是）"
+          },
+          "isQuery": {
+            "type": "string",
+            "description": "是否查询字段（1是）"
+          },
+          "queryType": {
+            "type": "string",
+            "description": "查询方式",
+            "enum": [
+              "EQ",
+              "NE",
+              "GT",
+              "GTE",
+              "LT",
+              "LTE",
+              "LIKE",
+              "BETWEEN"
+            ]
+          },
+          "isRequired": {
+            "type": "string",
+            "description": "是否必填（1是）"
+          },
+          "htmlType": {
+            "type": "string",
+            "description": "HTML 控件类型",
+            "enum": [
+              "input",
+              "textarea",
+              "select",
+              "radio",
+              "checkbox",
+              "datetime",
+              "imageUpload",
+              "fileUpload",
+              "editor"
+            ]
+          },
+          "dictType": {
+            "type": "string",
+            "description": "字典类型"
+          },
+          "sort": {
+            "type": "number",
+            "minimum": 0,
+            "description": "排序"
+          }
+        },
+        "required": [
+          "columnId"
+        ]
+      },
+      "UpdateGenTableDto": {
         "type": "object",
         "properties": {
           "tableId": {
             "type": "number",
             "description": "表ID"
+          },
+          "tableName": {
+            "type": "string",
+            "description": "表名称"
+          },
+          "tableComment": {
+            "type": "string",
+            "description": "表描述"
+          },
+          "className": {
+            "type": "string",
+            "description": "实体类名称（PascalCase）"
+          },
+          "packageName": {
+            "type": "string",
+            "description": "生成包路径"
+          },
+          "moduleName": {
+            "type": "string",
+            "description": "生成模块名（kebab-case）"
+          },
+          "businessName": {
+            "type": "string",
+            "description": "生成业务名（kebab-case）"
+          },
+          "functionName": {
+            "type": "string",
+            "description": "生成功能名"
+          },
+          "functionAuthor": {
+            "type": "string",
+            "description": "生成功能作者"
+          },
+          "tplCategory": {
+            "enum": [
+              "crud",
+              "tree",
+              "sub"
+            ],
+            "type": "string",
+            "description": "模板类型"
+          },
+          "tplWebType": {
+            "enum": [
+              "element-plus",
+              "naive-ui"
+            ],
+            "type": "string",
+            "description": "前端模板类型"
+          },
+          "genType": {
+            "type": "string",
+            "description": "生成类型（0: zip压缩包, 1: 自定义路径）"
+          },
+          "genPath": {
+            "type": "string",
+            "description": "生成路径"
+          },
+          "dataSourceId": {
+            "type": "number",
+            "description": "数据源ID"
+          },
+          "templateGroupId": {
+            "type": "number",
+            "description": "模板组ID"
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注"
+          },
+          "treeCode": {
+            "type": "string",
+            "description": "树编码字段（树形表必填）"
+          },
+          "treeParentCode": {
+            "type": "string",
+            "description": "树父编码字段（树形表必填）"
+          },
+          "treeName": {
+            "type": "string",
+            "description": "树名称字段（树形表必填）"
+          },
+          "subTableName": {
+            "type": "string",
+            "description": "子表名称（主子表必填）"
+          },
+          "subTableFkName": {
+            "type": "string",
+            "description": "子表外键名称（主子表必填）"
+          },
+          "options": {
+            "type": "string",
+            "description": "其他选项（JSON格式）"
+          },
+          "columns": {
+            "description": "列配置列表",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GenTableColumnUpdateDto"
+            }
           }
         },
         "required": [
@@ -44624,7 +44176,7 @@
           "permissions"
         ]
       },
-      "UpdateProfileDto": {
+      "UpdateProfileRequestDto": {
         "type": "object",
         "properties": {
           "nickName": {
@@ -44675,7 +44227,7 @@
           "imgUrl"
         ]
       },
-      "UpdatePwdDto": {
+      "UpdatePwdRequestDto": {
         "type": "object",
         "properties": {
           "oldPassword": {
@@ -44696,7 +44248,7 @@
           "newPassword"
         ]
       },
-      "CreateUserDto": {
+      "CreateUserRequestDto": {
         "type": "object",
         "properties": {
           "deptId": {
@@ -44795,7 +44347,7 @@
           "password"
         ]
       },
-      "BatchResultItem": {
+      "BatchResultItemResponseDto": {
         "type": "object",
         "properties": {
           "index": {
@@ -44820,7 +44372,7 @@
           "success"
         ]
       },
-      "BatchResultDto": {
+      "BatchResultResponseDto": {
         "type": "object",
         "properties": {
           "successCount": {
@@ -44839,7 +44391,7 @@
             "description": "详细结果",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/BatchResultItem"
+              "$ref": "#/components/schemas/BatchResultItemResponseDto"
             }
           }
         },
@@ -44850,7 +44402,7 @@
           "results"
         ]
       },
-      "BatchCreateUserItemDto": {
+      "BatchCreateUserItemRequestDto": {
         "type": "object",
         "properties": {
           "deptId": {
@@ -44926,7 +44478,7 @@
           "password"
         ]
       },
-      "BatchCreateUserDto": {
+      "BatchCreateUserRequestDto": {
         "type": "object",
         "properties": {
           "users": {
@@ -44935,7 +44487,7 @@
             "description": "用户列表",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/BatchCreateUserItemDto"
+              "$ref": "#/components/schemas/BatchCreateUserItemRequestDto"
             }
           }
         },
@@ -44943,7 +44495,7 @@
           "users"
         ]
       },
-      "BatchDeleteUserDto": {
+      "BatchDeleteUserRequestDto": {
         "type": "object",
         "properties": {
           "userIds": {
@@ -45094,7 +44646,7 @@
           "list"
         ]
       },
-      "ChangeUserStatusDto": {
+      "ChangeUserStatusRequestDto": {
         "type": "object",
         "properties": {
           "userId": {
@@ -45114,7 +44666,7 @@
           "status"
         ]
       },
-      "UpdateUserDto": {
+      "UpdateUserRequestDto": {
         "type": "object",
         "properties": {
           "deptId": {
@@ -45215,7 +44767,7 @@
           "userId"
         ]
       },
-      "ResetPwdDto": {
+      "ResetPwdRequestDto": {
         "type": "object",
         "properties": {
           "userId": {
@@ -45234,7 +44786,7 @@
           "password"
         ]
       },
-      "ListUserDto": {
+      "ListUserRequestDto": {
         "type": "object",
         "properties": {
           "pageNum": {
@@ -47852,7 +47404,7 @@
           "success"
         ]
       },
-      "ListJobDto": {
+      "ListJobRequestDto": {
         "type": "object",
         "properties": {
           "pageNum": {
@@ -48013,7 +47565,7 @@
           "success"
         ]
       },
-      "ListJobLogDto": {
+      "ListJobLogRequestDto": {
         "type": "object",
         "properties": {
           "pageNum": {
@@ -48485,7 +48037,7 @@
           "affected"
         ]
       },
-      "ListLoginlogDto": {
+      "ListLoginlogRequestDto": {
         "type": "object",
         "properties": {
           "pageNum": {
@@ -48809,7 +48361,7 @@
           "total"
         ]
       },
-      "QueryOperLogDto": {
+      "ListOperLogRequestDto": {
         "type": "object",
         "properties": {
           "operId": {

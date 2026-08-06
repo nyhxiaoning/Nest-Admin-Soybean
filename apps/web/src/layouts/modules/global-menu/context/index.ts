@@ -31,6 +31,10 @@ function useMixMenu() {
   }
 
   function getActiveFirstLevelMenuKey() {
+    if (!selectedKey.value) {
+      return;
+    }
+
     const [firstLevelRouteName] = selectedKey.value.split('_');
 
     setActiveFirstLevelMenuKey(firstLevelRouteName);
@@ -65,6 +69,11 @@ function useMixMenu() {
   }
 
   function getActiveSecondLevelMenuKey() {
+    if (!selectedKey.value) {
+      setActiveSecondLevelMenuKey('');
+      return;
+    }
+
     const keys = selectedKey.value.split('_');
 
     if (keys.length < 2) {
@@ -133,7 +142,11 @@ export function useMenu() {
     const { hideInMenu, activeMenu } = route.meta;
     const name = route.name as string;
 
-    const routeName = (hideInMenu ? activeMenu : name) || name;
+    if (!name) {
+      return '';
+    }
+
+    const routeName = hideInMenu ? (activeMenu || name) : name;
 
     return routeName;
   });

@@ -1,14 +1,25 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue';
-import type { SelectOption } from 'naive-ui';
+import { computed, reactive, ref, nextTick, markRaw } from 'vue';
+import type { SelectOption, InputInst } from 'naive-ui';
+import {
+  NButton,
+  NForm,
+  NFormItem,
+  NSelect,
+  NInput,
+  NCheckbox,
+  NSpin,
+  NEmpty,
+  NConfigProvider
+} from 'naive-ui';
 import { useLoading } from '@sa/hooks';
 import { fetchAuthGetCaptcha, fetchAuthGetTenantList } from '@/service/api';
-import { fetchSocialAuthBinding } from '@/service/api/system';
 import { useAuthStore } from '@/store/modules/auth';
 import { useRouterPush } from '@/hooks/common/router';
 import { useFormRules, useNaiveForm } from '@/hooks/common/form';
 import { localStg } from '@/utils/storage';
 import { $t } from '@/locales';
+
 defineOptions({
   name: 'PwdLogin'
 });
@@ -19,14 +30,15 @@ const { formRef, validate } = useNaiveForm();
 const { loading: codeLoading, startLoading: startCodeLoading, endLoading: endCodeLoading } = useLoading();
 const { loading: tenantLoading, startLoading: startTenantLoading, endLoading: endTenantLoading } = useLoading();
 
+const codeInputRef = ref<InputInst | null>(null);
 const codeUrl = ref<string>();
-const captchaEnabled = ref<boolean>(false);
-const registerEnabled = ref<boolean>(true);
+  // 是否打开验证码
+const captchaEnabled = ref<boolean>(true);
 const remberMe = ref<boolean>(false);
-
 const tenantEnabled = ref<boolean>(false);
-
 const tenantOption = ref<SelectOption[]>([]);
+const quickLoginLoading = reactive<Record<string, boolean>>({});
+const autoFilledCode = ref<boolean>(true); // 标记是否已自动填充验证码
 
 interface PwdLoginForm {
   tenantId: string;
@@ -34,61 +46,89 @@ interface PwdLoginForm {
   password: string;
   code?: string;
   uuid?: string;
+  clientId?: string;
+  grantType?: string;
+  rememberMe?: boolean;
 }
 
-const model: PwdLoginForm = reactive({
+const model = markRaw(reactive<PwdLoginForm>({
   tenantId: '000000',
   username: '',
-  password: ''
-});
+  password: '',
+  code: '',
+  clientId: 'pc', // 默认客户端ID
+  grantType: 'password', // 默认授权类型
+  rememberMe: false // 默认不记住密码
+}));
 
-// 演示账户一键登录
-async function handleDemoLogin() {
+const defaultAccounts = markRaw([
+  { label: '管理员', username: 'admin', password: 'admin123', desc: '系统全权管理' },
+  { label: '测试员', username: 'test', password: 'admin123', desc: '测试业务功能' },
+  { label: '演示员', username: 'demo', password: 'demo123', desc: '演示体验账号' }
+]);
+
+function handleQuickFill(acc: { username: string; password: string }) {
   model.tenantId = '000000';
-  model.username = 'demo';
-  model.password = 'demo123';
-  if (captchaEnabled.value) {
-    model.code = '';
-  }
-  // 填充后直接触发登录，无需手动点登录按钮
-  await handleSubmit();
+  model.username = acc.username;
+  model.password = acc.password;
+  // 重置验证码状态
+  autoFilledCode.value = false;
+  model.code = '';
+  nextTick(() => {
+    const usernameInput = document.querySelector('.login-form .n-input') as HTMLElement;
+    usernameInput?.click();
+  });
 }
 
-// 是否显示演示账户卡片：初始显示，填写过用户名后隐藏
-const showDemoCard = computed(() => model.username === '');
+async function handleQuickLogin(acc: { username: string; password: string }) {
+  if (quickLoginLoading[acc.username]) return;
+
+  quickLoginLoading[acc.username] = true;
+  try {
+    handleQuickFill(acc);
+    if (captchaEnabled.value && !model.code) {
+      window.$message?.info(`已填入账号【${acc.username}】，请输入验证码后登录`);
+      await nextTick();
+      codeInputRef.value?.focus();
+      return;
+    }
+    await handleSubmit();
+  } catch (error) {
+    console.error('快捷登录失败:', error);
+    window.$message?.error('登录失败，请重试');
+  } finally {
+    quickLoginLoading[acc.username] = false;
+  }
+}
 
 type RuleKey = Extract<keyof PwdLoginForm, 'username' | 'password' | 'code' | 'tenantId'>;
 
 const rules = computed<Record<RuleKey, App.Global.FormRule[]>>(() => {
-  // inside computed to make locale reactive, if not apply i18n, you can define it without computed
   const { formRules, createRequiredRule } = useFormRules();
 
   const loginRules: Record<RuleKey, App.Global.FormRule[]> = {
-    username: [...formRules.userName, { required: true }],
-    password: [createRequiredRule($t('form.pwd.required'))],
+    username: [...formRules.userName, { required: true, message: '请输入账号/用户名' }],
+    password: [createRequiredRule('请输入密码')],
     code: captchaEnabled.value ? [createRequiredRule($t('form.code.required'))] : [],
     tenantId: tenantEnabled.value ? formRules.tenantId : []
   };
 
   return loginRules;
 });
+
 async function handleFetchTenantList() {
   startTenantLoading();
   try {
     const { data } = await fetchAuthGetTenantList();
-    if (!data) {
-      return;
-    }
+    if (!data) return;
     tenantEnabled.value = data.tenantEnabled;
     if (data.tenantEnabled) {
-      tenantOption.value = data.voList.map(tenant => {
-        return {
-          label: tenant.companyName,
-          value: tenant.tenantId
-        };
-      });
+      tenantOption.value = data.voList.map(tenant => ({
+        label: tenant.companyName,
+        value: tenant.tenantId
+      }));
     }
-  } catch (error) {
+  } catch {
     // error handled by request interceptor
   } finally {
     endTenantLoading();
@@ -98,24 +138,56 @@ async function handleFetchTenantList() {
 handleFetchTenantList();
 
 async function handleSubmit() {
-  await validate();
-  // 勾选了需要记住密码设置在 localStorage 中设置记住用户名和密码
-  if (remberMe.value) {
+  // 1. 表单校验
+  try {
+    await validate();
+  } catch {
+    window.$message?.warning('请填写完整的登录信息');
+    return;
+  }
+
+  // 2. 记住我
+  if (model.rememberMe) {
     const { tenantId, username, password } = model;
     localStg.set('loginRember', { tenantId, username, password });
   } else {
-    // 否则移除
     localStg.remove('loginRember');
   }
+
+  // 3. 调用登录接口
   try {
     await authStore.login({
       tenantId: model.tenantId,
       username: model.username,
       password: model.password,
-      code: model.code,
-      uuid: model.uuid
+      code: model.code || undefined,
+      uuid: model.uuid || undefined,
+      clientId: model.clientId || 'pc', // 默认客户端ID
+      grantType: model.grantType || 'password', // 默认授权类型
+      rememberMe: model.rememberMe // 记住密码选项
     });
   } catch (error) {
+    // 4. 错误分类提示
+    const err = error as any;
+    const errMsg = err?.message || String(error) || '登录失败，请检查后重试';
+
+    if (errMsg.includes('账号') || errMsg.includes('用户名') || errMsg.includes('user')) {
+      window.$message?.error('账号不存在或已被禁用，请检查用户名是否正确');
+    } else if (errMsg.includes('密码') || errMsg.includes('password') || errMsg.includes('凭据')) {
+      window.$message?.error('密码错误，请检查密码是否正确');
+    } else if (errMsg.includes('验证码') || errMsg.includes('code') || errMsg.includes('captcha')) {
+      window.$message?.error('验证码错误或已过期，请重新输入验证码');
+    } else if (errMsg.includes('租户') || errMsg.includes('tenant')) {
+      window.$message?.error('租户选择无效，请确认租户编号是否正确');
+    } else if (errMsg.includes('锁定') || errMsg.includes('禁用') || errMsg.includes('locked') || errMsg.includes('disabled')) {
+      window.$message?.error('账号已被锁定或禁用，请联系管理员');
+    } else if (errMsg.includes('Network Error') || errMsg.includes('ECONNREFUSED') || errMsg.includes('Failed to fetch')) {
+      window.$message?.error('无法连接到后端服务器 (127.0.0.1:8080)，请在终端运行 pnpm dev 启动后端！');
+    } else {
+      window.$message?.error(errMsg);
+    }
+
+    // 5. 登录失败后刷新验证码
     handleFetchCaptchaCode();
   }
 }
@@ -124,29 +196,70 @@ async function handleFetchCaptchaCode() {
   startCodeLoading();
   try {
     const { data } = await fetchAuthGetCaptcha();
-    if (!data) {
-      return;
-    }
+    if (!data) return;
+
     captchaEnabled.value = data.captchaEnabled;
+
+    // 如果开启了验证码，获取新的验证码
     if (data.captchaEnabled && data.img) {
       model.uuid = data.uuid;
-      // 支持 SVG 和 base64 两种格式
+      autoFilledCode.value = false; // 重置自动填充状态
+      model.code = ''; // 清空验证码输入
+
+      // 处理验证码图片
       if (data.img.startsWith('<svg')) {
-        // SVG 格式：转换为 data URL
         codeUrl.value = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(data.img)))}`;
       } else {
-        // base64 格式
         codeUrl.value = `data:image/gif;base64,${data.img}`;
       }
+
+      // 自动聚焦到验证码输入框
+      await nextTick();
+      codeInputRef.value?.focus();
     }
-  } catch (error) {
-    // error handled by request interceptor
+  } catch (error: any) {
+    console.error('获取验证码失败:', error);
+    const errMsg = error?.message || String(error) || '';
+    if (errMsg.includes('Network Error') || errMsg.includes('ECONNREFUSED')) {
+      window.$message?.error('无法连接到服务器，请确保后端服务已启动');
+    } else {
+      window.$message?.error('获取验证码失败，请刷新重试');
+    }
   } finally {
     endCodeLoading();
   }
 }
 
+/**
+ * 自动填充验证码（如果后端支持返回验证码文本）
+ * @param captchaText 验证码文本
+ */
+function autoFillCaptcha(captchaText: string) {
+  if (captchaText && captchaEnabled.value) {
+    model.code = captchaText;
+    autoFilledCode.value = true;
+    window.$message?.success('验证码已自动填充');
+  }
+}
+
+/**
+ * 刷新验证码并自动聚焦
+ */
+function refreshCaptchaAndFocus() {
+  handleFetchCaptchaCode();
+}
+
 handleFetchCaptchaCode();
+
+// 全局错误处理器
+window.addEventListener('error', (event) => {
+  if (event.message?.includes('Maximum call stack size exceeded')) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    window.$message?.error('页面发生错误，请刷新重试');
+    return false;
+  }
+});
 
 function handleLoginRember() {
   const loginRember = localStg.get('loginRember');
@@ -156,127 +269,149 @@ function handleLoginRember() {
 }
 
 handleLoginRember();
-
-// async function handleRegister() {
-//   const { data, error } = await fetchGetConfigDetail('sys.account.registerUser');
-//   if (error) return;
-//   registerEnabled.value = data.configValue === 'true';
-// }
-
-// handleRegister();
-
-async function handleSocialLogin(type: Api.System.SocialSource) {
-  try {
-    const { data } = await fetchSocialAuthBinding(type, model.tenantId);
-    if (data) {
-      window.location.href = data;
-    }
-  } catch (error) {
-    // error handled by request interceptor
-  }
-}
 </script>
 
 <template>
-  <div>
-    <div class="mb-5px text-32px text-black font-600 dark:text-white">登录到您的账户</div>
-    <div class="pb-18px text-16px text-[#858585]">欢迎回来！请输入您的账户信息</div>
+  <div class="login-pwd-module">
+    <div class="mb-8px text-28px text-black font-600 dark:text-white">{{ $t('page.login.pwdLogin.title') }}</div>
+    <div class="pb-16px text-14px text-[#858585]">{{ $t('page.login.pwdLogin.subTitle') }}</div>
 
-    <!-- 演示账户一键登录 -->
-    <NButton v-if="showDemoCard" text block class="demo-card-btn" @click="handleDemoLogin">
-      <template #icon>
-        <icon-carbon:user-avatar class="text-24px" />
-      </template>
-      <div class="flex-col gap-4px text-left">
-        <div class="text-16px font-600">演示账户一键登录</div>
-        <div class="text-12px opacity-70">点击即可以 demo / demo123 进入系统</div>
+    <!-- 预设默认账号快捷填充面板 -->
+    <div class="demo-card mb-20px p-12px rounded-8px border border-primary/20 bg-primary/5">
+      <div class="mb-8px flex items-center justify-between text-12px font-600 text-gray-700 dark:text-gray-300">
+        <span class="flex items-center gap-4px">
+          <icon-carbon-user-avatar class="text-16px text-primary" />
+          快捷填入预设账号2222
+        </span>
+        <span class="text-11px text-gray-400 font-normal">默认租户: 000000</span>
       </div>
-      <template #suffix>
-        <icon-carbon:arrow-right class="text-20px opacity-60" />
-      </template>
-    </NButton>
+      <div class="grid grid-cols-3 gap-8px">
+        <div
+          v-for="acc in defaultAccounts"
+          :key="acc.username"
+          class="p-8px rounded-6px bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex flex-col justify-between hover:border-primary transition-all"
+        >
+          <div>
+            <div class="text-12px font-600 text-gray-800 dark:text-gray-100">
+              <span>{{ acc.label }}</span>
+            </div>
+            <div class="text-11px text-gray-400 truncate">{{ acc.username }}</div>
+          </div>
+          <div class="mt-8px flex items-center gap-4px">
+            <NButton
+              size="tiny"
+              secondary
+              type="primary"
+              class="flex-1"
+              :loading="quickLoginLoading[acc.username]"
+              @click.stop="handleQuickFill(acc)"
+            >
+              填入
+            </NButton>
+            <NButton
+              size="tiny"
+              type="primary"
+              class="flex-1"
+              :loading="quickLoginLoading[acc.username] || authStore.loginLoading"
+              @click.stop="handleQuickLogin(acc)"
+            >
+              登录
+            </NButton>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <NForm
       ref="formRef"
       :model="model"
       :rules="rules"
       size="large"
-      :show-label="false"
+      :show-label="true"
+      label-placement="top"
+      class="login-form"
       @keyup.enter="() => !authStore.loginLoading && handleSubmit()"
     >
-      <NFormItem v-if="tenantEnabled" path="tenantId">
+      <NFormItem v-if="tenantEnabled" label="租户" path="tenantId">
         <NSelect
           v-model:value="model.tenantId"
-          placeholder="请选择租户"
+          placeholder="请选择所属租户"
           :options="tenantOption"
           :loading="tenantLoading"
-        />
+        >
+          <template #prefix>
+            <icon-carbon-enterprise class="text-18px text-gray-400" />
+          </template>
+        </NSelect>
       </NFormItem>
-      <NFormItem path="username">
-        <NInput v-model:value="model.username" :placeholder="$t('page.login.common.userNamePlaceholder')" />
+
+      <NFormItem label="账号 / 用户名" path="username">
+        <NInput
+          v-model:value="model.username"
+          placeholder="请输入用户名/手机号/邮箱"
+          clearable
+        >
+          <template #prefix>
+            <icon-carbon-user class="text-18px text-gray-400" />
+          </template>
+        </NInput>
       </NFormItem>
-      <NFormItem path="password">
+
+      <NFormItem label="密码" path="password">
         <NInput
           v-model:value="model.password"
           type="password"
           show-password-on="click"
-          :placeholder="$t('page.login.common.passwordPlaceholder')"
-        />
+          placeholder="请输入登录密码"
+          clearable
+        >
+          <template #prefix>
+            <icon-carbon-password class="text-18px text-gray-400" />
+          </template>
+        </NInput>
       </NFormItem>
-      <NFormItem v-if="captchaEnabled" path="code">
-        <div class="w-full flex-y-center gap-16px">
-          <NInput v-model:value="model.code" :placeholder="$t('page.login.common.codePlaceholder')" />
-          <NSpin :show="codeLoading" :size="28" class="h-42px">
-            <NButton :focusable="false" class="login-code h-42px w-136px" @click="handleFetchCaptchaCode">
-              <img v-if="codeUrl" :src="codeUrl" />
-              <NEmpty v-else :show-icon="false" description="暂无验证码" />
+
+      <NFormItem v-if="captchaEnabled" label="验证码" path="code">
+        <div class="w-full flex-y-center gap-12px">
+          <NInput
+            ref="codeInputRef"
+            v-model:value="model.code"
+            placeholder="请输入右侧验证码"
+            clearable
+          >
+            <template #prefix>
+              <icon-carbon-security class="text-18px text-gray-400" />
+            </template>
+          </NInput>
+          <NSpin :show="codeLoading" :size="24" class="h-42px">
+            <NButton :focusable="false" class="login-code h-42px w-130px" @click="handleFetchCaptchaCode">
+              <img v-if="codeUrl" :src="codeUrl" alt="验证码" class="h-full w-full object-cover" />
+              <NEmpty v-else description="点击获取" />
             </NButton>
           </NSpin>
         </div>
       </NFormItem>
-      <NSpace vertical :size="12" class="mb-8px">
-        <div class="mx-6px mb-8px flex-y-center justify-between">
-          <NCheckbox v-model:checked="remberMe" size="large">{{ $t('page.login.pwdLogin.rememberMe') }}</NCheckbox>
-          <!--
- <NA type="primary" class="text-18px" @click="toggleLoginModule('reset-pwd')">
-            {{ $t('page.login.pwdLogin.forgetPassword') }}
-          </NA> 
--->
-        </div>
+
+      <div class="mb-16px flex-y-center justify-between">
+        <NCheckbox v-model:checked="remberMe" size="medium">{{ $t('page.login.pwdLogin.rememberMe') }}</NCheckbox>
+        <NButton text type="primary" size="small" @click="toggleLoginModule('reset-pwd')">
+          {{ $t('page.login.pwdLogin.forgetPassword') }}
+        </NButton>
+      </div>
+
+      <NSpace vertical :size="12" class="w-full">
         <NButton type="primary" size="large" block :loading="authStore.loginLoading" @click="handleSubmit">
           {{ $t('common.login') }}
         </NButton>
-        <NButton v-if="registerEnabled" size="large" block @click="toggleLoginModule('register')">
-          {{ $t('page.login.common.register') }}
+        <NButton size="large" block @click="toggleLoginModule('code-login')">
+          {{ $t('page.login.common.useCodeLogin') }}
         </NButton>
       </NSpace>
     </NForm>
-    <!-- 
-    <NDivider>
-      <div class="color-#858585">{{ $t('page.login.pwdLogin.otherAccountLogin') }}</div>
-    </NDivider> 
--->
 
-    <!--
- <div class="w-full flex-y-center gap-16px">
-      <NButton class="flex-1" @click="handleSocialLogin('gitee')">
-        <template #icon>
-          <icon-simple-icons:gitee class="color-#c71d23" />
-        </template>
-<span class="ml-6px">Gitee</span>
-</NButton>
-<NButton class="flex-1" @click="handleSocialLogin('github')">
-  <template #icon>
-          <icon-mdi:github class="color-#010409" />
-        </template>
-  <span class="ml-6px">GitHub</span>
-</NButton>
-</div> 
--->
-
-    <div class="mt-24px w-full text-center text-18px text-[#858585]">
-      您还没有账户？
-      <NButton text type="primary" class="text-18px" @click="toggleLoginModule('register')">
+    <div class="mt-20px w-full text-center text-14px text-[#858585]">
+      还没有账户？
+      <NButton text type="primary" class="font-600" @click="toggleLoginModule('register')">
         {{ $t('page.login.common.register') }}
       </NButton>
     </div>
@@ -286,78 +421,42 @@ async function handleSocialLogin(type: Api.System.SocialSource) {
 <style scoped>
 .login-code {
   &.n-button {
-    --n-padding: 0 8px !important;
-    background-color: #c0c0c0;
+    --n-padding: 0 !important;
+    background-color: #f3f4f6;
+    overflow: hidden;
   }
 
   img {
     height: 42px;
+    width: 100%;
   }
+}
+
+.demo-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.demo-card:hover {
+  border-color: var(--n-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.n-form-item .n-form-item-label) {
+  font-weight: 500;
+  font-size: 14px;
+  padding-bottom: 4px;
 }
 
 :deep(.n-base-selection),
 :deep(.n-input) {
   --n-height: 42px !important;
-  --n-font-size: 16px !important;
+  --n-font-size: 15px !important;
   --n-border-radius: 8px !important;
-}
-
-:deep(.n-base-selection-label) {
-  padding: 0 6px !important;
-}
-
-:deep(.n-checkbox) {
-  --n-size: 18px !important;
-  --n-font-size: 16px !important;
 }
 
 :deep(.n-button) {
   --n-height: 42px !important;
-  --n-font-size: 18px !important;
-  --n-border-radius: 8px !important;
-}
-
-:deep(.n-divider) {
   --n-font-size: 16px !important;
-  --n-font-weight: 400 !important;
-}
-
-/* 演示账户卡片样式 */
-.demo-account-card {
-  padding: 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.demo-account-card:hover {
-  border-color: #667eea;
-  background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-}
-
-.demo-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-
-/* 深色模式适配 */
-.dark .demo-account-card {
-  border-color: #4a4a4a;
-  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-}
-
-.dark .demo-account-card:hover {
-  border-color: #667eea;
-  background: linear-gradient(135deg, #667eea25 0%, #764ba225 100%);
+  --n-border-radius: 8px !important;
 }
 </style>

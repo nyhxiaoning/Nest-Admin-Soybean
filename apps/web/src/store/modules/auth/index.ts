@@ -116,7 +116,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
       const { data: loginToken } = await fetchAuthLogin(loginData);
 
       if (!loginToken) {
-        window.$message?.error('登录失败，请重试');
+        window.$message?.error('登录失败，未返回令牌');
         return;
       }
 
@@ -128,22 +128,19 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
         let needRedirect = redirect;
 
         if (isClear) {
-          // If the tab needs to be cleared,it means we don't need to redirect.
           needRedirect = false;
         }
         await redirectFromLogin(needRedirect);
-
-        // window.$notification?.success({
-        //   title: $t('page.login.common.loginSuccess'),
-        //   content: $t('page.login.common.welcomeBack', { userName: userInfo.userName }),
-        //   duration: 4500
-        // });
       }
-    } catch (error) {
+    } catch (error: any) {
       resetStore();
+      const errStr = String(error?.message || error || '');
+      if (errStr.includes('Network Error') || errStr.includes('ECONNREFUSED') || errStr.includes('Failed to fetch')) {
+        window.$message?.error('无法连接到后端服务器 (127.0.0.1:8080)，请在终端运行 pnpm dev 启动后端！');
+      }
+    } finally {
+      endLoading();
     }
-
-    endLoading();
 
     return Promise.resolve();
   }

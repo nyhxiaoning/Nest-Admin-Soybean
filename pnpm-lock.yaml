@@ -99,7 +99,7 @@ importers:
         specifier: ^1.39.0
         version: 1.39.0
       '@prisma/client':
-        specifier: ^5.17.0
+        specifier: ^5.22.0
         version: 5.22.0(prisma@5.22.0)
       '@songkeys/nestjs-redis':
         specifier: ^10.0.0
