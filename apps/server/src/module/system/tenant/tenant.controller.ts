@@ -20,6 +20,7 @@ import {
   TenantSwitchStatusResponseDto,
 } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-permission.decorator';
+import { NotRequireAuth } from 'src/module/system/user/user.decorator';
 import { Response } from 'express';
 import { Api } from 'src/core/decorators/api.decorator';
 import { Operlog } from 'src/core/decorators/operlog.decorator';

@@ -635,16 +635,12 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
           meta: elegantRoute.meta,
         });
 
-        // ─── children 递归转换（继承 skipBadRoutes 模式）───
+        // ─── children 递归转换（继承 skipBadRoutes 模式，不单独 throw）───
         if (config.children && Array.isArray(config.children)) {
           console.log(`[路由转换] 🔁 递归转换 "${config.name}" 的 ${config.children.length} 个子路由...`);
-          try {
-            elegantRoute.children = convertBackendMenuToElegantRoute(config.children, skipBadRoutes);
-          } catch (childError) {
-            const errMsg = `转换路由 "${config.name}" 的子路由失败: ${childError instanceof Error ? childError.message : String(childError)}`;
-            console.error(`[路由转换] ❌ ${errMsg}`);
-            throw new Error(`[路由转换错误] ${errMsg}`);
-          }
+          // 子路由转换错误由 convertBackendMenuToElegantRoute 内部的 skipBadRoutes 统一处理，
+          // 这里不单独 catch 再 throw，避免绕过外层的容错逻辑
+          elegantRoute.children = convertBackendMenuToElegantRoute(config.children, skipBadRoutes);
         }
 
         result.push(elegantRoute);

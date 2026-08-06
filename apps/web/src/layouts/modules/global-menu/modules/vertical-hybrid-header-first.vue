@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import type { RouteKey } from '@elegant-router/types';
 import { SimpleScrollbar } from '@sa/materials';
+import { NMenu } from 'naive-ui';
 import { useBoolean } from '@sa/hooks';
 import { GLOBAL_HEADER_MENU_ID, GLOBAL_SIDER_MENU_ID } from '@/constants/app';
 import { useAppStore } from '@/store/modules/app';
