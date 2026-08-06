@@ -35,12 +35,21 @@ function useMixMenu() {
   }
 
   function getActiveFirstLevelMenuKey() {
+    if (!selectedKey.value) {
+      return;
+    }
+
     const [firstLevelRouteName] = selectedKey.value.split('_');
 
     setActiveFirstLevelMenuKey(firstLevelRouteName);
   }
 
   function getActiveSecondLevelMenuKey() {
+    if (!selectedKey.value) {
+      setActiveSecondLevelMenuKey('');
+      return;
+    }
+
     const parts = selectedKey.value.split('_');
     if (parts.length > 1) {
       const secondLevelRouteName = parts.slice(0, 2).join('_');
@@ -152,7 +161,11 @@ export function useMenu() {
     const { hideInMenu, activeMenu } = route.meta;
     const name = route.name as string;
 
-    const routeName = (hideInMenu ? activeMenu : name) || name;
+    if (!name) {
+      return '';
+    }
+
+    const routeName = hideInMenu ? (activeMenu || name) : name;
 
     return routeName;
   });
