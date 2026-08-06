@@ -37,7 +37,7 @@ const remberMe = ref<boolean>(false);
 const tenantEnabled = ref<boolean>(false);
 const tenantOption = ref<SelectOption[]>([]);
 const quickLoginLoading = reactive<Record<string, boolean>>({});
-const autoFilledCode = ref<boolean>(false); // 标记是否已自动填充验证码
+const autoFilledCode = ref<boolean>(true); // 标记是否已自动填充验证码
 
 interface PwdLoginForm {
   tenantId: string;
