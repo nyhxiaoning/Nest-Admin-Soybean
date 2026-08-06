@@ -32,7 +32,8 @@ const { loading: tenantLoading, startLoading: startTenantLoading, endLoading: en
 
 const codeInputRef = ref<InputInst | null>(null);
 const codeUrl = ref<string>();
-const captchaEnabled = ref<boolean>(false);
+  // 是否打开验证码
+const captchaEnabled = ref<boolean>(true);
 const remberMe = ref<boolean>(false);
 const tenantEnabled = ref<boolean>(false);
 const tenantOption = ref<SelectOption[]>([]);
