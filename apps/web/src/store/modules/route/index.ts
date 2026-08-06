@@ -6,6 +6,7 @@ import type { CustomRoute, ElegantConstRoute, LastLevelRouteKey, RouteKey, Route
 import { router } from '@/router';
 import { fetchMenuGetRouters } from '@/service/api';
 import { humpToLine, isNotNull } from '@/utils/common';
+import { logDebug } from '@sa/utils';
 import { SetupStoreId } from '@/enum';
 import { createDynamicRoutes, createStaticRoutes, getAuthVueRoutes } from '@/router/routes';
 import { ROOT_ROUTE } from '@/router/routes/builtin';
@@ -61,53 +62,82 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   const authRoutes = shallowRef<ElegantConstRoute[]>([]);
 
   function addAuthRoutes(routes: ElegantConstRoute[]) {
+    console.log('[addAuthRoutes] 🟢 开始处理', routes.length, '条鉴权路由');
     const authRoutesMap = new Map<string, ElegantConstRoute>([]);
 
-    routes.forEach(route => {
+    routes.forEach((route, idx) => {
+      console.log(`[addAuthRoutes] ── 处理第 ${idx + 1}/${routes.length} 条: name="${route.name}" path="${route.path}" component="${route.component}"`);
+
       if (authRouteMode.value === 'dynamic') {
+        // dynamic 模式下，path='/' 且有 children 的根路由需要特殊处理
         if (route.path === '/' && route.children?.length) {
+          console.log(`[addAuthRoutes] 🔀 根路由 "${route.name}" path="/" 有 ${route.children.length} 个子路由，执行合并逻辑`);
           const child = route.children[0];
           // @ts-expect-error no hidden field
           child.hidden = route.hidden;
+          console.log(`[addAuthRoutes]   取第1个子路由: name="${child.name}" path="${child.path}"`);
           parseRouter(child);
           child.name = Math.random().toString(36).slice(2, 12);
+          console.log(`[addAuthRoutes]   子路由改名后: "${child.name}"`);
           Object.assign(route, child);
           delete route.children;
+          console.log(`[addAuthRoutes]   根路由最终: name="${route.name}" path="${route.path}" component="${route.component}" meta:`, route.meta);
           authRoutesMap.set(route.name, route);
           return;
         }
+        console.log(`[addAuthRoutes] 🔧 parseRouter 前: name="${route.name}" path="${route.path}" component="${route.component}" meta:`, route.meta);
         parseRouter(route);
+        console.log(`[addAuthRoutes] 🔧 parseRouter 后: name="${route.name}" path="${route.path}" component="${route.component}" meta:`, {
+          ...route.meta,
+          icon: route.meta?.icon,
+        });
       }
       authRoutesMap.set(route.name, route);
     });
 
+    console.log('[addAuthRoutes] 📦 parseRouter 完成，authRoutesMap 中共', authRoutesMap.size, '条');
+
     const dynamicRoutes = createDynamicRoutes();
+    console.log('[addAuthRoutes] 📋 dynamicRoutes.authRoutes 有', dynamicRoutes.authRoutes.length, '条:',
+      dynamicRoutes.authRoutes.map(r => r.name));
 
     dynamicRoutes.authRoutes.forEach(route => {
       const parent = authRoutesMap.get(route.name);
       if (parent && route.children) {
+        console.log(`[addAuthRoutes] 🔗 合并动态路由 "${route.name}" 的 ${route.children.length} 个子路由到父路由`);
         parent.children?.push(...route.children);
         return;
       }
+      console.log(`[addAuthRoutes] ➕ 新增动态路由: "${route.name}"`);
       authRoutesMap.set(route.name, route);
     });
 
     authRoutes.value = Array.from(authRoutesMap.values());
+    console.log('[addAuthRoutes] ✅ authRoutes 赋值完成，共', authRoutes.value.length, '条:',
+      authRoutes.value.map(r => ({ name: r.name, path: r.path, meta: r.meta })));
   }
 
   // eslint-disable-next-line complexity
   function parseRouter(route: ElegantConstRoute, parent?: ElegantConstRoute) {
+    console.log(`[parseRouter] 🟢 开始解析: name="${route.name}" path="${route.path}" component="${route.component}"`, {
+      hasParent: !!parent,
+      parentPath: parent?.path,
+    });
+
     route.meta = route.meta ? route.meta : { title: route.name };
     if (route.meta.title.startsWith('route.') || route.meta.title.startsWith('menu.')) {
       route.meta.i18nKey = route.meta.title as App.I18n.I18nKey;
     }
+    console.log(`[parseRouter]   meta:`, route.meta);
     const isLayout = route.component === 'Layout';
     const isFramePage = route.component === 'FrameView';
     const isParentLayout = route.component === 'ParentView';
     const isExternalLink = isNotNull(route.meta.link);
+    console.log(`[parseRouter]   类型判定: isLayout=${isLayout} isFramePage=${isFramePage} isParentLayout=${isParentLayout} isExternalLink=${isExternalLink}`);
 
     route.path = route.path.startsWith('/') ? route.path : `/${route.path}`;
     route.path = parent ? parent.path + route.path : route.path;
+    console.log(`[parseRouter]   path 计算: "${route.path}"`);
 
     route.name = route
       .component!.replace(/\/index$/, '')
@@ -118,6 +148,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
       const name = humpToLine(route.path.substring(1).replace('/', '_'));
       route.name = parent ? `${parent.name}_${name}` : name;
     }
+    console.log(`[parseRouter]   name 计算: "${route.name}"`);
 
     if (route.meta.icon?.startsWith('local-icon-')) {
       route.meta.localIcon = route.meta.icon.replace('local-icon-', '');
@@ -125,14 +156,18 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     } else if (!isNotNull(route.meta.icon)) {
       route.meta.icon = defaultIcon;
     }
+    console.log(`[parseRouter]   icon 处理: "${route.meta.icon}"`);
     // @ts-expect-error no hidden field
-    route.meta.hideInMenu = route.hidden;
+    const hideInMenu = route.meta.hideInMenu = route.hidden;
+    console.log(`[parseRouter]   hidden → meta.hideInMenu: ${route.hidden} → ${hideInMenu}`);
     if (route.meta.hideInMenu && parent && !route.meta.activeMenu) {
       // @ts-expect-error parent.name is activeMenu type
       route.meta.activeMenu = parent.name;
+      console.log(`[parseRouter]   设置 activeMenu: "${parent.name}"`);
     }
     // 是否需要keepAlive
     route.meta.keepAlive = !route.meta.noCache;
+    console.log(`[parseRouter]   noCache → keepAlive（取反）: ${route.meta.noCache} → ${route.meta.keepAlive}`);
 
     if (isFramePage) {
       if (isExternalLink) {
@@ -141,6 +176,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
         route.path = `/${random}`;
         route.name = random;
         route.component = 'layout.base$view.iframe-page';
+        console.log(`[parseRouter]   iframe 外链: path="${route.path}" name="${route.name}"`);
       } else {
         try {
           route.props = {
@@ -148,12 +184,15 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
             url: JSON.parse(route.query)?.url
           };
         } catch {}
+        route.component = parent && !isExternalLink ? 'view.iframe-page' : 'layout.base$view.iframe-page';
+        console.log(`[parseRouter]   iframe 内嵌: component="${route.component}"`);
       }
-      route.component = parent && !isExternalLink ? 'view.iframe-page' : 'layout.base$view.iframe-page';
     } else if (!isLayout && !isParentLayout) {
       route.component = parent ? `view.${route.name}` : `layout.base$view.${route.name}`;
+      console.log(`[parseRouter]   普通页面: component="${route.component}"`);
     } else {
       route.component = isParentLayout ? undefined : 'layout.base';
+      console.log(`[parseRouter]   布局组件: component="${route.component}"`);
     }
 
     delete route.meta.link;
@@ -162,6 +201,8 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     delete route.query;
     // @ts-expect-error no hidden field
     delete route.hidden;
+
+    console.log(`[parseRouter] ✅ 解析完成: name="${route.name}" path="${route.path}" component="${route.component}" hideInMenu=${route.meta.hideInMenu} keepAlive=${route.meta.keepAlive}`);
 
     route.children?.forEach(child => parseRouter(child, route));
   }
@@ -260,6 +301,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   /** Init auth route */
   async function initAuthRoute() {
     try {
+      debugger
       // check if user info is initialized
       if (!authStore.userInfo.user?.userId) {
         await authStore.initUserInfo();
@@ -298,22 +340,41 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   /** Init dynamic auth route */
   async function initDynamicAuthRoute() {
     try {
+      console.log('[路由初始化] 🔵 开始初始化动态鉴权路由...');
       const { data } = await fetchMenuGetRouters();
+      console.log('[路由初始化] 📥 后端返回原始数据:', {
+        isArray: Array.isArray(data),
+        length: data?.length,
+        firstItem: data?.[0],
+        lastItem: data?.[data.length - 1],
+        allNames: data?.map((item: any) => item?.name),
+      });
 
       if (!data) {
+        console.warn('[路由初始化] ⚠️ 后端返回数据为空');
         authStore.resetStore();
         return;
       }
 
-      // 转换 MenuResponseDto[] 为 ElegantConstRoute[]
-      addAuthRoutes(data as unknown as ElegantConstRoute[]);
+      // 转换后端 RouterConfig[] → 前端 ElegantConstRoute[]
+      // skipBadRoutes=true：转换失败的路由被跳过，不影响其余正常路由
+      console.log('[路由初始化] 🔧 开始转换后端数据格式（容错模式：跳过问题路由）...');
+      const elegantRoutes = convertBackendMenuToElegantRoute(data, true);
+      console.log('[路由初始化] ✅ 格式转换完成:', {
+        count: elegantRoutes.length,
+        routes: elegantRoutes.map(r => ({ name: r.name, path: r.path, component: r.component })),
+      });
+
+      addAuthRoutes(elegantRoutes);
 
       handleConstantAndAuthRoutes();
 
       handleUpdateRootRouteRedirect(routeHome.value);
 
       setIsInitAuthRoute(true);
+      console.log('[路由初始化] 🎉 动态鉴权路由初始化完成');
     } catch (error) {
+      console.error('[路由初始化] ❌ 动态鉴权路由初始化失败:', error);
       // if fetch user routes failed, reset store
       authStore.resetStore();
     }
@@ -321,26 +382,71 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
 
   /** handle constant and auth routes */
   function handleConstantAndAuthRoutes() {
+    console.log('[handleConstantAndAuthRoutes] 🟢 开始合并路由');
     const allRoutes = [...constantRoutes.value, ...authRoutes.value];
+    console.log('[handleConstantAndAuthRoutes]   所有路由:', {
+      constantCount: constantRoutes.value.length,
+      authCount: authRoutes.value.length,
+      totalCount: allRoutes.length,
+      allRoutes: allRoutes.map(r => ({ name: r.name, path: r.path, meta: r.meta })),
+    });
 
     const sortRoutes = sortRoutesByOrder(allRoutes);
+    console.log('[handleConstantAndAuthRoutes] ✅ 排序完成:', {
+      count: sortRoutes.length,
+      routes: sortRoutes.map(r => r.name),
+    });
 
     const vueRoutes = getAuthVueRoutes(sortRoutes);
+    console.log('[handleConstantAndAuthRoutes] ✅ Vue 格式转换完成:', {
+      count: vueRoutes.length,
+      vueRoutes: vueRoutes.map(r => ({ name: r.name, path: r.path, component: r.component, meta: r.meta })),
+    });
 
     resetVueRoutes();
+    console.log('[handleConstantAndAuthRoutes] ✅ 已重置旧 Vue 路由');
 
     addRoutesToVueRouter(vueRoutes);
+    console.log('[handleConstantAndAuthRoutes] ✅ 已添加新 Vue 路由');
 
     getGlobalMenus(sortRoutes);
+    console.log('[handleConstantAndAuthRoutes] ✅ 生成全局菜单:', {
+      count: menus.value.length,
+      menus: menus.value.map(m => ({
+        key: m.key,
+        label: m.label,
+        routePath: m.routePath,
+        routeKey: m.routeKey,
+        children: m.children?.length || 0,
+      })),
+    });
+    // 检查是否有异常的 URL key（通常是后端 name 字段写入了 URL）
+    const badKeys = menus.value.filter(m => /^https?:\/\//i.test(m.key));
+    if (badKeys.length > 0) {
+      console.error(
+        '[handleConstantAndAuthRoutes] ❌ 发现异常菜单 key（包含 URL），请检查后端 sys_menu 表 name 字段:',
+        badKeys.map(m => ({ key: m.key, label: m.label, routePath: m.routePath }))
+      );
+    }
+    // 菜单生成后，再额外打印一次完整结构，方便定位问题
+    console.log('[handleConstantAndAuthRoutes]   左侧菜单完整结构:',
+      JSON.parse(JSON.stringify(menus.value, (key, value) => {
+        // 过滤掉 VNode 对象（icon 渲染结果），只保留可序列化的数据
+        if (value && typeof value === 'object' && value.__v_isVNode) return '[VNode]';
+        if (key === 'icon') return '[SvgIcon]';
+        return value;
+      }, 2))
+    );
 
     // DEBUG: 检查生成的 menus
-    console.log('DEBUG: menus after getGlobalMenus:', menus.value.map(m => ({
+    console.log('[handleConstantAndAuthRoutes] 🔍 DEBUG menus 快照:', menus.value.map(m => ({
       key: m.key,
       label: m.label,
       children: m.children?.length || 0
     })));
 
     getCacheRoutes(vueRoutes);
+    console.log('[handleConstantAndAuthRoutes] ✅ 获取缓存路由:', cacheRoutes.value);
   }
 
   /**
@@ -414,6 +520,166 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
 
   async function onRouteSwitchWhenNotLoggedIn() {
     // some global init logic if it does not need to be logged in
+  }
+
+  /**
+   * 将后端返回的 RouterConfig[] 转换为前端 ElegantConstRoute[] 格式
+   *
+   * 后端 RouterConfig 字段      →   ElegantConstRoute 字段
+   * ─────────────────────────────────────────────────────────
+   * hidden: boolean              →  meta.hideInMenu: boolean
+   * meta.noCache: boolean        →  meta.keepAlive: boolean  (语义相反：true=不缓存)
+   * meta.link?: string           →  meta.link?: string        (一致)
+   * meta.title: string           →  meta.title: string        (一致)
+   * meta.icon?: string           →  meta.icon?: string        (一致)
+   * redirect = 'noRedirect'      →  redirect: undefined       (无跳转)
+   * redirect?: string            →  redirect?: string         (一致)
+   * alwaysShow?: boolean         →  无需映射，前端已默认处理
+   * component: string            →  component: string         (一致)
+   * name: string                 →  name: string              (一致)
+   * path: string                 →  path: string              (一致)
+   * query?: string               →  query?: string            (一致)
+   * children?: RouterConfig[]   →  children?: ElegantConstRoute[]
+   *
+   * @param routerConfigs 后端返回的 RouterConfig 数组
+   * @param skipBadRoutes 是否跳过转换失败的路由（true=容错模式，只跳过并报错，不影响其余路由）
+   * @returns 转换后的 ElegantConstRoute 数组
+   */
+  function convertBackendMenuToElegantRoute(
+    routerConfigs: any[],
+    skipBadRoutes: boolean = false
+  ): ElegantConstRoute[] {
+    console.log('[路由转换] 🟢 convertBackendMenuToElegantRoute 开始, 共', routerConfigs.length, '条路由, skipBadRoutes=', skipBadRoutes);
+    const errors: Array<{ index: number; name: string; error: Error }> = [];
+    const result: ElegantConstRoute[] = [];
+
+    routerConfigs.forEach((config, index) => {
+      console.log(`[路由转换] ── 处理第 ${index + 1}/${routerConfigs.length} 条: name="${config?.name}" path="${config?.path}"`);
+
+      try {
+        // ─── 字段存在性校验 ───
+        if (!config) {
+          throw new Error(`第 ${index + 1} 条路由数据为 null/undefined`);
+        }
+        const missingFields: string[] = [];
+        if (typeof config.name !== 'string' || !config.name) {
+          missingFields.push(`name="${String(config.name)}" (类型:${typeof config.name})`);
+        }
+        // name 不能是完整 URL（http/https 开头），这通常是后端 path 字段写入了 URL 导致
+        if (typeof config.name === 'string' && /^https?:\/\//i.test(config.name)) {
+          throw new Error(
+            `第 ${index + 1} 条路由的 name 字段是完整 URL（"${config.name}"）\n` +
+            `  根因：后端 sys_menu 表的 path 字段被写入了 URL（"${config.path}"），` +
+            `getRouteName() 对 path 做 Lodash.capitalize() 后 name 变成了 URL。\n` +
+            `  修复：将 sys_menu 记录改为外链类型（isFrame='0'），URL 存到 link 字段。\n` +
+            `  SQL 定位：SELECT menuId, menuName, path FROM sys_menu WHERE path LIKE 'http%';`
+          );
+        }
+        if (typeof config.path !== 'string') {
+          missingFields.push(`path="${String(config.path)}" (类型:${typeof config.path})`);
+        }
+        if (typeof config.component !== 'string') {
+          console.warn(`[路由转换] ⚠️ 第 ${index + 1} 条 component 类型异常: ${typeof config.component}，值: ${config.component}`);
+        }
+        if (missingFields.length > 0) {
+          throw new Error(`缺少必填字段: ${missingFields.join(', ')}`);
+        }
+
+        // ─── meta 格式校验 ───
+        const meta = config.meta;
+        if (meta !== undefined && meta !== null && typeof meta !== 'object') {
+          throw new Error(`meta 字段不是对象: ${typeof meta}, 值: ${meta}`);
+        }
+
+        // ─── hidden → meta.hideInMenu（语义一致）───
+        const hideInMenu = config.hidden ?? false;
+        console.log(`[路由转换]   hidden → meta.hideInMenu: ${config.hidden} → ${hideInMenu}`);
+
+        // ─── meta.noCache → meta.keepAlive（语义相反，取反）───
+        const noCache = meta?.noCache ?? false;
+        const keepAlive = !noCache;
+        console.log(`[路由转换]   noCache → keepAlive（取反）: ${noCache} → ${keepAlive}`);
+
+        // ─── redirect='noRedirect' → undefined ───
+        const redirect = config.redirect === 'noRedirect' ? undefined : config.redirect;
+        if (config.redirect === 'noRedirect') {
+          console.log(`[路由转换]   redirect='noRedirect' → undefined (不跳转)`);
+        } else if (config.redirect) {
+          console.log(`[路由转换]   redirect: "${config.redirect}"`);
+        }
+
+        // ─── 构建 ElegantConstRoute ───
+        const elegantRoute: ElegantConstRoute = {
+          name: config.name,
+          path: config.path,
+          component: config.component ?? '',
+          query: config.query,
+          redirect,
+          meta: meta
+            ? {
+                title: meta.title ?? config.name,
+                icon: meta.icon,
+                keepAlive,
+                link: meta.link,
+                hideInMenu,
+                ...(meta.alwaysShow !== undefined ? { alwaysShow: meta.alwaysShow } : {}),
+                ...(meta.roles ? { roles: meta.roles } : {}),
+              }
+            : { title: config.name },
+        };
+
+        console.log(`[路由转换] ✅ 第 ${index + 1} 条转换完成:`, {
+          name: elegantRoute.name,
+          path: elegantRoute.path,
+          component: elegantRoute.component,
+          meta: elegantRoute.meta,
+        });
+
+        // ─── children 递归转换（继承 skipBadRoutes 模式）───
+        if (config.children && Array.isArray(config.children)) {
+          console.log(`[路由转换] 🔁 递归转换 "${config.name}" 的 ${config.children.length} 个子路由...`);
+          try {
+            elegantRoute.children = convertBackendMenuToElegantRoute(config.children, skipBadRoutes);
+          } catch (childError) {
+            const errMsg = `转换路由 "${config.name}" 的子路由失败: ${childError instanceof Error ? childError.message : String(childError)}`;
+            console.error(`[路由转换] ❌ ${errMsg}`);
+            throw new Error(`[路由转换错误] ${errMsg}`);
+          }
+        }
+
+        result.push(elegantRoute);
+      } catch (routeError) {
+        const error = routeError instanceof Error ? routeError : new Error(String(routeError));
+        const nameLabel = config?.name ?? `[未知#${index + 1}]`;
+
+        console.error(
+          `[路由转换] ⚠️ 第 ${index + 1} 条路由转换失败: "${nameLabel}"\n`,
+          error.message
+        );
+
+        if (skipBadRoutes) {
+          // 容错模式：跳过这条，记录错误，不影响其余路由
+          errors.push({ index: index + 1, name: nameLabel, error });
+          console.warn(
+            `[路由转换] ⏭️ 容错模式已跳过第 ${index + 1} 条，其余路由继续处理`
+          );
+        } else {
+          // 严格模式：抛出异常，中断整个初始化
+          throw new Error(`[路由转换错误] 第 ${index + 1} 条 (${nameLabel}): ${error.message}`);
+        }
+      }
+    });
+
+    // ─── 打印错误汇总 ───
+    if (errors.length > 0) {
+      console.error(
+        '[路由转换] ❌ 以下路由转换失败并被跳过，请修复后端 sys_menu 表后刷新页面重试：\n',
+        errors.map(e => `  第 ${e.index} 条: "${e.name}" → ${e.error.message}`).join('\n')
+      );
+    }
+
+    console.log(`[路由转换] ✅ 转换完成，成功 ${result.length} 条，跳过 ${errors.length} 条`);
+    return result;
   }
 
   return {

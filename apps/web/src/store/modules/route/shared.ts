@@ -74,20 +74,32 @@ export function sortRoutesByOrder(routes: ElegantConstRoute[]) {
  * @param routes Auth routes
  */
 export function getGlobalMenusByAuthRoutes(routes: ElegantConstRoute[]) {
+  console.log('[getGlobalMenusByAuthRoutes] 🟢 开始生成全局菜单，共', routes.length, '条路由');
   const menus: App.Global.Menu[] = [];
 
-  routes.forEach(route => {
-    if (!route.meta?.hideInMenu) {
+  routes.forEach((route, idx) => {
+    const hideInMenu = route.meta?.hideInMenu;
+    const hasVisibleChild = route.children?.some(child => !child.meta?.hideInMenu);
+
+    console.log(`[getGlobalMenusByAuthRoutes] ── 检查第 ${idx + 1}/${routes.length} 条: name="${route.name}" path="${route.path}" hideInMenu=${hideInMenu} hasVisibleChild=${hasVisibleChild}`);
+
+    if (!hideInMenu) {
+      console.log(`[getGlobalMenusByAuthRoutes]   ✅ "${route.name}" 可见，生成菜单`);
       const menu = getGlobalMenuByBaseRoute(route);
 
-      if (route.children?.some(child => !child.meta?.hideInMenu)) {
-        menu.children = getGlobalMenusByAuthRoutes(route.children);
+      if (hasVisibleChild) {
+        console.log(`[getGlobalMenusByAuthRoutes]   🔁 "${route.name}" 有可见子路由，递归生成子菜单`);
+        menu.children = getGlobalMenusByAuthRoutes(route.children!);
+        console.log(`[getGlobalMenusByAuthRoutes]   "${route.name}" 子菜单生成完成，共`, menu.children?.length || 0, '条');
       }
 
       menus.push(menu);
+    } else {
+      console.log(`[getGlobalMenusByAuthRoutes]   ❌ "${route.name}" 被隐藏 (meta.hideInMenu=true)，不加入菜单`);
     }
   });
 
+  console.log(`[getGlobalMenusByAuthRoutes] ✅ 生成菜单完成，共`, menus.length, '条:', menus.map(m => m.key));
   return menus;
 }
 
