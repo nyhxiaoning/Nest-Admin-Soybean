@@ -154,7 +154,7 @@ async function handlePreviewTable(tableName: string) {
     return;
   }
 
-  previewApi.Tool.TableName.value = tableName;
+  previewTableName.value = tableName;
   previewVisible.value = true;
   startPreviewLoading();
 
@@ -176,7 +176,7 @@ function closeDrawer() {
 
 function closePreview() {
   previewVisible.value = false;
-  previewApi.Tool.TableName.value = '';
+  previewTableName.value = '';
   previewColumns.value = [];
 }
 
@@ -332,7 +332,7 @@ const previewTableColumns = [
   <NModal
     v-model:show="previewVisible"
     preset="card"
-    :title="`表结构预览 - ${previewApi.Tool.TableName}`"
+    :title="`表结构预览 - ${previewTableName}`"
     :style="{ width: '800px', maxWidth: '90%' }"
     :mask-closable="true"
     @close="closePreview"
@@ -340,7 +340,7 @@ const previewTableColumns = [
     <NSpin :show="previewLoading">
       <template v-if="previewColumns.length > 0">
         <NDescriptions :column="2" label-placement="left" bordered class="mb-16px">
-          <NDescriptionsItem label="表名">{{ previewApi.Tool.TableName }}</NDescriptionsItem>
+          <NDescriptionsItem label="表名">{{ previewTableName }}</NDescriptionsItem>
           <NDescriptionsItem label="字段数">{{ previewColumns.length }}</NDescriptionsItem>
         </NDescriptions>
 
