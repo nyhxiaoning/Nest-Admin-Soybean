@@ -7,7 +7,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { mw as requestIpMw } from 'request-ip';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from 'src/app.module';
-import { ValidationPipe, Logger, ShutdownSignal, VersioningType } from '@nestjs/common';
+import { ValidationPipe, Logger, ShutdownSignal } from '@nestjs/common';
 import { AppConfigService } from 'src/config/app-config.service';
 import { Logger as PinoLogger } from 'nestjs-pino';
 import path from 'path';
@@ -114,14 +114,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix(prefix);
 
-  // API 版本控制 (需求 6.2)
-  // 支持 URI 版本控制 (/api/v1/...) 和 Header 版本控制 (X-API-Version)
-  // 默认使用 v1 版本，未指定版本的请求将路由到默认版本
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1',
-    prefix: 'v',
-  });
+  // API 版本控制已移除，统一使用 /api 前缀（前端 VITE_APP_BASE_API=/api 对齐）
 
   // 全局验证
   app.useGlobalPipes(
@@ -223,7 +216,7 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   logger.log(`Nest-Admin-Soybean 服务启动成功`);
   logger.log(`服务地址: http://localhost:${port}${prefix}/`);
-  logger.log(`API 版本控制已启用 (默认版本: v1)`);
+  logger.log(`API 前缀: ${prefix}`);
   logger.log(`Swagger 文档: http://localhost:${port}${prefix}/swagger-ui/`);
   logger.log(`健康检查: http://localhost:${port}${prefix}/health`);
   logger.log(`Prometheus 指标: http://localhost:${port}${prefix}/metrics`);

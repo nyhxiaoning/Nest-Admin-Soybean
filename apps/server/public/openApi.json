@@ -1,10 +1,10 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/v1/login": {
+    "/api/login": {
       "post": {
         "description": "用户登录接口，需要用户名、密码和验证码",
-        "operationId": "MainController_login_v1",
+        "operationId": "MainController_login",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -120,10 +120,10 @@
         ]
       }
     },
-    "/api/v1/logout": {
+    "/api/logout": {
       "post": {
         "description": "退出当前登录状态，清除登录令牌",
-        "operationId": "MainController_logout_v1",
+        "operationId": "MainController_logout",
         "parameters": [],
         "responses": {
           "200": {
@@ -228,10 +228,10 @@
         ]
       }
     },
-    "/api/v1/register": {
+    "/api/register": {
       "post": {
         "description": "新用户注册接口，需要用户名、密码和验证码",
-        "operationId": "MainController_register_v1",
+        "operationId": "MainController_register",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -347,10 +347,10 @@
         ]
       }
     },
-    "/api/v1/registerUser": {
+    "/api/registerUser": {
       "get": {
         "description": "查询系统是否开启用户自主注册功能",
-        "operationId": "MainController_registerUser_v1",
+        "operationId": "MainController_registerUser",
         "parameters": [],
         "responses": {
           "200": {
@@ -456,10 +456,10 @@
         ]
       }
     },
-    "/api/v1/captchaImage": {
+    "/api/captchaImage": {
       "get": {
         "description": "获取登录/注册所需的图形验证码，返回 Base64 图片和 UUID",
-        "operationId": "MainController_captchaImage_v1",
+        "operationId": "MainController_captchaImage",
         "parameters": [],
         "responses": {
           "200": {
@@ -565,10 +565,10 @@
         ]
       }
     },
-    "/api/v1/getInfo": {
+    "/api/getInfo": {
       "get": {
         "description": "获取当前登录用户的基本信息、角色和权限",
-        "operationId": "MainController_getInfo_v1",
+        "operationId": "MainController_getInfo",
         "parameters": [],
         "responses": {
           "200": {
@@ -673,10 +673,10 @@
         ]
       }
     },
-    "/api/v1/getRouters": {
+    "/api/getRouters": {
       "get": {
         "description": "获取当前用户的前端路由菜单数据",
-        "operationId": "MainController_getRouters_v1",
+        "operationId": "MainController_getRouters",
         "parameters": [],
         "responses": {
           "200": {
@@ -784,10 +784,10 @@
         ]
       }
     },
-    "/api/v1/auth/tenant/list": {
+    "/api/auth/tenant/list": {
       "get": {
         "description": "获取系统中所有可用的租户列表，用于登录时选择租户",
-        "operationId": "AuthController_getTenantList_v1",
+        "operationId": "AuthController_getTenantList",
         "parameters": [],
         "responses": {
           "200": {
@@ -893,10 +893,10 @@
         ]
       }
     },
-    "/api/v1/auth/code": {
+    "/api/auth/code": {
       "get": {
         "description": "获取登录/注册所需的图形验证码",
-        "operationId": "AuthController_getCaptchaCode_v1",
+        "operationId": "AuthController_getCaptchaCode",
         "parameters": [],
         "responses": {
           "200": {
@@ -1002,10 +1002,10 @@
         ]
       }
     },
-    "/api/v1/auth/login": {
+    "/api/auth/login": {
       "post": {
         "description": "用户登录接口，支持租户、验证码验证",
-        "operationId": "AuthController_login_v1",
+        "operationId": "AuthController_login",
         "parameters": [
           {
             "name": "tenant-id",
@@ -1131,10 +1131,10 @@
         ]
       }
     },
-    "/api/v1/auth/register": {
+    "/api/auth/register": {
       "post": {
         "description": "新用户注册接口",
-        "operationId": "AuthController_register_v1",
+        "operationId": "AuthController_register",
         "parameters": [
           {
             "name": "tenant-id",
@@ -1260,10 +1260,10 @@
         ]
       }
     },
-    "/api/v1/auth/logout": {
+    "/api/auth/logout": {
       "post": {
         "description": "退出当前登录状态，Token 将被加入黑名单",
-        "operationId": "AuthController_logout_v1",
+        "operationId": "AuthController_logout",
         "parameters": [],
         "responses": {
           "200": {
@@ -1368,10 +1368,10 @@
         ]
       }
     },
-    "/api/v1/auth/social/callback": {
+    "/api/auth/social/callback": {
       "post": {
         "description": "第三方社交平台登录回调处理",
-        "operationId": "AuthController_socialCallback_v1",
+        "operationId": "AuthController_socialCallback",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1487,10 +1487,10 @@
         ]
       }
     },
-    "/api/v1/auth/publicKey": {
+    "/api/auth/publicKey": {
       "get": {
         "description": "获取RSA公钥用于数据加密",
-        "operationId": "AuthController_getPublicKey_v1",
+        "operationId": "AuthController_getPublicKey",
         "parameters": [],
         "responses": {
           "200": {
@@ -1596,10 +1596,10 @@
         ]
       }
     },
-    "/api/v1/system/client": {
+    "/api/system/client": {
       "post": {
         "description": "创建客户端",
-        "operationId": "ClientController_create_v1",
+        "operationId": "ClientController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1720,7 +1720,7 @@
       },
       "put": {
         "description": "修改客户端",
-        "operationId": "ClientController_update_v1",
+        "operationId": "ClientController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1837,10 +1837,10 @@
         ]
       }
     },
-    "/api/v1/system/client/list": {
+    "/api/system/client/list": {
       "get": {
         "description": "分页查询客户端列表",
-        "operationId": "ClientController_findAll_v1",
+        "operationId": "ClientController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -2031,10 +2031,10 @@
         ]
       }
     },
-    "/api/v1/system/client/{id}": {
+    "/api/system/client/{id}": {
       "get": {
         "description": "根据ID获取客户端详情",
-        "operationId": "ClientController_findOne_v1",
+        "operationId": "ClientController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -2149,10 +2149,10 @@
         ]
       }
     },
-    "/api/v1/system/client/changeStatus": {
+    "/api/system/client/changeStatus": {
       "put": {
         "description": "修改客户端状态",
-        "operationId": "ClientController_changeStatus_v1",
+        "operationId": "ClientController_changeStatus",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2269,10 +2269,10 @@
         ]
       }
     },
-    "/api/v1/system/client/{ids}": {
+    "/api/system/client/{ids}": {
       "delete": {
         "description": "批量删除客户端，多个ID用逗号分隔",
-        "operationId": "ClientController_remove_v1",
+        "operationId": "ClientController_remove",
         "parameters": [
           {
             "name": "ids",
@@ -2389,10 +2389,10 @@
         ]
       }
     },
-    "/api/v1/system/config": {
+    "/api/system/config": {
       "post": {
         "description": "创建系统参数配置",
-        "operationId": "ConfigController_create_v1",
+        "operationId": "ConfigController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2513,7 +2513,7 @@
       },
       "put": {
         "description": "修改系统参数配置",
-        "operationId": "ConfigController_update_v1",
+        "operationId": "ConfigController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2630,10 +2630,10 @@
         ]
       }
     },
-    "/api/v1/system/config/list": {
+    "/api/system/config/list": {
       "get": {
         "description": "分页查询系统参数列表",
-        "operationId": "ConfigController_findAll_v1",
+        "operationId": "ConfigController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -2823,10 +2823,10 @@
         ]
       }
     },
-    "/api/v1/system/config/{id}": {
+    "/api/system/config/{id}": {
       "get": {
         "description": "根据ID获取参数详情",
-        "operationId": "ConfigController_findOne_v1",
+        "operationId": "ConfigController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -2942,7 +2942,7 @@
       },
       "delete": {
         "description": "批量删除参数配置，多个ID用逗号分隔",
-        "operationId": "ConfigController_remove_v1",
+        "operationId": "ConfigController_remove",
         "parameters": [
           {
             "name": "id",
@@ -3059,10 +3059,10 @@
         ]
       }
     },
-    "/api/v1/system/config/configKey/{id}": {
+    "/api/system/config/configKey/{id}": {
       "get": {
         "description": "根据参数键获取参数值，优先使用缓存",
-        "operationId": "ConfigController_findOneByconfigKey_v1",
+        "operationId": "ConfigController_findOneByconfigKey",
         "parameters": [
           {
             "name": "id",
@@ -3177,10 +3177,10 @@
         ]
       }
     },
-    "/api/v1/system/config/updateByKey": {
+    "/api/system/config/updateByKey": {
       "put": {
         "description": "根据参数键名修改参数值",
-        "operationId": "ConfigController_updateByKey_v1",
+        "operationId": "ConfigController_updateByKey",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3297,10 +3297,10 @@
         ]
       }
     },
-    "/api/v1/system/config/refreshCache": {
+    "/api/system/config/refreshCache": {
       "delete": {
         "description": "清除并重新加载参数配置缓存",
-        "operationId": "ConfigController_refreshCache_v1",
+        "operationId": "ConfigController_refreshCache",
         "parameters": [],
         "responses": {
           "200": {
@@ -3407,10 +3407,10 @@
         ]
       }
     },
-    "/api/v1/system/config/export": {
+    "/api/system/config/export": {
       "post": {
         "description": "导出参数管理数据为xlsx文件",
-        "operationId": "ConfigController_export_v1",
+        "operationId": "ConfigController_export",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3530,10 +3530,10 @@
         ]
       }
     },
-    "/api/v1/system/dept": {
+    "/api/system/dept": {
       "post": {
         "description": "创建新部门，需要指定父部门ID",
-        "operationId": "DeptController_create_v1",
+        "operationId": "DeptController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3649,7 +3649,7 @@
       },
       "put": {
         "description": "更新部门信息",
-        "operationId": "DeptController_update_v1",
+        "operationId": "DeptController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3764,10 +3764,10 @@
         ]
       }
     },
-    "/api/v1/system/dept/list": {
+    "/api/system/dept/list": {
       "get": {
         "description": "获取部门列表，支持按名称和状态筛选",
-        "operationId": "DeptController_findAll_v1",
+        "operationId": "DeptController_findAll",
         "parameters": [
           {
             "name": "deptName",
@@ -3894,10 +3894,10 @@
         ]
       }
     },
-    "/api/v1/system/dept/optionselect": {
+    "/api/system/dept/optionselect": {
       "get": {
         "description": "获取部门选择框列表",
-        "operationId": "DeptController_optionselect_v1",
+        "operationId": "DeptController_optionselect",
         "parameters": [],
         "responses": {
           "200": {
@@ -4005,10 +4005,10 @@
         ]
       }
     },
-    "/api/v1/system/dept/{id}": {
+    "/api/system/dept/{id}": {
       "get": {
         "description": "根据部门ID获取部门详细信息",
-        "operationId": "DeptController_findOne_v1",
+        "operationId": "DeptController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -4124,7 +4124,7 @@
       },
       "delete": {
         "description": "根据ID删除部门，如果存在子部门则无法删除",
-        "operationId": "DeptController_remove_v1",
+        "operationId": "DeptController_remove",
         "parameters": [
           {
             "name": "id",
@@ -4262,10 +4262,10 @@
         ]
       }
     },
-    "/api/v1/system/dept/list/exclude/{id}": {
+    "/api/system/dept/list/exclude/{id}": {
       "get": {
         "description": "查询部门列表（排除指定节点及其子节点），用于编辑时选择父部门",
-        "operationId": "DeptController_findListExclude_v1",
+        "operationId": "DeptController_findListExclude",
         "parameters": [
           {
             "name": "id",
@@ -4383,10 +4383,10 @@
         ]
       }
     },
-    "/api/v1/system/dict/type": {
+    "/api/system/dict/type": {
       "post": {
         "description": "创建字典类型",
-        "operationId": "DictController_createType_v1",
+        "operationId": "DictController_createType",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -4502,7 +4502,7 @@
       },
       "put": {
         "description": "修改字典类型信息",
-        "operationId": "DictController_updateType_v1",
+        "operationId": "DictController_updateType",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -4617,10 +4617,10 @@
         ]
       }
     },
-    "/api/v1/system/dict/type/refreshCache": {
+    "/api/system/dict/type/refreshCache": {
       "delete": {
         "description": "清除并重新加载字典数据缓存",
-        "operationId": "DictController_refreshCache_v1",
+        "operationId": "DictController_refreshCache",
         "parameters": [],
         "responses": {
           "200": {
@@ -4725,10 +4725,10 @@
         ]
       }
     },
-    "/api/v1/system/dict/type/{id}": {
+    "/api/system/dict/type/{id}": {
       "delete": {
         "description": "批量删除字典类型，多个ID用逗号分隔",
-        "operationId": "DictController_deleteType_v1",
+        "operationId": "DictController_deleteType",
         "parameters": [
           {
             "name": "id",
@@ -4844,7 +4844,7 @@
       },
       "get": {
         "description": "根据ID获取字典类型详情",
-        "operationId": "DictController_findOneType_v1",
+        "operationId": "DictController_findOneType",
         "parameters": [
           {
             "name": "id",
@@ -4959,10 +4959,10 @@
         ]
       }
     },
-    "/api/v1/system/dict/type/list": {
+    "/api/system/dict/type/list": {
       "get": {
         "description": "分页查询字典类型列表",
-        "operationId": "DictController_findAllType_v1",
+        "operationId": "DictController_findAllType",
         "parameters": [
           {
             "name": "pageNum",
@@ -5152,10 +5152,10 @@
         ]
       }
     },
-    "/api/v1/system/dict/type/optionselect": {
+    "/api/system/dict/type/optionselect": {
       "get": {
         "description": "获取全部字典类型用于下拉选择",
-        "operationId": "DictController_findOptionselect_v1",
+        "operationId": "DictController_findOptionselect",
         "parameters": [],
         "responses": {
           "200": {
@@ -5263,10 +5263,10 @@
         ]
       }
     },
-    "/api/v1/system/dict/data": {
+    "/api/system/dict/data": {
       "post": {
         "description": "在指定字典类型下创建字典数据",
-        "operationId": "DictController_createDictData_v1",
+        "operationId": "DictController_createDictData",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -5382,7 +5382,7 @@
       },
       "put": {
         "description": "修改字典数据",
-        "operationId": "DictController_updateDictData_v1",
+        "operationId": "DictController_updateDictData",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -5497,10 +5497,10 @@
         ]
       }
     },
-    "/api/v1/system/dict/data/{id}": {
+    "/api/system/dict/data/{id}": {
       "delete": {
         "description": "批量删除字典数据，多个ID用逗号分隔",
-        "operationId": "DictController_deleteDictData_v1",
+        "operationId": "DictController_deleteDictData",
         "parameters": [
           {
             "name": "id",
@@ -5616,7 +5616,7 @@
       },
       "get": {
         "description": "根据字典编码获取字典数据详情",
-        "operationId": "DictController_findOneDictData_v1",
+        "operationId": "DictController_findOneDictData",
         "parameters": [
           {
             "name": "id",
@@ -5731,10 +5731,10 @@
         ]
       }
     },
-    "/api/v1/system/dict/data/list": {
+    "/api/system/dict/data/list": {
       "get": {
         "description": "查询指定字典类型下的数据列表",
-        "operationId": "DictController_findAllData_v1",
+        "operationId": "DictController_findAllData",
         "parameters": [
           {
             "name": "pageNum",
@@ -5925,10 +5925,10 @@
         ]
       }
     },
-    "/api/v1/system/dict/data/type/{id}": {
+    "/api/system/dict/data/type/{id}": {
       "get": {
         "description": "根据字典类型获取字典数据列表，优先使用缓存",
-        "operationId": "DictController_findOneDataType_v1",
+        "operationId": "DictController_findOneDataType",
         "parameters": [
           {
             "name": "id",
@@ -6046,10 +6046,10 @@
         ]
       }
     },
-    "/api/v1/system/dict/type/export": {
+    "/api/system/dict/type/export": {
       "post": {
         "description": "导出字典类型为xlsx文件",
-        "operationId": "DictController_export_v1",
+        "operationId": "DictController_export",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -6169,10 +6169,10 @@
         ]
       }
     },
-    "/api/v1/system/dict/data/export": {
+    "/api/system/dict/data/export": {
       "post": {
         "description": "导出字典数据为xlsx文件",
-        "operationId": "DictController_exportData_v1",
+        "operationId": "DictController_exportData",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -6292,10 +6292,10 @@
         ]
       }
     },
-    "/api/v1/system/docs/error-codes": {
+    "/api/system/docs/error-codes": {
       "get": {
         "description": "返回系统中所有的错误码及其含义，按错误码排序",
-        "operationId": "DocsController_getErrorCodes_v1",
+        "operationId": "DocsController_getErrorCodes",
         "parameters": [],
         "responses": {
           "200": {
@@ -6353,10 +6353,10 @@
         ]
       }
     },
-    "/api/v1/system/docs/error-codes/by-category": {
+    "/api/system/docs/error-codes/by-category": {
       "get": {
         "description": "返回按分类组织的错误码列表",
-        "operationId": "DocsController_getErrorCodesByCategory_v1",
+        "operationId": "DocsController_getErrorCodesByCategory",
         "parameters": [],
         "responses": {
           "200": {
@@ -6369,10 +6369,10 @@
         ]
       }
     },
-    "/api/v1/system/docs/error-codes/markdown": {
+    "/api/system/docs/error-codes/markdown": {
       "get": {
         "description": "返回 Markdown 格式的完整错误码文档，可用于生成文档",
-        "operationId": "DocsController_getErrorCodesMarkdown_v1",
+        "operationId": "DocsController_getErrorCodesMarkdown",
         "parameters": [],
         "responses": {
           "200": {
@@ -6406,10 +6406,10 @@
         ]
       }
     },
-    "/api/v1/system/docs/error-codes/json": {
+    "/api/system/docs/error-codes/json": {
       "get": {
         "description": "返回 JSON 格式的完整错误码文档，包含分类和详细说明",
-        "operationId": "DocsController_getErrorCodesJson_v1",
+        "operationId": "DocsController_getErrorCodesJson",
         "parameters": [],
         "responses": {
           "200": {
@@ -6422,10 +6422,10 @@
         ]
       }
     },
-    "/api/v1/system/menu/getRouters": {
+    "/api/system/menu/getRouters": {
       "get": {
         "description": "获取当前用户的路由菜单",
-        "operationId": "MenuController_getRouters_v1",
+        "operationId": "MenuController_getRouters",
         "parameters": [],
         "responses": {
           "200": {
@@ -6533,10 +6533,10 @@
         ]
       }
     },
-    "/api/v1/system/menu": {
+    "/api/system/menu": {
       "post": {
         "description": "创建新菜单，支持目录、菜单、按钮三种类型",
-        "operationId": "MenuController_create_v1",
+        "operationId": "MenuController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -6655,7 +6655,7 @@
       },
       "put": {
         "description": "修改菜单信息",
-        "operationId": "MenuController_update_v1",
+        "operationId": "MenuController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -6770,10 +6770,10 @@
         ]
       }
     },
-    "/api/v1/system/menu/list": {
+    "/api/system/menu/list": {
       "get": {
         "description": "获取菜单列表，支持按名称和状态筛选",
-        "operationId": "MenuController_findAll_v1",
+        "operationId": "MenuController_findAll",
         "parameters": [
           {
             "name": "menuName",
@@ -6918,10 +6918,10 @@
         ]
       }
     },
-    "/api/v1/system/menu/treeselect": {
+    "/api/system/menu/treeselect": {
       "get": {
         "description": "获取菜单树形结构，用于下拉选择",
-        "operationId": "MenuController_treeSelect_v1",
+        "operationId": "MenuController_treeSelect",
         "parameters": [],
         "responses": {
           "200": {
@@ -7029,10 +7029,10 @@
         ]
       }
     },
-    "/api/v1/system/menu/roleMenuTreeselect/{roleId}": {
+    "/api/system/menu/roleMenuTreeselect/{roleId}": {
       "get": {
         "description": "获取角色已分配的菜单树结构",
-        "operationId": "MenuController_roleMenuTreeselect_v1",
+        "operationId": "MenuController_roleMenuTreeselect",
         "parameters": [
           {
             "name": "roleId",
@@ -7147,10 +7147,10 @@
         ]
       }
     },
-    "/api/v1/system/menu/tenantPackageMenuTreeselect/{packageId}": {
+    "/api/system/menu/tenantPackageMenuTreeselect/{packageId}": {
       "get": {
         "description": "获取租户套餐已分配的菜单树结构",
-        "operationId": "MenuController_tenantPackageMenuTreeselect_v1",
+        "operationId": "MenuController_tenantPackageMenuTreeselect",
         "parameters": [
           {
             "name": "packageId",
@@ -7265,10 +7265,10 @@
         ]
       }
     },
-    "/api/v1/system/menu/{menuId}": {
+    "/api/system/menu/{menuId}": {
       "get": {
         "description": "根据菜单ID获取菜单详细信息",
-        "operationId": "MenuController_findOne_v1",
+        "operationId": "MenuController_findOne",
         "parameters": [
           {
             "name": "menuId",
@@ -7384,7 +7384,7 @@
       },
       "delete": {
         "description": "删除菜单，会同时删除子菜单",
-        "operationId": "MenuController_remove_v1",
+        "operationId": "MenuController_remove",
         "parameters": [
           {
             "name": "menuId",
@@ -7499,10 +7499,10 @@
         ]
       }
     },
-    "/api/v1/system/menu/cascade/{menuIds}": {
+    "/api/system/menu/cascade/{menuIds}": {
       "delete": {
         "description": "级联删除菜单，多个ID用逗号分隔",
-        "operationId": "MenuController_cascadeRemove_v1",
+        "operationId": "MenuController_cascadeRemove",
         "parameters": [
           {
             "name": "menuIds",
@@ -7617,10 +7617,10 @@
         ]
       }
     },
-    "/api/v1/system/notice": {
+    "/api/system/notice": {
       "post": {
         "description": "发布新的通知公告",
-        "operationId": "NoticeController_create_v1",
+        "operationId": "NoticeController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -7739,7 +7739,7 @@
       },
       "put": {
         "description": "修改通知公告内容",
-        "operationId": "NoticeController_update_v1",
+        "operationId": "NoticeController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -7854,10 +7854,10 @@
         ]
       }
     },
-    "/api/v1/system/notice/list": {
+    "/api/system/notice/list": {
       "get": {
         "description": "分页查询通知公告列表",
-        "operationId": "NoticeController_findAll_v1",
+        "operationId": "NoticeController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -8045,10 +8045,10 @@
         ]
       }
     },
-    "/api/v1/system/notice/{id}": {
+    "/api/system/notice/{id}": {
       "get": {
         "description": "根据ID获取通知公告详情",
-        "operationId": "NoticeController_findOne_v1",
+        "operationId": "NoticeController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -8164,7 +8164,7 @@
       },
       "delete": {
         "description": "批量删除通知公告，多个ID用逗号分隔",
-        "operationId": "NoticeController_remove_v1",
+        "operationId": "NoticeController_remove",
         "parameters": [
           {
             "name": "id",
@@ -8279,10 +8279,10 @@
         ]
       }
     },
-    "/api/v1/system/post": {
+    "/api/system/post": {
       "post": {
         "description": "创建新岗位",
-        "operationId": "PostController_create_v1",
+        "operationId": "PostController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -8401,7 +8401,7 @@
       },
       "put": {
         "description": "修改岗位信息",
-        "operationId": "PostController_update_v1",
+        "operationId": "PostController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -8516,10 +8516,10 @@
         ]
       }
     },
-    "/api/v1/system/post/list": {
+    "/api/system/post/list": {
       "get": {
         "description": "分页查询岗位列表",
-        "operationId": "PostController_findAll_v1",
+        "operationId": "PostController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -8718,10 +8718,10 @@
         ]
       }
     },
-    "/api/v1/system/post/optionselect": {
+    "/api/system/post/optionselect": {
       "get": {
         "description": "获取岗位选择框列表",
-        "operationId": "PostController_optionselect_v1",
+        "operationId": "PostController_optionselect",
         "parameters": [
           {
             "name": "deptId",
@@ -8846,10 +8846,10 @@
         ]
       }
     },
-    "/api/v1/system/post/deptTree": {
+    "/api/system/post/deptTree": {
       "get": {
         "description": "获取部门树形结构",
-        "operationId": "PostController_deptTree_v1",
+        "operationId": "PostController_deptTree",
         "parameters": [],
         "responses": {
           "200": {
@@ -8957,10 +8957,10 @@
         ]
       }
     },
-    "/api/v1/system/post/{id}": {
+    "/api/system/post/{id}": {
       "get": {
         "description": "根据ID获取岗位详情",
-        "operationId": "PostController_findOne_v1",
+        "operationId": "PostController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -9075,10 +9075,10 @@
         ]
       }
     },
-    "/api/v1/system/post/{ids}": {
+    "/api/system/post/{ids}": {
       "delete": {
         "description": "批量删除岗位，多个ID用逗号分隔",
-        "operationId": "PostController_remove_v1",
+        "operationId": "PostController_remove",
         "parameters": [
           {
             "name": "ids",
@@ -9193,10 +9193,10 @@
         ]
       }
     },
-    "/api/v1/system/post/export": {
+    "/api/system/post/export": {
       "post": {
         "description": "导出岗位数据为xlsx文件",
-        "operationId": "PostController_export_v1",
+        "operationId": "PostController_export",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -9316,10 +9316,10 @@
         ]
       }
     },
-    "/api/v1/system/role": {
+    "/api/system/role": {
       "post": {
         "description": "创建新角色并分配权限",
-        "operationId": "RoleController_create_v1",
+        "operationId": "RoleController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -9438,7 +9438,7 @@
       },
       "put": {
         "description": "修改角色信息及权限",
-        "operationId": "RoleController_update_v1",
+        "operationId": "RoleController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -9553,10 +9553,10 @@
         ]
       }
     },
-    "/api/v1/system/role/list": {
+    "/api/system/role/list": {
       "get": {
         "description": "分页查询角色列表",
-        "operationId": "RoleController_findAll_v1",
+        "operationId": "RoleController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -9761,10 +9761,10 @@
         ]
       }
     },
-    "/api/v1/system/role/optionselect": {
+    "/api/system/role/optionselect": {
       "get": {
         "description": "获取角色选择框列表",
-        "operationId": "RoleController_optionselect_v1",
+        "operationId": "RoleController_optionselect",
         "parameters": [
           {
             "name": "roleIds",
@@ -9881,10 +9881,10 @@
         ]
       }
     },
-    "/api/v1/system/role/deptTree/{id}": {
+    "/api/system/role/deptTree/{id}": {
       "get": {
         "description": "获取角色数据权限的部门树",
-        "operationId": "RoleController_deptTree_v1",
+        "operationId": "RoleController_deptTree",
         "parameters": [
           {
             "name": "id",
@@ -9999,10 +9999,10 @@
         ]
       }
     },
-    "/api/v1/system/role/{id}": {
+    "/api/system/role/{id}": {
       "get": {
         "description": "根据角色ID获取角色详情",
-        "operationId": "RoleController_findOne_v1",
+        "operationId": "RoleController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -10118,7 +10118,7 @@
       },
       "delete": {
         "description": "批量删除角色，多个ID用逗号分隔",
-        "operationId": "RoleController_remove_v1",
+        "operationId": "RoleController_remove",
         "parameters": [
           {
             "name": "id",
@@ -10233,10 +10233,10 @@
         ]
       }
     },
-    "/api/v1/system/role/dataScope": {
+    "/api/system/role/dataScope": {
       "put": {
         "description": "修改角色的数据权限范围",
-        "operationId": "RoleController_dataScope_v1",
+        "operationId": "RoleController_dataScope",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -10351,10 +10351,10 @@
         ]
       }
     },
-    "/api/v1/system/role/changeStatus": {
+    "/api/system/role/changeStatus": {
       "put": {
         "description": "启用或停用角色",
-        "operationId": "RoleController_changeStatus_v1",
+        "operationId": "RoleController_changeStatus",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -10469,10 +10469,10 @@
         ]
       }
     },
-    "/api/v1/system/role/authUser/allocatedList": {
+    "/api/system/role/authUser/allocatedList": {
       "get": {
         "description": "获取角色已分配的用户列表",
-        "operationId": "RoleController_authUserAllocatedList_v1",
+        "operationId": "RoleController_authUserAllocatedList",
         "parameters": [
           {
             "name": "pageNum",
@@ -10664,10 +10664,10 @@
         ]
       }
     },
-    "/api/v1/system/role/authUser/unallocatedList": {
+    "/api/system/role/authUser/unallocatedList": {
       "get": {
         "description": "获取角色未分配的用户列表",
-        "operationId": "RoleController_authUserUnAllocatedList_v1",
+        "operationId": "RoleController_authUserUnAllocatedList",
         "parameters": [
           {
             "name": "pageNum",
@@ -10859,10 +10859,10 @@
         ]
       }
     },
-    "/api/v1/system/role/authUser/cancel": {
+    "/api/system/role/authUser/cancel": {
       "put": {
         "description": "取消用户与角色的绑定关系",
-        "operationId": "RoleController_authUserCancel_v1",
+        "operationId": "RoleController_authUserCancel",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -10977,10 +10977,10 @@
         ]
       }
     },
-    "/api/v1/system/role/authUser/cancelAll": {
+    "/api/system/role/authUser/cancelAll": {
       "put": {
         "description": "批量取消用户与角色的绑定关系",
-        "operationId": "RoleController_authUserCancelAll_v1",
+        "operationId": "RoleController_authUserCancelAll",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -11095,10 +11095,10 @@
         ]
       }
     },
-    "/api/v1/system/role/authUser/selectAll": {
+    "/api/system/role/authUser/selectAll": {
       "put": {
         "description": "批量将用户绑定到角色",
-        "operationId": "RoleController_authUserSelectAll_v1",
+        "operationId": "RoleController_authUserSelectAll",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -11213,10 +11213,10 @@
         ]
       }
     },
-    "/api/v1/system/role/export": {
+    "/api/system/role/export": {
       "post": {
         "description": "导出角色管理数据为xlsx文件",
-        "operationId": "RoleController_export_v1",
+        "operationId": "RoleController_export",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -11336,10 +11336,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant": {
+    "/api/system/tenant": {
       "post": {
         "description": "创建新租户并创建租户管理员账号",
-        "operationId": "TenantController_create_v1",
+        "operationId": "TenantController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -11458,7 +11458,7 @@
       },
       "put": {
         "description": "修改租户信息",
-        "operationId": "TenantController_update_v1",
+        "operationId": "TenantController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -11573,10 +11573,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/list": {
+    "/api/system/tenant/list": {
       "get": {
         "description": "分页查询租户列表",
-        "operationId": "TenantController_findAll_v1",
+        "operationId": "TenantController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -11801,10 +11801,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/syncTenantDict": {
+    "/api/system/tenant/syncTenantDict": {
       "get": {
         "description": "将超级管理员的字典数据同步到所有租户",
-        "operationId": "TenantController_syncTenantDict_v1",
+        "operationId": "TenantController_syncTenantDict",
         "parameters": [],
         "responses": {
           "200": {
@@ -11909,10 +11909,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/syncTenantPackage": {
+    "/api/system/tenant/syncTenantPackage": {
       "get": {
         "description": "同步租户套餐菜单权限",
-        "operationId": "TenantController_syncTenantPackage_v1",
+        "operationId": "TenantController_syncTenantPackage",
         "parameters": [
           {
             "name": "tenantId",
@@ -12036,10 +12036,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/syncTenantConfig": {
+    "/api/system/tenant/syncTenantConfig": {
       "get": {
         "description": "将超级管理员的配置同步到所有租户",
-        "operationId": "TenantController_syncTenantConfig_v1",
+        "operationId": "TenantController_syncTenantConfig",
         "parameters": [],
         "responses": {
           "200": {
@@ -12144,10 +12144,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/select-list": {
+    "/api/system/tenant/select-list": {
       "get": {
         "description": "获取可切换的租户列表（仅超级管理员可用）",
-        "operationId": "TenantController_getSelectList_v1",
+        "operationId": "TenantController_getSelectList",
         "parameters": [],
         "responses": {
           "200": {
@@ -12252,10 +12252,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/switch-status": {
+    "/api/system/tenant/switch-status": {
       "get": {
         "description": "获取当前租户切换状态",
-        "operationId": "TenantController_getSwitchStatus_v1",
+        "operationId": "TenantController_getSwitchStatus",
         "parameters": [],
         "responses": {
           "200": {
@@ -12360,10 +12360,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/dynamic/{tenantId}": {
+    "/api/system/tenant/dynamic/{tenantId}": {
       "get": {
         "description": "切换到指定租户（仅超级管理员可用）",
-        "operationId": "TenantController_switchTenant_v1",
+        "operationId": "TenantController_switchTenant",
         "parameters": [
           {
             "name": "tenantId",
@@ -12478,10 +12478,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/dynamic/clear": {
+    "/api/system/tenant/dynamic/clear": {
       "get": {
         "description": "清除租户切换状态，恢复到原租户",
-        "operationId": "TenantController_restoreTenant_v1",
+        "operationId": "TenantController_restoreTenant",
         "parameters": [],
         "responses": {
           "200": {
@@ -12586,10 +12586,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/{id}": {
+    "/api/system/tenant/{id}": {
       "get": {
         "description": "根据ID获取租户详情",
-        "operationId": "TenantController_findOne_v1",
+        "operationId": "TenantController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -12704,10 +12704,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/{ids}": {
+    "/api/system/tenant/{ids}": {
       "delete": {
         "description": "批量删除租户",
-        "operationId": "TenantController_remove_v1",
+        "operationId": "TenantController_remove",
         "parameters": [
           {
             "name": "ids",
@@ -12822,10 +12822,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/export": {
+    "/api/system/tenant/export": {
       "post": {
         "description": "导出租户数据为Excel文件",
-        "operationId": "TenantController_export_v1",
+        "operationId": "TenantController_export",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -12945,10 +12945,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/dashboard/stats": {
+    "/api/system/tenant/dashboard/stats": {
       "get": {
         "description": "获取租户总数、活跃数、用户数等统计卡片数据",
-        "operationId": "TenantDashboardController_getStats_v1",
+        "operationId": "TenantDashboardController_getStats",
         "parameters": [],
         "responses": {
           "200": {
@@ -13053,10 +13053,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/dashboard/trend": {
+    "/api/system/tenant/dashboard/trend": {
       "get": {
         "description": "获取指定时间范围内的租户增长趋势数据",
-        "operationId": "TenantDashboardController_getTrend_v1",
+        "operationId": "TenantDashboardController_getTrend",
         "parameters": [
           {
             "name": "beginTime",
@@ -13185,10 +13185,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/dashboard/package-distribution": {
+    "/api/system/tenant/dashboard/package-distribution": {
       "get": {
         "description": "获取租户套餐分布饼图数据",
-        "operationId": "TenantDashboardController_getPackageDistribution_v1",
+        "operationId": "TenantDashboardController_getPackageDistribution",
         "parameters": [],
         "responses": {
           "200": {
@@ -13296,10 +13296,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/dashboard/expiring-tenants": {
+    "/api/system/tenant/dashboard/expiring-tenants": {
       "get": {
         "description": "获取指定天数内即将到期的租户列表",
-        "operationId": "TenantDashboardController_getExpiringTenants_v1",
+        "operationId": "TenantDashboardController_getExpiringTenants",
         "parameters": [
           {
             "name": "days",
@@ -13418,10 +13418,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/dashboard/quota-top": {
+    "/api/system/tenant/dashboard/quota-top": {
       "get": {
         "description": "获取配额使用率最高的10个租户",
-        "operationId": "TenantDashboardController_getQuotaTopTenants_v1",
+        "operationId": "TenantDashboardController_getQuotaTopTenants",
         "parameters": [],
         "responses": {
           "200": {
@@ -13529,10 +13529,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/dashboard": {
+    "/api/system/tenant/dashboard": {
       "get": {
         "description": "获取仪表盘所有数据（统计、趋势、分布、到期列表、TOP10）",
-        "operationId": "TenantDashboardController_getDashboardData_v1",
+        "operationId": "TenantDashboardController_getDashboardData",
         "parameters": [
           {
             "name": "beginTime",
@@ -13658,10 +13658,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/quota/list": {
+    "/api/system/tenant/quota/list": {
       "get": {
         "description": "分页查询所有租户的配额使用情况",
-        "operationId": "TenantQuotaController_findAll_v1",
+        "operationId": "TenantQuotaController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -13853,10 +13853,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/quota/{tenantId}": {
+    "/api/system/tenant/quota/{tenantId}": {
       "get": {
         "description": "获取单个租户的配额详情，包含变更历史",
-        "operationId": "TenantQuotaController_findOne_v1",
+        "operationId": "TenantQuotaController_findOne",
         "parameters": [
           {
             "name": "tenantId",
@@ -13970,10 +13970,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/quota": {
+    "/api/system/tenant/quota": {
       "put": {
         "description": "修改租户的配额限制值",
-        "operationId": "TenantQuotaController_update_v1",
+        "operationId": "TenantQuotaController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -14090,10 +14090,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/quota/check": {
+    "/api/system/tenant/quota/check": {
       "post": {
         "description": "检查指定租户的配额是否允许操作",
-        "operationId": "TenantQuotaController_checkQuota_v1",
+        "operationId": "TenantQuotaController_checkQuota",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -14211,10 +14211,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/audit/list": {
+    "/api/system/tenant/audit/list": {
       "get": {
         "description": "分页查询所有租户的审计日志",
-        "operationId": "TenantAuditController_findAll_v1",
+        "operationId": "TenantAuditController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -14441,10 +14441,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/audit/{id}": {
+    "/api/system/tenant/audit/{id}": {
       "get": {
         "description": "获取单条审计日志的详细信息，包含操作前后数据变化",
-        "operationId": "TenantAuditController_findOne_v1",
+        "operationId": "TenantAuditController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -14558,10 +14558,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/audit/stats/summary": {
+    "/api/system/tenant/audit/stats/summary": {
       "get": {
         "description": "获取审计日志统计数据",
-        "operationId": "TenantAuditController_getStats_v1",
+        "operationId": "TenantAuditController_getStats",
         "parameters": [
           {
             "name": "tenantId",
@@ -14675,10 +14675,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/audit/export": {
+    "/api/system/tenant/audit/export": {
       "post": {
         "description": "导出审计日志为Excel格式",
-        "operationId": "TenantAuditController_export_v1",
+        "operationId": "TenantAuditController_export",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -14798,10 +14798,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/package": {
+    "/api/system/tenant/package": {
       "post": {
         "description": "创建新租户套餐",
-        "operationId": "TenantPackageController_create_v1",
+        "operationId": "TenantPackageController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -14922,7 +14922,7 @@
       },
       "put": {
         "description": "修改租户套餐信息",
-        "operationId": "TenantPackageController_update_v1",
+        "operationId": "TenantPackageController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -15039,10 +15039,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/package/list": {
+    "/api/system/tenant/package/list": {
       "get": {
         "description": "分页查询租户套餐列表",
-        "operationId": "TenantPackageController_findAll_v1",
+        "operationId": "TenantPackageController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -15220,10 +15220,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/package/selectList": {
+    "/api/system/tenant/package/selectList": {
       "get": {
         "description": "获取租户套餐选择框列表",
-        "operationId": "TenantPackageController_selectList_v1",
+        "operationId": "TenantPackageController_selectList",
         "parameters": [],
         "responses": {
           "200": {
@@ -15331,10 +15331,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/package/{id}": {
+    "/api/system/tenant/package/{id}": {
       "get": {
         "description": "根据ID获取租户套餐详情",
-        "operationId": "TenantPackageController_findOne_v1",
+        "operationId": "TenantPackageController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -15449,10 +15449,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/package/{ids}": {
+    "/api/system/tenant/package/{ids}": {
       "delete": {
         "description": "批量删除租户套餐",
-        "operationId": "TenantPackageController_remove_v1",
+        "operationId": "TenantPackageController_remove",
         "parameters": [
           {
             "name": "ids",
@@ -15569,10 +15569,10 @@
         ]
       }
     },
-    "/api/v1/system/tenant/package/export": {
+    "/api/system/tenant/package/export": {
       "post": {
         "description": "导出租户套餐数据为Excel文件",
-        "operationId": "TenantPackageController_export_v1",
+        "operationId": "TenantPackageController_export",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -15692,10 +15692,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/list": {
+    "/api/tool/gen/list": {
       "get": {
         "description": "分页查询已导入的数据表列表",
-        "operationId": "ToolController_findAll_v1",
+        "operationId": "ToolController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -15884,10 +15884,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/db/list": {
+    "/api/tool/gen/db/list": {
       "get": {
         "description": "查询数据库中未导入的表",
-        "operationId": "ToolController_genDbList_v1",
+        "operationId": "ToolController_genDbList",
         "parameters": [
           {
             "name": "pageNum",
@@ -16076,10 +16076,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/getDataNames": {
+    "/api/tool/gen/getDataNames": {
       "get": {
         "description": "获取可用的数据源名称",
-        "operationId": "ToolController_getDataNames_v1",
+        "operationId": "ToolController_getDataNames",
         "parameters": [],
         "responses": {
           "200": {
@@ -16186,10 +16186,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/importTable": {
+    "/api/tool/gen/importTable": {
       "post": {
         "description": "将数据库表导入到代码生成列表",
-        "operationId": "ToolController_genImportTable_v1",
+        "operationId": "ToolController_genImportTable",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -16309,10 +16309,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/synchDb/{tableName}": {
+    "/api/tool/gen/synchDb/{tableName}": {
       "get": {
         "description": "从数据库同步表字段结构",
-        "operationId": "ToolController_synchDb_v1",
+        "operationId": "ToolController_synchDb",
         "parameters": [
           {
             "name": "tableName",
@@ -16429,10 +16429,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/{id}": {
+    "/api/tool/gen/{id}": {
       "get": {
         "description": "获取代码生成表详情，包含字段信息",
-        "operationId": "ToolController_gen_v1",
+        "operationId": "ToolController_gen",
         "parameters": [
           {
             "name": "id",
@@ -16550,7 +16550,7 @@
       },
       "delete": {
         "description": "从代码生成列表中删除表",
-        "operationId": "ToolController_remove_v1",
+        "operationId": "ToolController_remove",
         "parameters": [
           {
             "name": "id",
@@ -16667,10 +16667,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen": {
+    "/api/tool/gen": {
       "put": {
         "description": "修改表的代码生成配置",
-        "operationId": "ToolController_genUpdate_v1",
+        "operationId": "ToolController_genUpdate",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -16787,10 +16787,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/batchGenCode/zip": {
+    "/api/tool/gen/batchGenCode/zip": {
       "get": {
         "description": "根据表名生成代码并下载为zip压缩包，文件名格式：{projectName}_{timestamp}.zip",
-        "operationId": "ToolController_batchGenCode_v1",
+        "operationId": "ToolController_batchGenCode",
         "parameters": [
           {
             "name": "tableNames",
@@ -16918,10 +16918,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/batchGenCode": {
+    "/api/tool/gen/batchGenCode": {
       "post": {
         "description": "根据表ID列表生成代码并下载为zip压缩包，文件名格式：{projectName}_{timestamp}.zip",
-        "operationId": "ToolController_batchGenCodeByIds_v1",
+        "operationId": "ToolController_batchGenCodeByIds",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -17041,10 +17041,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/preview/{id}": {
+    "/api/tool/gen/preview/{id}": {
       "get": {
         "description": "在线预览生成的代码内容",
-        "operationId": "ToolController_preview_v1",
+        "operationId": "ToolController_preview",
         "parameters": [
           {
             "name": "id",
@@ -17161,10 +17161,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/datasource": {
+    "/api/tool/gen/datasource": {
       "post": {
         "description": "创建新的数据库连接配置",
-        "operationId": "DataSourceController_create_v1",
+        "operationId": "DataSourceController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -17208,10 +17208,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/datasource/{id}": {
+    "/api/tool/gen/datasource/{id}": {
       "put": {
         "description": "更新数据库连接配置",
-        "operationId": "DataSourceController_update_v1",
+        "operationId": "DataSourceController_update",
         "parameters": [
           {
             "name": "id",
@@ -17266,7 +17266,7 @@
       },
       "delete": {
         "description": "删除数据库连接配置（软删除）",
-        "operationId": "DataSourceController_delete_v1",
+        "operationId": "DataSourceController_delete",
         "parameters": [
           {
             "name": "id",
@@ -17301,7 +17301,7 @@
       },
       "get": {
         "description": "根据ID查询数据源详情",
-        "operationId": "DataSourceController_findOne_v1",
+        "operationId": "DataSourceController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -17339,10 +17339,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/datasource/list": {
+    "/api/tool/gen/datasource/list": {
       "get": {
         "description": "分页查询数据源列表",
-        "operationId": "DataSourceController_list_v1",
+        "operationId": "DataSourceController_list",
         "parameters": [
           {
             "name": "pageNum",
@@ -17450,10 +17450,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/datasource/test": {
+    "/api/tool/gen/datasource/test": {
       "post": {
         "description": "测试数据库连接是否可用",
-        "operationId": "DataSourceController_testConnection_v1",
+        "operationId": "DataSourceController_testConnection",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -17487,10 +17487,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/datasource/{id}/test": {
+    "/api/tool/gen/datasource/{id}/test": {
       "get": {
         "description": "测试已保存的数据库连接是否可用",
-        "operationId": "DataSourceController_testConnectionById_v1",
+        "operationId": "DataSourceController_testConnectionById",
         "parameters": [
           {
             "name": "id",
@@ -17524,10 +17524,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/datasource/{id}/tables": {
+    "/api/tool/gen/datasource/{id}/tables": {
       "get": {
         "description": "获取指定数据源中的所有表",
-        "operationId": "DataSourceController_getTables_v1",
+        "operationId": "DataSourceController_getTables",
         "parameters": [
           {
             "name": "id",
@@ -17568,10 +17568,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/datasource/{id}/tables/{tableName}/columns": {
+    "/api/tool/gen/datasource/{id}/tables/{tableName}/columns": {
       "get": {
         "description": "获取指定表的所有列信息",
-        "operationId": "DataSourceController_getColumns_v1",
+        "operationId": "DataSourceController_getColumns",
         "parameters": [
           {
             "name": "id",
@@ -17621,10 +17621,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/template/group": {
+    "/api/tool/gen/template/group": {
       "post": {
         "description": "创建新的模板组",
-        "operationId": "TemplateController_createGroup_v1",
+        "operationId": "TemplateController_createGroup",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -17668,10 +17668,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/template/group/{id}": {
+    "/api/tool/gen/template/group/{id}": {
       "put": {
         "description": "更新模板组信息",
-        "operationId": "TemplateController_updateGroup_v1",
+        "operationId": "TemplateController_updateGroup",
         "parameters": [
           {
             "name": "id",
@@ -17729,7 +17729,7 @@
       },
       "delete": {
         "description": "删除模板组及其所有模板（软删除）",
-        "operationId": "TemplateController_deleteGroup_v1",
+        "operationId": "TemplateController_deleteGroup",
         "parameters": [
           {
             "name": "id",
@@ -17767,7 +17767,7 @@
       },
       "get": {
         "description": "根据ID查询模板组详情，包含所有模板",
-        "operationId": "TemplateController_findOneGroup_v1",
+        "operationId": "TemplateController_findOneGroup",
         "parameters": [
           {
             "name": "id",
@@ -17805,10 +17805,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/template/group/list": {
+    "/api/tool/gen/template/group/list": {
       "get": {
         "description": "分页查询模板组列表，包含当前租户和系统级模板组",
-        "operationId": "TemplateController_listGroups_v1",
+        "operationId": "TemplateController_listGroups",
         "parameters": [
           {
             "name": "pageNum",
@@ -17911,10 +17911,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/template/group/default": {
+    "/api/tool/gen/template/group/default": {
       "get": {
         "description": "获取当前租户或系统级的默认模板组",
-        "operationId": "TemplateController_getDefaultGroup_v1",
+        "operationId": "TemplateController_getDefaultGroup",
         "parameters": [],
         "responses": {
           "200": {
@@ -17942,10 +17942,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/template/group/{id}/export": {
+    "/api/tool/gen/template/group/{id}/export": {
       "get": {
         "description": "将模板组导出为 JSON 文件",
-        "operationId": "TemplateController_exportGroup_v1",
+        "operationId": "TemplateController_exportGroup",
         "parameters": [
           {
             "name": "id",
@@ -17983,10 +17983,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/template/group/import": {
+    "/api/tool/gen/template/group/import": {
       "post": {
         "description": "从 JSON 数据导入模板组",
-        "operationId": "TemplateController_importGroup_v1",
+        "operationId": "TemplateController_importGroup",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -18030,10 +18030,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/template": {
+    "/api/tool/gen/template": {
       "post": {
         "description": "在指定模板组中创建新模板",
-        "operationId": "TemplateController_createTemplate_v1",
+        "operationId": "TemplateController_createTemplate",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -18080,10 +18080,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/template/{id}": {
+    "/api/tool/gen/template/{id}": {
       "put": {
         "description": "更新模板信息",
-        "operationId": "TemplateController_updateTemplate_v1",
+        "operationId": "TemplateController_updateTemplate",
         "parameters": [
           {
             "name": "id",
@@ -18138,7 +18138,7 @@
       },
       "delete": {
         "description": "删除模板（软删除）",
-        "operationId": "TemplateController_deleteTemplate_v1",
+        "operationId": "TemplateController_deleteTemplate",
         "parameters": [
           {
             "name": "id",
@@ -18173,7 +18173,7 @@
       },
       "get": {
         "description": "根据ID查询模板详情",
-        "operationId": "TemplateController_findOneTemplate_v1",
+        "operationId": "TemplateController_findOneTemplate",
         "parameters": [
           {
             "name": "id",
@@ -18211,10 +18211,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/template/list": {
+    "/api/tool/gen/template/list": {
       "get": {
         "description": "分页查询模板列表",
-        "operationId": "TemplateController_listTemplates_v1",
+        "operationId": "TemplateController_listTemplates",
         "parameters": [
           {
             "name": "pageNum",
@@ -18332,10 +18332,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/template/validate": {
+    "/api/tool/gen/template/validate": {
       "post": {
         "description": "验证模板内容的语法是否正确，并返回使用的变量列表",
-        "operationId": "TemplateController_validateTemplate_v1",
+        "operationId": "TemplateController_validateTemplate",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -18409,10 +18409,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/history/list": {
+    "/api/tool/gen/history/list": {
       "get": {
         "description": "分页查询代码生成历史记录列表",
-        "operationId": "HistoryController_list_v1",
+        "operationId": "HistoryController_list",
         "parameters": [
           {
             "name": "tableId",
@@ -18543,10 +18543,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/history/{id}": {
+    "/api/tool/gen/history/{id}": {
       "get": {
         "description": "根据ID查询历史记录详情，包含生成的代码快照",
-        "operationId": "HistoryController_findOne_v1",
+        "operationId": "HistoryController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -18628,7 +18628,7 @@
       },
       "delete": {
         "description": "删除指定的历史记录",
-        "operationId": "HistoryController_delete_v1",
+        "operationId": "HistoryController_delete",
         "parameters": [
           {
             "name": "id",
@@ -18659,10 +18659,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/history/{id}/download": {
+    "/api/tool/gen/history/{id}/download": {
       "get": {
         "description": "下载指定历史版本的生成代码（ZIP格式）",
-        "operationId": "HistoryController_download_v1",
+        "operationId": "HistoryController_download",
         "parameters": [
           {
             "name": "id",
@@ -18701,10 +18701,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/history/batch": {
+    "/api/tool/gen/history/batch": {
       "delete": {
         "description": "批量删除多条历史记录",
-        "operationId": "HistoryController_batchDelete_v1",
+        "operationId": "HistoryController_batchDelete",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -18770,10 +18770,10 @@
         ]
       }
     },
-    "/api/v1/tool/gen/history/cleanup": {
+    "/api/tool/gen/history/cleanup": {
       "post": {
         "description": "清理指定天数之前的历史记录（默认30天）",
-        "operationId": "HistoryController_cleanup_v1",
+        "operationId": "HistoryController_cleanup",
         "parameters": [
           {
             "name": "days",
@@ -18826,10 +18826,10 @@
         ]
       }
     },
-    "/api/v1/system/user/getInfo": {
+    "/api/system/user/getInfo": {
       "get": {
         "description": "获取当前登录用户的详细信息、角色和权限",
-        "operationId": "UserController_getInfo_v1",
+        "operationId": "UserController_getInfo",
         "parameters": [],
         "responses": {
           "200": {
@@ -18934,10 +18934,10 @@
         ]
       }
     },
-    "/api/v1/system/user/profile": {
+    "/api/system/user/profile": {
       "get": {
         "description": "获取当前登录用户的个人信息",
-        "operationId": "UserController_profile_v1",
+        "operationId": "UserController_profile",
         "parameters": [],
         "responses": {
           "200": {
@@ -19043,7 +19043,7 @@
       },
       "put": {
         "description": "修改当前用户的个人基本信息",
-        "operationId": "UserController_updateProfile_v1",
+        "operationId": "UserController_updateProfile",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -19160,10 +19160,10 @@
         ]
       }
     },
-    "/api/v1/system/user/profile/avatar": {
+    "/api/system/user/profile/avatar": {
       "post": {
         "description": "上传并更新当前用户头像",
-        "operationId": "UserController_avatar_v1",
+        "operationId": "UserController_avatar",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -19291,10 +19291,10 @@
         ]
       }
     },
-    "/api/v1/system/user/profile/updatePwd": {
+    "/api/system/user/profile/updatePwd": {
       "put": {
         "description": "修改当前用户的登录密码",
-        "operationId": "UserController_updatePwd_v1",
+        "operationId": "UserController_updatePwd",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -19411,10 +19411,10 @@
         ]
       }
     },
-    "/api/v1/system/user": {
+    "/api/system/user": {
       "post": {
         "description": "创建新用户，可分配角色和岗位",
-        "operationId": "UserController_create_v1",
+        "operationId": "UserController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -19535,7 +19535,7 @@
       },
       "get": {
         "description": "获取所有角色和岗位列表，用于新建/编辑用户时选择",
-        "operationId": "UserController_findPostAndRoleAll_v1",
+        "operationId": "UserController_findPostAndRoleAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -19641,7 +19641,7 @@
       },
       "put": {
         "description": "更新用户基本信息",
-        "operationId": "UserController_update_v1",
+        "operationId": "UserController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -19758,10 +19758,10 @@
         ]
       }
     },
-    "/api/v1/system/user/batch": {
+    "/api/system/user/batch": {
       "post": {
         "description": "批量创建用户，单次最多100个，返回每个用户的创建结果",
-        "operationId": "UserController_batchCreate_v1",
+        "operationId": "UserController_batchCreate",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -19880,7 +19880,7 @@
       },
       "delete": {
         "description": "批量删除用户，单次最多100个，返回每个用户的删除结果",
-        "operationId": "UserController_batchDelete_v1",
+        "operationId": "UserController_batchDelete",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -19995,10 +19995,10 @@
         ]
       }
     },
-    "/api/v1/system/user/list": {
+    "/api/system/user/list": {
       "get": {
         "description": "分页查询用户列表，支持多条件筛选",
-        "operationId": "UserController_findAll_v1",
+        "operationId": "UserController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -20223,10 +20223,10 @@
         ]
       }
     },
-    "/api/v1/system/user/deptTree": {
+    "/api/system/user/deptTree": {
       "get": {
         "description": "获取部门树形结构，用于用户筛选",
-        "operationId": "UserController_deptTree_v1",
+        "operationId": "UserController_deptTree",
         "parameters": [],
         "responses": {
           "200": {
@@ -20334,10 +20334,10 @@
         ]
       }
     },
-    "/api/v1/system/user/authRole/{id}": {
+    "/api/system/user/authRole/{id}": {
       "get": {
         "description": "获取用户已分配的角色信息",
-        "operationId": "UserController_authRole_v1",
+        "operationId": "UserController_authRole",
         "parameters": [
           {
             "name": "id",
@@ -20452,10 +20452,10 @@
         ]
       }
     },
-    "/api/v1/system/user/authRole": {
+    "/api/system/user/authRole": {
       "put": {
         "description": "更新用户的角色分配",
-        "operationId": "UserController_updateAuthRole_v1",
+        "operationId": "UserController_updateAuthRole",
         "parameters": [
           {
             "name": "userId",
@@ -20581,10 +20581,10 @@
         ]
       }
     },
-    "/api/v1/system/user/optionselect": {
+    "/api/system/user/optionselect": {
       "get": {
         "description": "获取用户选择框列表",
-        "operationId": "UserController_optionselect_v1",
+        "operationId": "UserController_optionselect",
         "parameters": [],
         "responses": {
           "200": {
@@ -20689,10 +20689,10 @@
         ]
       }
     },
-    "/api/v1/system/user/list/dept/{deptId}": {
+    "/api/system/user/list/dept/{deptId}": {
       "get": {
         "description": "获取指定部门的用户列表",
-        "operationId": "UserController_findByDeptId_v1",
+        "operationId": "UserController_findByDeptId",
         "parameters": [
           {
             "name": "deptId",
@@ -20807,10 +20807,10 @@
         ]
       }
     },
-    "/api/v1/system/user/{userId}": {
+    "/api/system/user/{userId}": {
       "get": {
         "description": "根据用户ID获取用户详细信息",
-        "operationId": "UserController_findOne_v1",
+        "operationId": "UserController_findOne",
         "parameters": [
           {
             "name": "userId",
@@ -20925,10 +20925,10 @@
         ]
       }
     },
-    "/api/v1/system/user/changeStatus": {
+    "/api/system/user/changeStatus": {
       "put": {
         "description": "启用或停用用户账号",
-        "operationId": "UserController_changeStatus_v1",
+        "operationId": "UserController_changeStatus",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -21045,10 +21045,10 @@
         ]
       }
     },
-    "/api/v1/system/user/resetPwd": {
+    "/api/system/user/resetPwd": {
       "put": {
         "description": "管理员重置用户密码",
-        "operationId": "UserController_resetPwd_v1",
+        "operationId": "UserController_resetPwd",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -21165,10 +21165,10 @@
         ]
       }
     },
-    "/api/v1/system/user/{id}": {
+    "/api/system/user/{id}": {
       "delete": {
         "description": "批量删除用户，多个ID用逗号分隔",
-        "operationId": "UserController_remove_v1",
+        "operationId": "UserController_remove",
         "parameters": [
           {
             "name": "id",
@@ -21285,10 +21285,10 @@
         ]
       }
     },
-    "/api/v1/system/user/export": {
+    "/api/system/user/export": {
       "post": {
         "description": "导出用户信息数据为xlsx文件",
-        "operationId": "UserController_export_v1",
+        "operationId": "UserController_export",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -21408,9 +21408,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/folder": {
+    "/api/system/file-manager/folder": {
       "post": {
-        "operationId": "FileManagerController_createFolder_v1",
+        "operationId": "FileManagerController_createFolder",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -21528,7 +21528,7 @@
         ]
       },
       "put": {
-        "operationId": "FileManagerController_updateFolder_v1",
+        "operationId": "FileManagerController_updateFolder",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -21643,9 +21643,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/folder/{folderId}": {
+    "/api/system/file-manager/folder/{folderId}": {
       "delete": {
-        "operationId": "FileManagerController_deleteFolder_v1",
+        "operationId": "FileManagerController_deleteFolder",
         "parameters": [
           {
             "name": "folderId",
@@ -21761,9 +21761,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/folder/list": {
+    "/api/system/file-manager/folder/list": {
       "get": {
-        "operationId": "FileManagerController_listFolders_v1",
+        "operationId": "FileManagerController_listFolders",
         "parameters": [
           {
             "name": "parentId",
@@ -21890,9 +21890,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/folder/tree": {
+    "/api/system/file-manager/folder/tree": {
       "get": {
-        "operationId": "FileManagerController_getFolderTree_v1",
+        "operationId": "FileManagerController_getFolderTree",
         "parameters": [],
         "responses": {
           "200": {
@@ -22000,9 +22000,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/file/list": {
+    "/api/system/file-manager/file/list": {
       "get": {
-        "operationId": "FileManagerController_listFiles_v1",
+        "operationId": "FileManagerController_listFiles",
         "parameters": [
           {
             "name": "pageNum",
@@ -22207,9 +22207,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/file/move": {
+    "/api/system/file-manager/file/move": {
       "post": {
-        "operationId": "FileManagerController_moveFiles_v1",
+        "operationId": "FileManagerController_moveFiles",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -22329,9 +22329,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/file/rename": {
+    "/api/system/file-manager/file/rename": {
       "post": {
-        "operationId": "FileManagerController_renameFile_v1",
+        "operationId": "FileManagerController_renameFile",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -22449,9 +22449,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/file": {
+    "/api/system/file-manager/file": {
       "delete": {
-        "operationId": "FileManagerController_deleteFiles_v1",
+        "operationId": "FileManagerController_deleteFiles",
         "parameters": [],
         "responses": {
           "200": {
@@ -22558,9 +22558,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/file/{uploadId}": {
+    "/api/system/file-manager/file/{uploadId}": {
       "get": {
-        "operationId": "FileManagerController_getFileDetail_v1",
+        "operationId": "FileManagerController_getFileDetail",
         "parameters": [
           {
             "name": "uploadId",
@@ -22674,9 +22674,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/share": {
+    "/api/system/file-manager/share": {
       "post": {
-        "operationId": "FileManagerController_createShare_v1",
+        "operationId": "FileManagerController_createShare",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -22794,9 +22794,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/share/{shareId}": {
+    "/api/system/file-manager/share/{shareId}": {
       "get": {
-        "operationId": "FileManagerController_getShare_v1",
+        "operationId": "FileManagerController_getShare",
         "parameters": [
           {
             "name": "shareId",
@@ -22918,7 +22918,7 @@
         ]
       },
       "delete": {
-        "operationId": "FileManagerController_cancelShare_v1",
+        "operationId": "FileManagerController_cancelShare",
         "parameters": [
           {
             "name": "shareId",
@@ -23034,9 +23034,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/share/{shareId}/download": {
+    "/api/system/file-manager/share/{shareId}/download": {
       "post": {
-        "operationId": "FileManagerController_downloadShare_v1",
+        "operationId": "FileManagerController_downloadShare",
         "parameters": [
           {
             "name": "shareId",
@@ -23155,9 +23155,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/share/my/list": {
+    "/api/system/file-manager/share/my/list": {
       "get": {
-        "operationId": "FileManagerController_myShares_v1",
+        "operationId": "FileManagerController_myShares",
         "parameters": [],
         "responses": {
           "200": {
@@ -23262,9 +23262,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/recycle/list": {
+    "/api/system/file-manager/recycle/list": {
       "get": {
-        "operationId": "FileManagerController_getRecycleList_v1",
+        "operationId": "FileManagerController_getRecycleList",
         "parameters": [
           {
             "name": "pageNum",
@@ -23469,9 +23469,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/recycle/restore": {
+    "/api/system/file-manager/recycle/restore": {
       "put": {
-        "operationId": "FileManagerController_restoreFiles_v1",
+        "operationId": "FileManagerController_restoreFiles",
         "parameters": [],
         "responses": {
           "200": {
@@ -23578,9 +23578,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/recycle/clear": {
+    "/api/system/file-manager/recycle/clear": {
       "delete": {
-        "operationId": "FileManagerController_clearRecycle_v1",
+        "operationId": "FileManagerController_clearRecycle",
         "parameters": [],
         "responses": {
           "200": {
@@ -23687,9 +23687,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/file/{uploadId}/versions": {
+    "/api/system/file-manager/file/{uploadId}/versions": {
       "get": {
-        "operationId": "FileManagerController_getFileVersions_v1",
+        "operationId": "FileManagerController_getFileVersions",
         "parameters": [
           {
             "name": "uploadId",
@@ -23803,9 +23803,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/file/restore-version": {
+    "/api/system/file-manager/file/restore-version": {
       "post": {
-        "operationId": "FileManagerController_restoreVersion_v1",
+        "operationId": "FileManagerController_restoreVersion",
         "parameters": [],
         "responses": {
           "200": {
@@ -23913,9 +23913,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/file/{uploadId}/access-token": {
+    "/api/system/file-manager/file/{uploadId}/access-token": {
       "get": {
-        "operationId": "FileManagerController_getAccessToken_v1",
+        "operationId": "FileManagerController_getAccessToken",
         "parameters": [
           {
             "name": "uploadId",
@@ -24029,9 +24029,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/file/{uploadId}/download": {
+    "/api/system/file-manager/file/{uploadId}/download": {
       "get": {
-        "operationId": "FileManagerController_downloadFile_v1",
+        "operationId": "FileManagerController_downloadFile",
         "parameters": [
           {
             "name": "uploadId",
@@ -24155,9 +24155,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/file/batch-download": {
+    "/api/system/file-manager/file/batch-download": {
       "post": {
-        "operationId": "FileManagerController_batchDownload_v1",
+        "operationId": "FileManagerController_batchDownload",
         "parameters": [],
         "responses": {
           "200": {
@@ -24267,9 +24267,9 @@
         ]
       }
     },
-    "/api/v1/system/file-manager/storage/stats": {
+    "/api/system/file-manager/storage/stats": {
       "get": {
-        "operationId": "FileManagerController_getStorageStats_v1",
+        "operationId": "FileManagerController_getStorageStats",
         "parameters": [],
         "responses": {
           "200": {
@@ -24374,10 +24374,10 @@
         ]
       }
     },
-    "/api/v1/system/sms/channel": {
+    "/api/system/sms/channel": {
       "post": {
         "description": "创建新的短信渠道",
-        "operationId": "SmsChannelController_create_v1",
+        "operationId": "SmsChannelController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -24498,7 +24498,7 @@
       },
       "put": {
         "description": "修改短信渠道信息",
-        "operationId": "SmsChannelController_update_v1",
+        "operationId": "SmsChannelController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -24615,10 +24615,10 @@
         ]
       }
     },
-    "/api/v1/system/sms/channel/list": {
+    "/api/system/sms/channel/list": {
       "get": {
         "description": "分页查询短信渠道列表",
-        "operationId": "SmsChannelController_findAll_v1",
+        "operationId": "SmsChannelController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -24805,10 +24805,10 @@
         ]
       }
     },
-    "/api/v1/system/sms/channel/enabled": {
+    "/api/system/sms/channel/enabled": {
       "get": {
         "description": "获取所有启用的短信渠道（用于下拉选择）",
-        "operationId": "SmsChannelController_getEnabledChannels_v1",
+        "operationId": "SmsChannelController_getEnabledChannels",
         "parameters": [],
         "responses": {
           "200": {
@@ -24915,10 +24915,10 @@
         ]
       }
     },
-    "/api/v1/system/sms/channel/{id}": {
+    "/api/system/sms/channel/{id}": {
       "get": {
         "description": "根据ID获取短信渠道详情",
-        "operationId": "SmsChannelController_findOne_v1",
+        "operationId": "SmsChannelController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -25034,7 +25034,7 @@
       },
       "delete": {
         "description": "批量删除短信渠道，多个ID用逗号分隔",
-        "operationId": "SmsChannelController_remove_v1",
+        "operationId": "SmsChannelController_remove",
         "parameters": [
           {
             "name": "id",
@@ -25151,10 +25151,10 @@
         ]
       }
     },
-    "/api/v1/system/sms/template": {
+    "/api/system/sms/template": {
       "post": {
         "description": "创建新的短信模板",
-        "operationId": "SmsTemplateController_create_v1",
+        "operationId": "SmsTemplateController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -25275,7 +25275,7 @@
       },
       "put": {
         "description": "修改短信模板信息",
-        "operationId": "SmsTemplateController_update_v1",
+        "operationId": "SmsTemplateController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -25392,10 +25392,10 @@
         ]
       }
     },
-    "/api/v1/system/sms/template/list": {
+    "/api/system/sms/template/list": {
       "get": {
         "description": "分页查询短信模板列表",
-        "operationId": "SmsTemplateController_findAll_v1",
+        "operationId": "SmsTemplateController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -25605,10 +25605,10 @@
         ]
       }
     },
-    "/api/v1/system/sms/template/{id}": {
+    "/api/system/sms/template/{id}": {
       "get": {
         "description": "根据ID获取短信模板详情",
-        "operationId": "SmsTemplateController_findOne_v1",
+        "operationId": "SmsTemplateController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -25724,7 +25724,7 @@
       },
       "delete": {
         "description": "批量删除短信模板，多个ID用逗号分隔",
-        "operationId": "SmsTemplateController_remove_v1",
+        "operationId": "SmsTemplateController_remove",
         "parameters": [
           {
             "name": "id",
@@ -25841,10 +25841,10 @@
         ]
       }
     },
-    "/api/v1/system/sms/send": {
+    "/api/system/sms/send": {
       "post": {
         "description": "发送单条短信",
-        "operationId": "SmsSendController_send_v1",
+        "operationId": "SmsSendController_send",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -25964,10 +25964,10 @@
         ]
       }
     },
-    "/api/v1/system/sms/send/batch": {
+    "/api/system/sms/send/batch": {
       "post": {
         "description": "批量发送短信",
-        "operationId": "SmsSendController_batchSend_v1",
+        "operationId": "SmsSendController_batchSend",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -26087,10 +26087,10 @@
         ]
       }
     },
-    "/api/v1/system/sms/send/resend/{logId}": {
+    "/api/system/sms/send/resend/{logId}": {
       "post": {
         "description": "重发失败的短信",
-        "operationId": "SmsSendController_resend_v1",
+        "operationId": "SmsSendController_resend",
         "parameters": [
           {
             "name": "logId",
@@ -26210,10 +26210,10 @@
         ]
       }
     },
-    "/api/v1/system/sms/log/list": {
+    "/api/system/sms/log/list": {
       "get": {
         "description": "分页查询短信日志列表",
-        "operationId": "SmsLogController_findAll_v1",
+        "operationId": "SmsLogController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -26427,10 +26427,10 @@
         ]
       }
     },
-    "/api/v1/system/sms/log/{id}": {
+    "/api/system/sms/log/{id}": {
       "get": {
         "description": "根据ID获取短信日志详情",
-        "operationId": "SmsLogController_findOne_v1",
+        "operationId": "SmsLogController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -26545,10 +26545,10 @@
         ]
       }
     },
-    "/api/v1/system/sms/log/mobile/{mobile}": {
+    "/api/system/sms/log/mobile/{mobile}": {
       "get": {
         "description": "根据手机号查询短信日志",
-        "operationId": "SmsLogController_findByMobile_v1",
+        "operationId": "SmsLogController_findByMobile",
         "parameters": [
           {
             "name": "mobile",
@@ -26665,10 +26665,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/account": {
+    "/api/system/mail/account": {
       "post": {
         "description": "创建新的邮箱账号",
-        "operationId": "MailAccountController_create_v1",
+        "operationId": "MailAccountController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -26789,7 +26789,7 @@
       },
       "put": {
         "description": "修改邮箱账号信息",
-        "operationId": "MailAccountController_update_v1",
+        "operationId": "MailAccountController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -26906,10 +26906,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/account/list": {
+    "/api/system/mail/account/list": {
       "get": {
         "description": "分页查询邮箱账号列表",
-        "operationId": "MailAccountController_findAll_v1",
+        "operationId": "MailAccountController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -27096,10 +27096,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/account/enabled": {
+    "/api/system/mail/account/enabled": {
       "get": {
         "description": "获取所有启用的邮箱账号（用于下拉选择）",
-        "operationId": "MailAccountController_getEnabledAccounts_v1",
+        "operationId": "MailAccountController_getEnabledAccounts",
         "parameters": [],
         "responses": {
           "200": {
@@ -27206,10 +27206,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/account/{id}": {
+    "/api/system/mail/account/{id}": {
       "get": {
         "description": "根据ID获取邮箱账号详情",
-        "operationId": "MailAccountController_findOne_v1",
+        "operationId": "MailAccountController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -27325,7 +27325,7 @@
       },
       "delete": {
         "description": "批量删除邮箱账号，多个ID用逗号分隔",
-        "operationId": "MailAccountController_remove_v1",
+        "operationId": "MailAccountController_remove",
         "parameters": [
           {
             "name": "id",
@@ -27442,10 +27442,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/template": {
+    "/api/system/mail/template": {
       "post": {
         "description": "创建新的邮件模板",
-        "operationId": "MailTemplateController_create_v1",
+        "operationId": "MailTemplateController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -27566,7 +27566,7 @@
       },
       "put": {
         "description": "修改邮件模板信息",
-        "operationId": "MailTemplateController_update_v1",
+        "operationId": "MailTemplateController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -27683,10 +27683,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/template/list": {
+    "/api/system/mail/template/list": {
       "get": {
         "description": "分页查询邮件模板列表",
-        "operationId": "MailTemplateController_findAll_v1",
+        "operationId": "MailTemplateController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -27882,10 +27882,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/template/{id}": {
+    "/api/system/mail/template/{id}": {
       "get": {
         "description": "根据ID获取邮件模板详情",
-        "operationId": "MailTemplateController_findOne_v1",
+        "operationId": "MailTemplateController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -28001,7 +28001,7 @@
       },
       "delete": {
         "description": "批量删除邮件模板，多个ID用逗号分隔",
-        "operationId": "MailTemplateController_remove_v1",
+        "operationId": "MailTemplateController_remove",
         "parameters": [
           {
             "name": "id",
@@ -28118,10 +28118,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/send": {
+    "/api/system/mail/send": {
       "post": {
         "description": "使用模板发送单封邮件",
-        "operationId": "MailSendController_send_v1",
+        "operationId": "MailSendController_send",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -28241,10 +28241,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/send/batch": {
+    "/api/system/mail/send/batch": {
       "post": {
         "description": "使用模板批量发送邮件",
-        "operationId": "MailSendController_batchSend_v1",
+        "operationId": "MailSendController_batchSend",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -28364,10 +28364,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/send/resend/{logId}": {
+    "/api/system/mail/send/resend/{logId}": {
       "post": {
         "description": "重新发送失败的邮件",
-        "operationId": "MailSendController_resend_v1",
+        "operationId": "MailSendController_resend",
         "parameters": [
           {
             "name": "logId",
@@ -28487,10 +28487,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/send/test": {
+    "/api/system/mail/send/test": {
       "post": {
         "description": "测试邮箱账号是否可用",
-        "operationId": "MailSendController_testSend_v1",
+        "operationId": "MailSendController_testSend",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -28610,10 +28610,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/log/list": {
+    "/api/system/mail/log/list": {
       "get": {
         "description": "分页查询邮件日志列表",
-        "operationId": "MailLogController_findAll_v1",
+        "operationId": "MailLogController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -28809,10 +28809,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/log/stats": {
+    "/api/system/mail/log/stats": {
       "get": {
         "description": "获取邮件发送状态统计",
-        "operationId": "MailLogController_getStats_v1",
+        "operationId": "MailLogController_getStats",
         "parameters": [],
         "responses": {
           "200": {
@@ -28919,10 +28919,10 @@
         ]
       }
     },
-    "/api/v1/system/mail/log/{id}": {
+    "/api/system/mail/log/{id}": {
       "get": {
         "description": "根据ID获取邮件日志详情",
-        "operationId": "MailLogController_findOne_v1",
+        "operationId": "MailLogController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -29037,10 +29037,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/template": {
+    "/api/system/notify/template": {
       "post": {
         "description": "创建新的站内信模板",
-        "operationId": "NotifyTemplateController_create_v1",
+        "operationId": "NotifyTemplateController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -29161,7 +29161,7 @@
       },
       "put": {
         "description": "修改站内信模板信息",
-        "operationId": "NotifyTemplateController_update_v1",
+        "operationId": "NotifyTemplateController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -29278,10 +29278,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/template/list": {
+    "/api/system/notify/template/list": {
       "get": {
         "description": "分页查询站内信模板列表",
-        "operationId": "NotifyTemplateController_findAll_v1",
+        "operationId": "NotifyTemplateController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -29477,10 +29477,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/template/select": {
+    "/api/system/notify/template/select": {
       "get": {
         "description": "获取所有启用的站内信模板（用于下拉选择）",
-        "operationId": "NotifyTemplateController_getSelectList_v1",
+        "operationId": "NotifyTemplateController_getSelectList",
         "parameters": [],
         "responses": {
           "200": {
@@ -29585,10 +29585,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/template/{id}": {
+    "/api/system/notify/template/{id}": {
       "get": {
         "description": "根据ID获取站内信模板详情",
-        "operationId": "NotifyTemplateController_findOne_v1",
+        "operationId": "NotifyTemplateController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -29704,7 +29704,7 @@
       },
       "delete": {
         "description": "批量删除站内信模板，多个ID用逗号分隔",
-        "operationId": "NotifyTemplateController_remove_v1",
+        "operationId": "NotifyTemplateController_remove",
         "parameters": [
           {
             "name": "id",
@@ -29821,10 +29821,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/message/send": {
+    "/api/system/notify/message/send": {
       "post": {
         "description": "发送站内信给指定用户（单发/群发）",
-        "operationId": "NotifyMessageController_send_v1",
+        "operationId": "NotifyMessageController_send",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -29944,10 +29944,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/message/send-all": {
+    "/api/system/notify/message/send-all": {
       "post": {
         "description": "发送站内信给所有用户",
-        "operationId": "NotifyMessageController_sendAll_v1",
+        "operationId": "NotifyMessageController_sendAll",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -30067,10 +30067,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/message/list": {
+    "/api/system/notify/message/list": {
       "get": {
         "description": "分页查询所有站内信消息列表",
-        "operationId": "NotifyMessageController_findAll_v1",
+        "operationId": "NotifyMessageController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -30257,10 +30257,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/message/my-list": {
+    "/api/system/notify/message/my-list": {
       "get": {
         "description": "分页查询当前用户的站内信列表",
-        "operationId": "NotifyMessageController_findMyMessages_v1",
+        "operationId": "NotifyMessageController_findMyMessages",
         "parameters": [
           {
             "name": "pageNum",
@@ -30429,10 +30429,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/message/unread-count": {
+    "/api/system/notify/message/unread-count": {
       "get": {
         "description": "获取当前用户的未读站内信数量",
-        "operationId": "NotifyMessageController_getUnreadCount_v1",
+        "operationId": "NotifyMessageController_getUnreadCount",
         "parameters": [],
         "responses": {
           "200": {
@@ -30537,10 +30537,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/message/recent": {
+    "/api/system/notify/message/recent": {
       "get": {
         "description": "获取当前用户最近的站内信列表（用于通知铃铛下拉）",
-        "operationId": "NotifyMessageController_getRecentMessages_v1",
+        "operationId": "NotifyMessageController_getRecentMessages",
         "parameters": [
           {
             "name": "limit",
@@ -30654,10 +30654,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/message/{id}": {
+    "/api/system/notify/message/{id}": {
       "get": {
         "description": "根据ID获取站内信详情",
-        "operationId": "NotifyMessageController_findOne_v1",
+        "operationId": "NotifyMessageController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -30773,7 +30773,7 @@
       },
       "delete": {
         "description": "删除单条站内信（软删除）",
-        "operationId": "NotifyMessageController_remove_v1",
+        "operationId": "NotifyMessageController_remove",
         "parameters": [
           {
             "name": "id",
@@ -30890,10 +30890,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/message/read/{id}": {
+    "/api/system/notify/message/read/{id}": {
       "put": {
         "description": "标记单条站内信为已读",
-        "operationId": "NotifyMessageController_markAsRead_v1",
+        "operationId": "NotifyMessageController_markAsRead",
         "parameters": [
           {
             "name": "id",
@@ -31010,10 +31010,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/message/read-batch/{ids}": {
+    "/api/system/notify/message/read-batch/{ids}": {
       "put": {
         "description": "批量标记站内信为已读，多个ID用逗号分隔",
-        "operationId": "NotifyMessageController_markAsReadBatch_v1",
+        "operationId": "NotifyMessageController_markAsReadBatch",
         "parameters": [
           {
             "name": "ids",
@@ -31130,10 +31130,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/message/read-all": {
+    "/api/system/notify/message/read-all": {
       "put": {
         "description": "标记当前用户所有站内信为已读",
-        "operationId": "NotifyMessageController_markAllAsRead_v1",
+        "operationId": "NotifyMessageController_markAllAsRead",
         "parameters": [],
         "responses": {
           "200": {
@@ -31240,10 +31240,10 @@
         ]
       }
     },
-    "/api/v1/system/notify/message/batch/{ids}": {
+    "/api/system/notify/message/batch/{ids}": {
       "delete": {
         "description": "批量删除站内信（软删除），多个ID用逗号分隔",
-        "operationId": "NotifyMessageController_removeBatch_v1",
+        "operationId": "NotifyMessageController_removeBatch",
         "parameters": [
           {
             "name": "ids",
@@ -31360,10 +31360,10 @@
         ]
       }
     },
-    "/api/v1/monitor/job/list": {
+    "/api/monitor/job/list": {
       "get": {
         "description": "分页查询定时任务列表",
-        "operationId": "JobController_findAll_v1",
+        "operationId": "JobController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -31552,10 +31552,10 @@
         ]
       }
     },
-    "/api/v1/monitor/job/{jobId}": {
+    "/api/monitor/job/{jobId}": {
       "get": {
         "description": "根据任务ID获取定时任务详细信息",
-        "operationId": "JobController_getInfo_v1",
+        "operationId": "JobController_getInfo",
         "parameters": [
           {
             "name": "jobId",
@@ -31670,10 +31670,10 @@
         ]
       }
     },
-    "/api/v1/monitor/job": {
+    "/api/monitor/job": {
       "post": {
         "description": "新增定时任务",
-        "operationId": "JobController_add_v1",
+        "operationId": "JobController_add",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -31792,7 +31792,7 @@
       },
       "put": {
         "description": "更新定时任务信息",
-        "operationId": "JobController_update_v1",
+        "operationId": "JobController_update",
         "parameters": [],
         "responses": {
           "200": {
@@ -31897,10 +31897,10 @@
         ]
       }
     },
-    "/api/v1/monitor/job/changeStatus": {
+    "/api/monitor/job/changeStatus": {
       "put": {
         "description": "启用或停用定时任务",
-        "operationId": "JobController_changeStatus_v1",
+        "operationId": "JobController_changeStatus",
         "parameters": [],
         "responses": {
           "200": {
@@ -32005,10 +32005,10 @@
         ]
       }
     },
-    "/api/v1/monitor/job/{jobIds}": {
+    "/api/monitor/job/{jobIds}": {
       "delete": {
         "description": "批量删除定时任务，多个ID用逗号分隔",
-        "operationId": "JobController_remove_v1",
+        "operationId": "JobController_remove",
         "parameters": [
           {
             "name": "jobIds",
@@ -32123,10 +32123,10 @@
         ]
       }
     },
-    "/api/v1/monitor/job/run": {
+    "/api/monitor/job/run": {
       "put": {
         "description": "手动触发定时任务执行",
-        "operationId": "JobController_run_v1",
+        "operationId": "JobController_run",
         "parameters": [],
         "responses": {
           "200": {
@@ -32231,10 +32231,10 @@
         ]
       }
     },
-    "/api/v1/monitor/job/export": {
+    "/api/monitor/job/export": {
       "post": {
         "description": "导出定时任务数据为xlsx文件",
-        "operationId": "JobController_export_v1",
+        "operationId": "JobController_export",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -32354,10 +32354,10 @@
         ]
       }
     },
-    "/api/v1/monitor/jobLog/list": {
+    "/api/monitor/jobLog/list": {
       "get": {
         "description": "分页查询定时任务执行日志",
-        "operationId": "JobLogController_findAll_v1",
+        "operationId": "JobLogController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -32546,10 +32546,10 @@
         ]
       }
     },
-    "/api/v1/monitor/jobLog/clean": {
+    "/api/monitor/jobLog/clean": {
       "delete": {
         "description": "清除所有定时任务执行日志",
-        "operationId": "JobLogController_clean_v1",
+        "operationId": "JobLogController_clean",
         "parameters": [],
         "responses": {
           "200": {
@@ -32654,10 +32654,10 @@
         ]
       }
     },
-    "/api/v1/monitor/jobLog/export": {
+    "/api/monitor/jobLog/export": {
       "post": {
         "description": "导出定时任务执行日志为xlsx文件",
-        "operationId": "JobLogController_export_v1",
+        "operationId": "JobLogController_export",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -32777,10 +32777,10 @@
         ]
       }
     },
-    "/api/v1/monitor/server": {
+    "/api/monitor/server": {
       "get": {
         "description": "获取服务器CPU、内存、系统等监控信息",
-        "operationId": "ServerController_getInfo_v1",
+        "operationId": "ServerController_getInfo",
         "parameters": [],
         "responses": {
           "200": {
@@ -32885,10 +32885,10 @@
         ]
       }
     },
-    "/api/v1/monitor/cache": {
+    "/api/monitor/cache": {
       "get": {
         "description": "获取Redis缓存监控信息",
-        "operationId": "CacheController_getInfo_v1",
+        "operationId": "CacheController_getInfo",
         "parameters": [],
         "responses": {
           "200": {
@@ -32993,10 +32993,10 @@
         ]
       }
     },
-    "/api/v1/monitor/cache/getNames": {
+    "/api/monitor/cache/getNames": {
       "get": {
         "description": "获取所有缓存分类名称",
-        "operationId": "CacheController_getNames_v1",
+        "operationId": "CacheController_getNames",
         "parameters": [],
         "responses": {
           "200": {
@@ -33101,10 +33101,10 @@
         ]
       }
     },
-    "/api/v1/monitor/cache/getKeys/{id}": {
+    "/api/monitor/cache/getKeys/{id}": {
       "get": {
         "description": "根据缓存名称获取所有键名",
-        "operationId": "CacheController_getKeys_v1",
+        "operationId": "CacheController_getKeys",
         "parameters": [
           {
             "name": "id",
@@ -33219,10 +33219,10 @@
         ]
       }
     },
-    "/api/v1/monitor/cache/getValue/{cacheName}/{cacheKey}": {
+    "/api/monitor/cache/getValue/{cacheName}/{cacheKey}": {
       "get": {
         "description": "获取指定缓存的内容",
-        "operationId": "CacheController_getValue_v1",
+        "operationId": "CacheController_getValue",
         "parameters": [
           {
             "name": "cacheName",
@@ -33346,10 +33346,10 @@
         ]
       }
     },
-    "/api/v1/monitor/cache/clearCacheName/{cacheName}": {
+    "/api/monitor/cache/clearCacheName/{cacheName}": {
       "delete": {
         "description": "清除指定分类下的所有缓存",
-        "operationId": "CacheController_clearCacheName_v1",
+        "operationId": "CacheController_clearCacheName",
         "parameters": [
           {
             "name": "cacheName",
@@ -33464,10 +33464,10 @@
         ]
       }
     },
-    "/api/v1/monitor/cache/clearCacheKey/{cacheKey}": {
+    "/api/monitor/cache/clearCacheKey/{cacheKey}": {
       "delete": {
         "description": "清除指定的缓存键",
-        "operationId": "CacheController_clearCacheKey_v1",
+        "operationId": "CacheController_clearCacheKey",
         "parameters": [
           {
             "name": "cacheKey",
@@ -33582,10 +33582,10 @@
         ]
       }
     },
-    "/api/v1/monitor/cache/clearCacheAll": {
+    "/api/monitor/cache/clearCacheAll": {
       "delete": {
         "description": "清除所有缓存数据",
-        "operationId": "CacheController_clearCacheAll_v1",
+        "operationId": "CacheController_clearCacheAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -33690,10 +33690,10 @@
         ]
       }
     },
-    "/api/v1/monitor/logininfor/list": {
+    "/api/monitor/logininfor/list": {
       "get": {
         "description": "分页查询登录日志列表",
-        "operationId": "LoginlogController_findAll_v1",
+        "operationId": "LoginlogController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -33883,10 +33883,10 @@
         ]
       }
     },
-    "/api/v1/monitor/logininfor/clean": {
+    "/api/monitor/logininfor/clean": {
       "delete": {
         "description": "清空所有登录日志记录",
-        "operationId": "LoginlogController_removeAll_v1",
+        "operationId": "LoginlogController_removeAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -33991,10 +33991,10 @@
         ]
       }
     },
-    "/api/v1/monitor/logininfor/unlock/{username}": {
+    "/api/monitor/logininfor/unlock/{username}": {
       "get": {
         "description": "解锁被锁定的用户账号",
-        "operationId": "LoginlogController_unlock_v1",
+        "operationId": "LoginlogController_unlock",
         "parameters": [
           {
             "name": "username",
@@ -34109,10 +34109,10 @@
         ]
       }
     },
-    "/api/v1/monitor/logininfor/{id}": {
+    "/api/monitor/logininfor/{id}": {
       "delete": {
         "description": "批量删除登录日志，多个ID用逗号分隔",
-        "operationId": "LoginlogController_remove_v1",
+        "operationId": "LoginlogController_remove",
         "parameters": [
           {
             "name": "id",
@@ -34227,10 +34227,10 @@
         ]
       }
     },
-    "/api/v1/monitor/logininfor/export": {
+    "/api/monitor/logininfor/export": {
       "post": {
         "description": "导出登录日志数据为xlsx文件",
-        "operationId": "LoginlogController_export_v1",
+        "operationId": "LoginlogController_export",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -34350,10 +34350,10 @@
         ]
       }
     },
-    "/api/v1/monitor/online/list": {
+    "/api/monitor/online/list": {
       "get": {
         "description": "查询当前在线用户列表",
-        "operationId": "OnlineController_findAll_v1",
+        "operationId": "OnlineController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -34499,10 +34499,10 @@
         ]
       }
     },
-    "/api/v1/monitor/online/{token}": {
+    "/api/monitor/online/{token}": {
       "delete": {
         "description": "强制用户下线",
-        "operationId": "OnlineController_delete_v1",
+        "operationId": "OnlineController_delete",
         "parameters": [
           {
             "name": "token",
@@ -34617,10 +34617,10 @@
         ]
       }
     },
-    "/api/v1/monitor/operlog/clean": {
+    "/api/monitor/operlog/clean": {
       "delete": {
         "description": "清空所有操作日志记录",
-        "operationId": "OperlogController_removeAll_v1",
+        "operationId": "OperlogController_removeAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -34725,10 +34725,10 @@
         ]
       }
     },
-    "/api/v1/monitor/operlog/list": {
+    "/api/monitor/operlog/list": {
       "get": {
         "description": "分页查询操作日志列表",
-        "operationId": "OperlogController_findAll_v1",
+        "operationId": "OperlogController_findAll",
         "parameters": [
           {
             "name": "operId",
@@ -35045,10 +35045,10 @@
         ]
       }
     },
-    "/api/v1/monitor/operlog/{operId}": {
+    "/api/monitor/operlog/{operId}": {
       "get": {
         "description": "根据日志ID获取操作日志详情",
-        "operationId": "OperlogController_findOne_v1",
+        "operationId": "OperlogController_findOne",
         "parameters": [
           {
             "name": "operId",
@@ -35164,7 +35164,7 @@
       },
       "delete": {
         "description": "删除指定操作日志记录",
-        "operationId": "OperlogController_remove_v1",
+        "operationId": "OperlogController_remove",
         "parameters": [
           {
             "name": "operId",
@@ -35279,10 +35279,10 @@
         ]
       }
     },
-    "/api/v1/monitor/operlog/export": {
+    "/api/monitor/operlog/export": {
       "post": {
         "description": "导出操作日志数据为xlsx文件",
-        "operationId": "OperlogController_exportData_v1",
+        "operationId": "OperlogController_exportData",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -35402,9 +35402,9 @@
         ]
       }
     },
-    "/api/v1/health": {
+    "/api/health": {
       "get": {
-        "operationId": "HealthController_check_v1",
+        "operationId": "HealthController_check",
         "parameters": [],
         "responses": {
           "200": {
@@ -35571,9 +35571,9 @@
         ]
       }
     },
-    "/api/v1/health/live": {
+    "/api/health/live": {
       "get": {
-        "operationId": "HealthController_checkLive_v1",
+        "operationId": "HealthController_checkLive",
         "parameters": [],
         "responses": {
           "200": {
@@ -35740,9 +35740,9 @@
         ]
       }
     },
-    "/api/v1/health/liveness": {
+    "/api/health/liveness": {
       "get": {
-        "operationId": "HealthController_checkLiveness_v1",
+        "operationId": "HealthController_checkLiveness",
         "parameters": [],
         "responses": {
           "200": {
@@ -35909,9 +35909,9 @@
         ]
       }
     },
-    "/api/v1/health/ready": {
+    "/api/health/ready": {
       "get": {
-        "operationId": "HealthController_checkReady_v1",
+        "operationId": "HealthController_checkReady",
         "parameters": [],
         "responses": {
           "200": {
@@ -36078,9 +36078,9 @@
         ]
       }
     },
-    "/api/v1/health/readiness": {
+    "/api/health/readiness": {
       "get": {
-        "operationId": "HealthController_checkReadiness_v1",
+        "operationId": "HealthController_checkReadiness",
         "parameters": [],
         "responses": {
           "200": {
@@ -36247,9 +36247,9 @@
         ]
       }
     },
-    "/api/v1/health/info": {
+    "/api/health/info": {
       "get": {
-        "operationId": "HealthController_getInfo_v1",
+        "operationId": "HealthController_getInfo",
         "parameters": [],
         "responses": {
           "200": {
@@ -36262,9 +36262,9 @@
         ]
       }
     },
-    "/api/v1/info": {
+    "/api/info": {
       "get": {
-        "operationId": "InfoController_getInfo_v1",
+        "operationId": "InfoController_getInfo",
         "parameters": [],
         "responses": {
           "200": {
@@ -36277,9 +36277,9 @@
         ]
       }
     },
-    "/api/v1/metrics": {
+    "/api/metrics": {
       "get": {
-        "operationId": "PrometheusController_index_v1",
+        "operationId": "PrometheusController_index",
         "parameters": [],
         "responses": {
           "200": {
@@ -36291,9 +36291,9 @@
         ]
       }
     },
-    "/api/v1/resource/sse": {
+    "/api/resource/sse": {
       "get": {
-        "operationId": "SseController_sse_v1",
+        "operationId": "SseController_sse",
         "parameters": [
           {
             "name": "Authorization",
@@ -36335,9 +36335,9 @@
         ]
       }
     },
-    "/api/v1/resource/sse/close": {
+    "/api/resource/sse/close": {
       "get": {
-        "operationId": "SseController_closeSse_v1",
+        "operationId": "SseController_closeSse",
         "parameters": [],
         "responses": {
           "200": {
@@ -36355,9 +36355,9 @@
         ]
       }
     },
-    "/api/v1/resource/sse/send": {
+    "/api/resource/sse/send": {
       "post": {
-        "operationId": "SseController_sendMessage_v1",
+        "operationId": "SseController_sendMessage",
         "parameters": [],
         "responses": {
           "201": {
@@ -36375,9 +36375,9 @@
         ]
       }
     },
-    "/api/v1/resource/sse/broadcast": {
+    "/api/resource/sse/broadcast": {
       "post": {
-        "operationId": "SseController_broadcast_v1",
+        "operationId": "SseController_broadcast",
         "parameters": [],
         "responses": {
           "201": {
@@ -36395,9 +36395,9 @@
         ]
       }
     },
-    "/api/v1/resource/sse/count": {
+    "/api/resource/sse/count": {
       "post": {
-        "operationId": "SseController_getCount_v1",
+        "operationId": "SseController_getCount",
         "parameters": [],
         "responses": {
           "201": {
@@ -36415,10 +36415,10 @@
         ]
       }
     },
-    "/api/v1/resource/oss/config": {
+    "/api/resource/oss/config": {
       "post": {
         "description": "创建OSS配置",
-        "operationId": "OssConfigController_create_v1",
+        "operationId": "OssConfigController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -36539,7 +36539,7 @@
       },
       "put": {
         "description": "修改OSS配置",
-        "operationId": "OssConfigController_update_v1",
+        "operationId": "OssConfigController_update",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -36656,10 +36656,10 @@
         ]
       }
     },
-    "/api/v1/resource/oss/config/list": {
+    "/api/resource/oss/config/list": {
       "get": {
         "description": "分页查询OSS配置列表",
-        "operationId": "OssConfigController_findAll_v1",
+        "operationId": "OssConfigController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -36861,10 +36861,10 @@
         ]
       }
     },
-    "/api/v1/resource/oss/config/{id}": {
+    "/api/resource/oss/config/{id}": {
       "get": {
         "description": "根据ID获取OSS配置详情",
-        "operationId": "OssConfigController_findOne_v1",
+        "operationId": "OssConfigController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -36979,10 +36979,10 @@
         ]
       }
     },
-    "/api/v1/resource/oss/config/changeStatus": {
+    "/api/resource/oss/config/changeStatus": {
       "put": {
         "description": "修改OSS配置状态",
-        "operationId": "OssConfigController_changeStatus_v1",
+        "operationId": "OssConfigController_changeStatus",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -37099,10 +37099,10 @@
         ]
       }
     },
-    "/api/v1/resource/oss/config/{ids}": {
+    "/api/resource/oss/config/{ids}": {
       "delete": {
         "description": "批量删除OSS配置，多个ID用逗号分隔",
-        "operationId": "OssConfigController_remove_v1",
+        "operationId": "OssConfigController_remove",
         "parameters": [
           {
             "name": "ids",
@@ -37219,10 +37219,10 @@
         ]
       }
     },
-    "/api/v1/resource/oss/list": {
+    "/api/resource/oss/list": {
       "get": {
         "description": "分页查询OSS文件列表",
-        "operationId": "OssController_findAll_v1",
+        "operationId": "OssController_findAll",
         "parameters": [
           {
             "name": "pageNum",
@@ -37426,10 +37426,10 @@
         ]
       }
     },
-    "/api/v1/resource/oss/listByIds/{ids}": {
+    "/api/resource/oss/listByIds/{ids}": {
       "get": {
         "description": "根据ID列表获取OSS文件",
-        "operationId": "OssController_findByIds_v1",
+        "operationId": "OssController_findByIds",
         "parameters": [
           {
             "name": "ids",
@@ -37544,10 +37544,10 @@
         ]
       }
     },
-    "/api/v1/resource/oss/{id}": {
+    "/api/resource/oss/{id}": {
       "get": {
         "description": "根据ID获取OSS文件详情",
-        "operationId": "OssController_findOne_v1",
+        "operationId": "OssController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -37662,10 +37662,10 @@
         ]
       }
     },
-    "/api/v1/resource/oss/upload": {
+    "/api/resource/oss/upload": {
       "post": {
         "description": "上传文件到OSS",
-        "operationId": "OssController_upload_v1",
+        "operationId": "OssController_upload",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -37790,10 +37790,10 @@
         ]
       }
     },
-    "/api/v1/resource/oss/{ids}": {
+    "/api/resource/oss/{ids}": {
       "delete": {
         "description": "批量删除OSS文件，多个ID用逗号分隔",
-        "operationId": "OssController_remove_v1",
+        "operationId": "OssController_remove",
         "parameters": [
           {
             "name": "ids",
