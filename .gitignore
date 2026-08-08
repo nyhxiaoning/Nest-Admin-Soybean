@@ -10,6 +10,9 @@ build/
 out/
 # 保留 apps/web/build/（Vite 插件配置文件，需要提交）
 !apps/web/build/
+# 保留“表单构建”路由页面（目录名与通用 build 忽略规则冲突）
+!apps/web/src/views/tool/build/
+!apps/web/src/views/tool/build/index.vue
 
 # Logs
 logs/
@@ -115,4 +118,3 @@ docker-compose.override.yml
 nest_admin.pem
 
 pnpm-lock.yaml
-
