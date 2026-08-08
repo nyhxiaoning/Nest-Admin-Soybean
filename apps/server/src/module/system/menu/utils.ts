@@ -49,6 +49,10 @@ interface RouterConfig {
  * @param arr
  */
 export const buildMenus = (arr: MenuItem[]): RouterConfig[] => {
+  // Button permissions belong to authorization checks, not to the router tree.
+  // Filtering them up front is especially important for nested directories:
+  // otherwise a button directly below a directory is emitted as a "#" route.
+  arr = arr.filter((menu) => menu.menuType !== UserConstants.TYPE_BUTTON);
   //保证父级菜单排在前面
   arr.sort((a, b) => a.parentId - b.parentId);
   const kData: Record<number, InternalMenuItem> = {}; // 以id做key的对象 暂时储存数据

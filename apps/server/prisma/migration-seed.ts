@@ -17,6 +17,145 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+const codegenPageMenus = [
+  {
+    menuName: '数据源管理',
+    orderNum: 1,
+    path: 'datasource',
+    component: 'tool/gen/datasource/index',
+    perms: 'tool:gen:datasource:list',
+    icon: 'mdi:database-cog-outline',
+    remark: '代码生成数据源管理菜单',
+  },
+  {
+    menuName: '模板管理',
+    orderNum: 2,
+    path: 'template',
+    component: 'tool/gen/template/index',
+    perms: 'tool:gen:template:list',
+    icon: 'mdi:file-document-edit-outline',
+    remark: '代码生成模板管理菜单',
+  },
+  {
+    menuName: '生成历史',
+    orderNum: 3,
+    path: 'history',
+    component: 'tool/gen/history/index',
+    perms: 'tool:gen:history:list',
+    icon: 'mdi:history',
+    remark: '代码生成历史菜单',
+  },
+] as const;
+
+/**
+ * Align existing databases with the nested code-generator routes used by the Vue app.
+ * The lookup uses stable component paths instead of fixed IDs so this remains safe for
+ * databases where user-created menus have already consumed IDs 121-123.
+ */
+async function syncCodegenMenus() {
+  const parent = await prisma.sysMenu.findFirst({
+    where: {
+      tenantId: '000000',
+      OR: [{ menuId: 116 }, { parentId: 3, path: 'gen' }, { component: 'tool/gen/index' }],
+    },
+    orderBy: { menuId: 'asc' },
+  });
+
+  if (!parent) {
+    console.warn('⚠️ 未找到“代码生成”菜单，跳过子菜单同步');
+    return;
+  }
+
+  await prisma.sysMenu.update({
+    where: { menuId: parent.menuId },
+    data: {
+      component: null,
+      menuType: 'M',
+      perms: '',
+      remark: '代码生成目录',
+      delFlag: '0',
+      status: '0',
+    },
+  });
+
+  // The base seed imports explicit menu IDs, which does not advance PostgreSQL's
+  // serial sequence. Align it before creating a missing menu to prevent P2002.
+  await prisma.$queryRaw`
+    SELECT setval(
+      pg_get_serial_sequence('sys_menu', 'menu_id'),
+      COALESCE((SELECT MAX(menu_id) FROM sys_menu), 1),
+      true
+    )
+  `;
+
+  const pageMenuIds: number[] = [];
+
+  for (const page of codegenPageMenus) {
+    const existing = await prisma.sysMenu.findFirst({
+      where: {
+        tenantId: parent.tenantId,
+        OR: [
+          { component: page.component },
+          { parentId: parent.menuId, path: page.path },
+          { parentId: parent.menuId, menuName: page.menuName },
+        ],
+      },
+      orderBy: { menuId: 'asc' },
+    });
+
+    const data = {
+      tenantId: parent.tenantId,
+      parentId: parent.menuId,
+      ...page,
+      query: '',
+      isFrame: '1',
+      isCache: '0',
+      menuType: 'C',
+      visible: '0',
+      status: '0',
+      delFlag: '0',
+      updateBy: 'system',
+    };
+
+    const menu = existing
+      ? await prisma.sysMenu.update({ where: { menuId: existing.menuId }, data })
+      : await prisma.sysMenu.create({ data: { ...data, createBy: 'system' } });
+
+    pageMenuIds.push(menu.menuId);
+  }
+
+  const assignedRoles = await prisma.sysRoleMenu.findMany({
+    where: { menuId: parent.menuId },
+    select: { roleId: true },
+  });
+
+  if (assignedRoles.length > 0) {
+    await prisma.sysRoleMenu.createMany({
+      data: assignedRoles.flatMap(({ roleId }) => pageMenuIds.map((menuId) => ({ roleId, menuId }))),
+      skipDuplicates: true,
+    });
+  }
+
+  const tenantPackages = await prisma.sysTenantPackage.findMany({
+    where: { menuIds: { not: null } },
+    select: { packageId: true, menuIds: true },
+  });
+
+  for (const tenantPackage of tenantPackages) {
+    const packageMenuIds = (tenantPackage.menuIds || '')
+      .split(',')
+      .map(Number)
+      .filter(Number.isFinite);
+
+    if (!packageMenuIds.includes(parent.menuId)) continue;
+
+    await prisma.sysTenantPackage.update({
+      where: { packageId: tenantPackage.packageId },
+      data: { menuIds: [...new Set([...packageMenuIds, ...pageMenuIds])].join(',') },
+    });
+  }
+}
+
 async function main() {
   console.log('🌱 开始导入迁移表种子数据...\n');
 
@@ -163,6 +302,10 @@ async function main() {
     ],
     skipDuplicates: true,
   });
+
+  // ==================== 代码生成器菜单 ====================
+  console.log('📝 同步代码生成器菜单...');
+  await syncCodegenMenus();
 
   // ==================== 租户配额表 ====================
   console.log('📝 导入租户配额...');
