@@ -1,49 +1,51 @@
+import process from 'node:process';
 import type { ProxyOptions } from 'vite';
 import dayjs from 'dayjs';
 
-type ProxyItem = [string, string];
-
-type ProxyList = ProxyItem[];
-
-type ProxyTargetList = Record<string, ProxyOptions>;
+/**
+ * Get build time
+ */
+export function getBuildTime() {
+  return dayjs().format('YYYY-MM-DD HH:mm:ss');
+}
 
 /**
- * Create Vite proxy for development
- * @param viteEnv - Vite environment variables
- * @param enable - Whether to enable proxy
+ * Create vite proxy
+ *
+ * @param viteEnv
+ * @param enable
  */
-export function createViteProxy(viteEnv: Env.ImportMeta, enable: boolean): ProxyTargetList | undefined {
-  if (!enable) return undefined;
-
-  const baseApi = viteEnv.VITE_APP_BASE_API;
-  const apiPrefix = '/api';
-
-  const proxyList: ProxyList = [['/api', viteEnv.VITE_SERVICE_BASE_URL]];
-
-  if (baseApi) {
-    proxyList.push([baseApi, viteEnv.VITE_SERVICE_BASE_URL]);
+export function createViteProxy(viteEnv: Env.ImportMeta, enable: boolean) {
+  if (!enable || viteEnv.VITE_HTTP_PROXY !== 'Y') {
+    return undefined;
   }
 
-  const proxy: ProxyTargetList = {};
+  const { VITE_SERVICE_BASE_URL, VITE_OTHER_SERVICE_BASE_URL } = viteEnv;
 
-  for (const [prefix, target] of proxyList) {
-    const isHttps = target.startsWith('https');
+  const proxy: Record<string, ProxyOptions> = {};
 
-    proxy[prefix] = {
-      target,
-      changeOrigin: true,
-      ws: true,
-      // 后端已移除 URI 版本控制（无 /v1 版本），统一使用 /api 前缀。
-      // 前端自定义前缀（如 /dev-api）移除后，直接转发到后端 /api 路径。
-      rewrite: path => `${apiPrefix}${path.replace(new RegExp(`^${prefix}`), '')}`,
-      ...(isHttps ? { secure: false } : {})
-    };
+  const baseApi = (viteEnv as any).VITE_APP_BASE_API || '/api';
+
+  proxy[baseApi] = {
+    target: VITE_SERVICE_BASE_URL,
+    changeOrigin: true,
+    rewrite: path => path
+  };
+
+  if (VITE_OTHER_SERVICE_BASE_URL) {
+    try {
+      const otherService = JSON.parse(VITE_OTHER_SERVICE_BASE_URL) as Record<string, string>;
+      Object.entries(otherService).forEach(([prefix, target]) => {
+        proxy[prefix] = {
+          target,
+          changeOrigin: true,
+          rewrite: path => path.replace(new RegExp(`^${prefix}`), '')
+        };
+      });
+    } catch {
+      // ignore invalid json
+    }
   }
 
   return proxy;
-}
-
-/** Get the current build time */
-export function getBuildTime() {
-  return dayjs().format('YYYY-MM-DD HH:mm:ss');
 }
