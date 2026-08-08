@@ -99,14 +99,21 @@ Provide a complete example `EnvironmentFile` at `/etc/nest-admin-soybean/server.
 NODE_ENV=production
 APP_PORT=8080
 APP_PREFIX=/api
-DATABASE_URL=postgresql://nestadmin_app:CHANGE_ME@127.0.0.1:5432/nest_admin?schema=public&sslmode=require
+DATABASE_URL=postgresql://nestadmin_app:CHANGE_ME@127.0.0.1:5432/nest_admin?schema=public&sslmode=disable
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_USERNAME=nestadmin_app
+DB_PASSWORD=CHANGE_ME
+DB_DATABASE=nest_admin
+DB_SCHEMA=public
+DB_SSL=false
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
 REDIS_PASSWORD=CHANGE_ME
 REDIS_DB=0
 JWT_SECRET=GENERATE_AT_LEAST_32_RANDOM_BYTES
 FILE_IS_LOCAL=true
-FILE_UPLOAD_LOCATION=/var/lib/nest-admin-soybean/uploads
+FILE_UPLOAD_LOCATION=upload
 FILE_DOMAIN=https://admin.example.com
 FILE_SERVE_ROOT=/profile
 LOG_TO_FILE=false
@@ -114,7 +121,7 @@ LOG_LEVEL=info
 CRYPTO_ENABLED=false
 ```
 
-Provide a frontend build override that sets `VITE_SERVICE_BASE_URL=/api`, disables Vite proxying, and keeps history mode. Explain build-time immutability of Vite variables and `chmod 600` for the backend environment file.
+Provide a frontend build override that sets `VITE_SERVICE_BASE_URL=` and `VITE_APP_BASE_API=/api`, disables Vite proxying, and keeps history mode. This matches `getServiceBaseURL()`, which concatenates both values, and also gives SSE/WebSocket code the `/api` prefix. Explain build-time immutability of Vite variables, the `apps/server/upload` symlink to the shared upload directory, and `chmod 600` for the backend environment file.
 
 - [ ] **Step 6: Verify chapters 1–4 contain current project paths and no secret values**
 
@@ -297,7 +304,7 @@ healthcheck:
     - node -e "/* request http://127.0.0.1:8080/api/health/ready */"
 ```
 
-State that current Dockerfile/Compose `/api/v1/health/ready` checks do not match `main.ts`, and current `.env.prod` `/prod-api` does not match the Nginx `/api/` proxy. Do not edit those files in this task.
+State that current Dockerfile/Compose `/api/v1/health/ready` checks do not match `main.ts`, current `.env.prod` `/prod-api` does not match the Nginx `/api/` proxy, and current absolute `FILE_UPLOAD_LOCATION=/data/uploads` is joined to `process.cwd()` by the application instead of resolving to the mounted volume. Document `FILE_UPLOAD_LOCATION=../../../data/uploads` for the current container workdir. Do not edit those files in this task.
 
 - [ ] **Step 8: Verify migration safety and dual-path completeness**
 
