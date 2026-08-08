@@ -8,6 +8,8 @@ dist/
 dist-ssr/
 build/
 out/
+# 保留 apps/web/build/（Vite 插件配置文件，需要提交）
+!apps/web/build/
 
 # Logs
 logs/
