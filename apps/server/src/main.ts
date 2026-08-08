@@ -136,7 +136,7 @@ async function bootstrap() {
     helmet({
       crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
       crossOriginResourcePolicy: false,
-      // 完善 CSP 策略
+      // 完善 CSP 策略，跨域和同源策略
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
@@ -147,7 +147,8 @@ async function bootstrap() {
           fontSrc: ["'self'", 'data:'],
           objectSrc: ["'none'"],
           mediaSrc: ["'self'"],
-          frameSrc: ["'self'"],
+          // frameSrc 允许前端页面嵌入 Swagger UI iframe
+          frameSrc: ["'self'", 'http://localhost:9527', 'http://localhost:9728', 'https://cdn.jsdelivr.net'],
         },
       },
       // 其他安全头

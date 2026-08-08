@@ -113,3 +113,6 @@ docker-compose.override.yml
 .history/
 
 nest_admin.pem
+
+pnpm-lock.yaml
+
