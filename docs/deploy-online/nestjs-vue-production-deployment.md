@@ -422,7 +422,7 @@ systemd 的工作目录是该版本的 `apps/server`，所以 `FILE_UPLOAD_LOCAT
 
 ### 4.4 Vue 生产构建配置
 
-创建一个不提交 Git 的 `apps/web/.env.production.local`，或者在 CI 中注入等价变量：
+本项目执行 `vite build --mode prod`，因此应创建一个不提交 Git 的 `apps/web/.env.prod.local`，或者在 CI 中注入等价变量：
 
 ```dotenv
 VITE_BASE_URL=/
@@ -869,7 +869,606 @@ curl -I https://admin.example.com/profile/not-found-test
 
 ## 七、数据库与 Redis 生产加固
 
+### 7.1 当前仓库的 Prisma 迁移阻断项
+
+截至本文编写时，仓库包含 `apps/server/prisma/schema.prisma`，但没有 `apps/server/prisma/migrations/`。这意味着：
+
+- `prisma migrate deploy` 没有可执行的版本化迁移；
+- 新的空生产数据库无法仅靠当前发布包创建业务表；
+- Docker 入口脚本虽然会执行 `prisma migrate deploy`，但不能替代缺失的迁移文件。
+
+> [!CAUTION]
+> 没有提交并审核基线迁移之前，不应宣称生产部署已经可复现。不要在生产库使用
+> `prisma db push`，更不能用 `--force-reset` 绕过迁移体系。
+
+### 7.2 为新项目创建基线迁移
+
+以下操作只在开发分支和隔离的开发数据库中执行，并纳入代码审查：
+
+```bash
+cd apps/server
+mkdir -p prisma/migrations/20260808_baseline
+pnpm exec prisma migrate diff \
+  --from-empty \
+  --to-schema-datamodel prisma/schema.prisma \
+  --script > prisma/migrations/20260808_baseline/migration.sql
+```
+
+检查生成 SQL，重点关注：
+
+- 主键、自增序列、唯一索引和外键；
+- PostgreSQL 扩展、枚举和默认值；
+- 是否出现意外的 `DROP TABLE` 或 `DROP COLUMN`；
+- 字符集、时区和字段精度；
+- Schema 是否为预期的 `public`。
+
+使用全新的临时数据库验证：
+
+```bash
+pnpm exec prisma migrate deploy
+pnpm exec prisma migrate status
+```
+
+验证通过后，把整个 `prisma/migrations/20260808_baseline/` 提交到 Git。实际名称应使用团队生成基线的真实时间戳。
+
+### 7.3 已有数据库如何登记基线
+
+如果生产数据库已经通过历史方式建表，不能直接再次执行基线 SQL。先备份，然后确认数据库结构与当前 Schema 一致：
+
+```bash
+cd apps/server
+pnpm exec prisma migrate diff \
+  --from-schema-datasource prisma/schema.prisma \
+  --to-schema-datamodel prisma/schema.prisma \
+  --exit-code
+```
+
+只有差异检查确认没有未处理差异后，才把基线标记为已应用：
+
+```bash
+pnpm exec prisma migrate resolve --applied 20260808_baseline
+pnpm exec prisma migrate status
+```
+
+如果存在差异，应先由 DBA 和开发人员制作补偿迁移，不能直接 `resolve --applied` 掩盖结构漂移。
+
+### 7.4 PostgreSQL 账号和网络加固
+
+应用使用独立数据库和最小权限账号。示例 SQL 应由 DBA 在管理连接中执行：
+
+```sql
+CREATE ROLE nestadmin_app LOGIN PASSWORD 'CHANGE_ME_WITH_A_RANDOM_PASSWORD';
+CREATE DATABASE nest_admin OWNER nestadmin_app;
+REVOKE ALL ON DATABASE nest_admin FROM PUBLIC;
+GRANT CONNECT, TEMPORARY ON DATABASE nest_admin TO nestadmin_app;
+```
+
+连接到 `nest_admin` 后：
+
+```sql
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+GRANT USAGE, CREATE ON SCHEMA public TO nestadmin_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE nestadmin_app IN SCHEMA public
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nestadmin_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE nestadmin_app IN SCHEMA public
+  GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO nestadmin_app;
+```
+
+加固要求：
+
+- PostgreSQL 只监听本机或私有网络；
+- `pg_hba.conf` 只允许应用服务器网段；
+- 云数据库强制 TLS，并按照供应商要求验证 CA；
+- 不使用 `postgres` 超级用户作为应用账号；
+- 设置连接数上限，配合 `DATABASE_POOL_SIZE`；
+- 对慢查询、锁等待、连接耗尽和磁盘增长告警。
+
+### 7.5 数据库备份与恢复演练
+
+迁移前创建自包含格式备份：
+
+```bash
+sudo install -d -m 700 -o postgres -g postgres /var/backups/nest-admin-soybean
+sudo -u postgres pg_dump \
+  --format=custom \
+  --file=/var/backups/nest-admin-soybean/nest_admin-before-release.dump \
+  nest_admin
+```
+
+检查备份可读：
+
+```bash
+sudo -u postgres pg_restore --list \
+  /var/backups/nest-admin-soybean/nest_admin-before-release.dump | head
+```
+
+备份必须传输到独立存储，并定期在隔离环境执行恢复演练。只有备份文件而没有恢复验证，不能视为有效灾备。
+
+### 7.6 Redis 加固
+
+最低要求：
+
+- 只绑定 `127.0.0.1` 或私有地址；
+- 保持保护模式开启；
+- 使用 Redis ACL 或高强度密码；
+- 不向公网开放 `6379`；
+- 开启 AOF 持久化，按业务要求同时保留 RDB 快照；
+- 设置 `maxmemory` 和经过评估的淘汰策略；
+- 监控内存、连接数、拒绝连接、命中率、阻塞命令和持久化失败；
+- 应用缓存、Bull 队列和其他系统最好使用不同实例或明确的 key 前缀。
+
+当前项目 Redis 配置只有密码字段，没有用户名字段，因此应加固 `default` 用户；如果希望使用独立 ACL 用户，需要先给后端增加 `REDIS_USERNAME` 支持。兼容当前代码的 ACL 示例：
+
+```text
+user default on >CHANGE_ME ~nest-admin:* +@all
+```
+
+项目配置对应：
+
+```dotenv
+REDIS_PASSWORD=CHANGE_ME
+REDIS_DB=0
+REDIS_KEY_PREFIX=nest-admin:
+```
+
+> [!WARNING]
+> `FLUSHDB` 会清空当前逻辑 DB，导致登录会话、Token 黑名单、菜单缓存和队列状态受影响。生产环境不得把仓库的 `redis:flush` 当作常规部署步骤。
+
+### 7.7 生产迁移和初始化数据策略
+
+每次发布执行：
+
+```bash
+cd /opt/nest-admin-soybean/current/apps/server
+pnpm exec prisma migrate status
+pnpm exec prisma migrate deploy
+```
+
+迁移策略：
+
+| 命令 | 生产环境 | 用途 |
+|---|---|---|
+| `prisma migrate status` | 允许 | 检查迁移状态 |
+| `prisma migrate deploy` | 允许 | 执行已审核并提交的迁移 |
+| `pnpm run prisma:seed:migration` | 审核后允许 | 执行项目幂等业务数据补丁 |
+| `pnpm run prisma:seed:only` | 仅全新空库且审核后 | 写入系统初始数据，不包含强制重建步骤 |
+| `pnpm run prisma:seed` | 禁止 | 脚本包含 `db push --force-reset --accept-data-loss` |
+| `pnpm run prisma:init` | 禁止 | 强制重置并重新初始化数据库 |
+| `pnpm run prisma:reset` | 禁止 | 重置迁移和数据 |
+
+全新空库在基线迁移成功后仍需要系统初始租户、管理员、角色、菜单和客户端数据。当前 `seed.ts` 主要使用 `createMany({ skipDuplicates: true })`，但执行前仍应完成代码审查和备份：
+
+```bash
+cd apps/server
+pnpm run prisma:seed:only
+pnpm run prisma:seed:migration
+```
+
+首次登录后立即修改默认管理员密码、客户端密钥和 `USER_INITIAL_PASSWORD`。已有业务库不要把 `prisma:seed:only` 当作升级脚本。
+
 ## 八、部署步骤与脚本
+
+### 8.1 部署前统一检查
+
+两种方案都必须完成：
+
+```bash
+git status --short
+git rev-parse --short HEAD
+pnpm install --frozen-lockfile
+pnpm --filter @nest-admin/server prisma:generate
+pnpm --filter @nest-admin/types build
+pnpm --filter @nest-admin/server build:prod
+NODE_OPTIONS=--max-old-space-size=4096 pnpm --filter @nest-admin/web build
+```
+
+上线门禁：
+
+- [ ] `apps/server/prisma/migrations/` 已存在并通过审核；
+- [ ] 前端使用 `VITE_SERVICE_BASE_URL=` 和 `VITE_APP_BASE_API=/api`；
+- [ ] 生产环境变量已脱离 Git；
+- [ ] 数据库备份完成并可读取；
+- [ ] 当前 Git SHA、数据库迁移状态和上一稳定版本已记录；
+- [ ] 80/443、DNS、证书和防火墙准备完成；
+- [ ] 维护窗口和回滚负责人已确认。
+
+### 8.2 systemd 首次部署
+
+以下流程假设源码已检出到 `/srv/nest-admin-source`：
+
+1. 在源码目录检出经过测试的 tag 或 Git SHA；
+2. 创建时间戳发布目录；
+3. 复制源码但排除 `.git`、`node_modules` 和环境文件；
+4. 写入受控的 `apps/web/.env.prod.local`；
+5. 按第三章顺序安装依赖并构建；
+6. 创建 `apps/server/upload` 到共享上传目录的软链接；
+7. 备份数据库；
+8. 加载后端生产环境，检查并执行 `prisma migrate deploy`；
+9. 原子切换 `current` 软链接；
+10. 重启 systemd，循环检查 `/api/health/ready`；
+11. 验证首页、登录、Vue 子路由刷新、上传和日志。
+
+手动命令示例：
+
+```bash
+export RELEASE_ID="$(date +%Y%m%d-%H%M%S)-$(git -C /srv/nest-admin-source rev-parse --short HEAD)"
+export RELEASE_DIR="/opt/nest-admin-soybean/releases/${RELEASE_ID}"
+
+sudo install -d -m 755 -o nestadmin -g nestadmin "${RELEASE_DIR}"
+sudo rsync -a \
+  --exclude=.git \
+  --exclude=node_modules \
+  --exclude='apps/*/node_modules' \
+  --exclude='apps/server/.env*' \
+  --exclude='apps/web/.env.*.local' \
+  /srv/nest-admin-source/ "${RELEASE_DIR}/"
+sudo install -m 640 -o nestadmin -g nestadmin \
+  /etc/nest-admin-soybean/web.env.prod.local \
+  "${RELEASE_DIR}/apps/web/.env.prod.local"
+sudo chown -R nestadmin:nestadmin "${RELEASE_DIR}"
+
+sudo -u nestadmin pnpm --dir "${RELEASE_DIR}" install --frozen-lockfile
+sudo -u nestadmin pnpm --dir "${RELEASE_DIR}" --filter @nest-admin/types build
+sudo -u nestadmin pnpm --dir "${RELEASE_DIR}" --filter @nest-admin/server prisma:generate
+sudo -u nestadmin pnpm --dir "${RELEASE_DIR}" --filter @nest-admin/server build:prod
+sudo -u nestadmin env NODE_OPTIONS=--max-old-space-size=4096 \
+  pnpm --dir "${RELEASE_DIR}" --filter @nest-admin/web build
+
+sudo -u nestadmin ln -s /var/lib/nest-admin-soybean/uploads \
+  "${RELEASE_DIR}/apps/server/upload"
+```
+
+加载环境并迁移：
+
+```bash
+set -a
+. /etc/nest-admin-soybean/server.env
+set +a
+sudo --preserve-env -u nestadmin \
+  pnpm --dir "${RELEASE_DIR}/apps/server" exec prisma migrate status
+sudo --preserve-env -u nestadmin \
+  pnpm --dir "${RELEASE_DIR}/apps/server" exec prisma migrate deploy
+```
+
+原子切换：
+
+```bash
+sudo ln -s "${RELEASE_DIR}" /opt/nest-admin-soybean/current.next
+sudo mv -Tf /opt/nest-admin-soybean/current.next /opt/nest-admin-soybean/current
+sudo systemctl restart nest-admin-server
+curl --fail http://127.0.0.1:8080/api/health/ready
+```
+
+### 8.3 systemd 一键部署脚本模板
+
+将下面脚本保存到运维机的 `/usr/local/sbin/deploy-nest-admin`。脚本应由受控的 sudo 规则运行，源码目录必须提前检出目标版本且工作区干净。
+
+```bash
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly APP_USER="nestadmin"
+readonly APP_ROOT="/opt/nest-admin-soybean"
+readonly SOURCE_DIR="/srv/nest-admin-source"
+readonly SERVER_ENV="/etc/nest-admin-soybean/server.env"
+readonly WEB_ENV="/etc/nest-admin-soybean/web.env.prod.local"
+readonly UPLOAD_DIR="/var/lib/nest-admin-soybean/uploads"
+readonly BACKUP_DIR="/var/backups/nest-admin-soybean"
+readonly PNPM_BIN="$(command -v pnpm)"
+
+if [[ "${EUID}" -ne 0 ]]; then
+  echo "必须通过 sudo 运行" >&2
+  exit 1
+fi
+
+for required in "${SOURCE_DIR}/.git" "${SERVER_ENV}" "${WEB_ENV}"; do
+  if [[ ! -e "${required}" ]]; then
+    echo "缺少必需文件: ${required}" >&2
+    exit 1
+  fi
+done
+
+if ! git -C "${SOURCE_DIR}" diff --quiet || ! git -C "${SOURCE_DIR}" diff --cached --quiet; then
+  echo "源码工作区不干净，停止部署" >&2
+  exit 1
+fi
+
+readonly GIT_SHA="$(git -C "${SOURCE_DIR}" rev-parse --short HEAD)"
+readonly RELEASE_ID="$(date +%Y%m%d-%H%M%S)-${GIT_SHA}"
+readonly RELEASE_DIR="${APP_ROOT}/releases/${RELEASE_ID}"
+readonly CURRENT_LINK="${APP_ROOT}/current"
+readonly PREVIOUS_RELEASE="$(readlink -f "${CURRENT_LINK}" 2>/dev/null || true)"
+switched=0
+
+rollback_app() {
+  local exit_code=$?
+  echo "部署失败，退出码: ${exit_code}" >&2
+  if [[ "${switched}" -eq 1 && -n "${PREVIOUS_RELEASE}" && -d "${PREVIOUS_RELEASE}" ]]; then
+    ln -s "${PREVIOUS_RELEASE}" "${APP_ROOT}/current.rollback"
+    mv -Tf "${APP_ROOT}/current.rollback" "${CURRENT_LINK}"
+    systemctl restart nest-admin-server || true
+    echo "应用已切回 ${PREVIOUS_RELEASE}；数据库迁移不会自动回滚" >&2
+  fi
+  exit "${exit_code}"
+}
+trap rollback_app ERR
+
+install -d -m 755 -o "${APP_USER}" -g "${APP_USER}" "${RELEASE_DIR}"
+install -d -m 700 "${BACKUP_DIR}"
+
+rsync -a \
+  --exclude=.git \
+  --exclude=node_modules \
+  --exclude='apps/*/node_modules' \
+  --exclude='apps/server/.env*' \
+  --exclude='apps/web/.env.*.local' \
+  "${SOURCE_DIR}/" "${RELEASE_DIR}/"
+
+install -m 640 -o "${APP_USER}" -g "${APP_USER}" \
+  "${WEB_ENV}" "${RELEASE_DIR}/apps/web/.env.prod.local"
+chown -R "${APP_USER}:${APP_USER}" "${RELEASE_DIR}"
+
+runuser -u "${APP_USER}" -m -- "${PNPM_BIN}" --dir "${RELEASE_DIR}" install --frozen-lockfile
+runuser -u "${APP_USER}" -m -- "${PNPM_BIN}" --dir "${RELEASE_DIR}" --filter @nest-admin/types build
+runuser -u "${APP_USER}" -m -- "${PNPM_BIN}" --dir "${RELEASE_DIR}" --filter @nest-admin/server prisma:generate
+runuser -u "${APP_USER}" -m -- "${PNPM_BIN}" --dir "${RELEASE_DIR}" --filter @nest-admin/server build:prod
+runuser -u "${APP_USER}" -m -- env NODE_OPTIONS=--max-old-space-size=4096 \
+  "${PNPM_BIN}" --dir "${RELEASE_DIR}" --filter @nest-admin/web build
+runuser -u "${APP_USER}" -- ln -s "${UPLOAD_DIR}" "${RELEASE_DIR}/apps/server/upload"
+
+set -a
+# shellcheck disable=SC1090
+. "${SERVER_ENV}"
+set +a
+
+readonly BACKUP_FILE="${BACKUP_DIR}/nest_admin-${RELEASE_ID}.dump"
+PGPASSWORD="${DB_PASSWORD}" pg_dump \
+  --host="${DB_HOST}" \
+  --port="${DB_PORT}" \
+  --username="${DB_USERNAME}" \
+  --dbname="${DB_DATABASE}" \
+  --format=custom \
+  --file="${BACKUP_FILE}"
+pg_restore --list "${BACKUP_FILE}" >/dev/null
+
+runuser -u "${APP_USER}" -m -- "${PNPM_BIN}" \
+  --dir "${RELEASE_DIR}/apps/server" exec prisma migrate status
+runuser -u "${APP_USER}" -m -- "${PNPM_BIN}" \
+  --dir "${RELEASE_DIR}/apps/server" exec prisma migrate deploy
+
+ln -s "${RELEASE_DIR}" "${APP_ROOT}/current.next"
+mv -Tf "${APP_ROOT}/current.next" "${CURRENT_LINK}"
+switched=1
+systemctl restart nest-admin-server
+
+for attempt in $(seq 1 30); do
+  if curl --fail --silent http://127.0.0.1:8080/api/health/ready >/dev/null; then
+    trap - ERR
+    echo "部署成功: ${RELEASE_ID}"
+    echo "数据库备份: ${BACKUP_FILE}"
+    exit 0
+  fi
+  sleep 2
+done
+
+echo "就绪检查超时" >&2
+false
+```
+
+脚本不会自动删除旧版本或数据库备份。旧版本清理应由独立、经过确认的保留策略完成。
+
+### 8.4 Docker Compose 部署前的本地覆盖
+
+Dockerfile 使用 `vite build --mode coolify`，因此创建不提交 Git 的 `apps/web/.env.coolify.local`：
+
+```dotenv
+VITE_SERVICE_BASE_URL=
+VITE_APP_BASE_API=/api
+VITE_HTTP_PROXY=N
+VITE_APP_ENCRYPT=N
+VITE_APP_RSA_PUBLIC_KEY=
+```
+
+当前仓库有三个必须处理的漂移：
+
+| 位置 | 当前问题 | 正确值/处理 |
+|---|---|---|
+| Server Dockerfile 健康检查 | `/api/v1/health/ready` | `/api/health/ready` |
+| 根 Compose Server 健康检查 | `/api/v1/health/ready` | `/api/health/ready` |
+| Compose 上传目录 | 绝对值 `/data/uploads` 被代码与工作目录拼接 | 当前 Workdir 使用 `../../../data/uploads` |
+| `.env.coolify` | `/api/v1` | 用 `.env.coolify.local` 覆盖为同域 `/api` |
+
+在这些漂移没有通过独立代码修改修正前，建议使用下方独立生产 Compose 文件，不要直接运行根 `docker-compose.yml`。
+
+### 8.5 独立生产 Compose 文件
+
+创建 `docker-compose.production.yml`：
+
+```yaml
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB must be set}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER must be set}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [backend]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:?REDIS_PASSWORD must be set}"]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD must be set}
+    volumes:
+      - redis_data:/data
+    networks: [backend]
+
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      APP_PORT: 8080
+      APP_PREFIX: /api
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public&sslmode=disable
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_DATABASE: ${POSTGRES_DB}
+      DB_SCHEMA: public
+      DB_SSL: "false"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_DB: ${REDIS_DB:-0}
+      REDIS_KEY_PREFIX: nest-admin:
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+      FILE_IS_LOCAL: "true"
+      FILE_UPLOAD_LOCATION: ../../../data/uploads
+      FILE_DOMAIN: ${FILE_DOMAIN:?FILE_DOMAIN must be set}
+      FILE_SERVE_ROOT: /profile
+      LOG_TO_FILE: "false"
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      CRYPTO_ENABLED: ${CRYPTO_ENABLED:-false}
+      CLIENT_DEFAULT_ID: pc
+      CLIENT_DEFAULT_GRANT_TYPE: password
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - node -e "const http=require('http');http.get('http://127.0.0.1:8080/api/health/ready',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - server_uploads:/data/uploads
+    networks: [backend]
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3000}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    networks: [backend]
+
+volumes:
+  postgres_data:
+  redis_data:
+  server_uploads:
+
+networks:
+  backend:
+    driver: bridge
+```
+
+数据库密码包含 `@`、`:`、`/` 等 URL 保留字符时，`DATABASE_URL` 中必须使用 URL 编码。更稳妥的做法是让密码生成策略只使用 URL 安全字符，同时保持足够长度和随机性。
+
+### 8.6 Docker Compose 首次部署
+
+```bash
+# 1. 检查最终合并和变量替换结果；输出可能包含敏感值，不要保存到公共日志。
+docker compose --env-file .env -f docker-compose.production.yml config --quiet
+
+# 2. 构建镜像。
+docker compose --env-file .env -f docker-compose.production.yml build
+
+# 3. 启动依赖和后端；后端入口会执行 prisma migrate deploy。
+docker compose --env-file .env -f docker-compose.production.yml up -d postgres redis server
+
+# 4. 确认后端就绪后启动前端。
+docker compose --env-file .env -f docker-compose.production.yml up -d web
+
+# 5. 查看状态和日志。
+docker compose --env-file .env -f docker-compose.production.yml ps
+docker compose --env-file .env -f docker-compose.production.yml logs --tail=200 server
+
+# 6. 从宿主机验证页面和代理。
+curl --fail http://127.0.0.1:3000/
+curl --fail http://127.0.0.1:3000/api/health/ready
+```
+
+全新空库在基线迁移后，按 7.7 节审核并执行初始数据脚本：
+
+```bash
+docker compose --env-file .env -f docker-compose.production.yml exec server \
+  pnpm run prisma:seed:only
+docker compose --env-file .env -f docker-compose.production.yml exec server \
+  pnpm run prisma:seed:migration
+```
+
+完成后立即修改默认管理员和客户端凭据。
+
+### 8.7 Docker Compose 更新部署
+
+迁移前备份：
+
+```bash
+install -d -m 700 backups
+docker compose --env-file .env -f docker-compose.production.yml exec -T postgres \
+  pg_dump -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -Fc > \
+  "backups/nest_admin-$(date +%Y%m%d-%H%M%S).dump"
+```
+
+然后更新到已审核的 Git SHA：
+
+```bash
+git fetch --tags
+git checkout YOUR_REVIEWED_GIT_SHA
+docker compose --env-file .env -f docker-compose.production.yml build server web
+docker compose --env-file .env -f docker-compose.production.yml up -d server web
+docker compose --env-file .env -f docker-compose.production.yml ps
+curl --fail http://127.0.0.1:3000/api/health/ready
+```
+
+单机 Compose 只运行一个 Server 副本时，入口脚本自动迁移可以接受。扩容多个 Server 副本时，应改为独立的一次性迁移任务，所有副本就绪前只允许一个迁移执行者。
+
+### 8.8 部署后验收
+
+- [ ] `curl https://admin.example.com/` 返回前端 HTML；
+- [ ] `/api/health/live` 和内部 `/api/health/ready` 成功；
+- [ ] 管理员可以登录并刷新 Token；
+- [ ] 动态菜单完整显示；
+- [ ] 直接刷新 Vue 子路由不返回 404；
+- [ ] 上传文件后可通过 `/profile/` 访问；
+- [ ] PostgreSQL 和 Redis 未暴露公网端口；
+- [ ] Nginx、NestJS、PostgreSQL、Redis 日志无持续错误；
+- [ ] HTTPS 证书链和自动续期正常；
+- [ ] 当前 Git SHA、迁移版本和备份文件已登记。
 
 ## 九、日志与监控
 

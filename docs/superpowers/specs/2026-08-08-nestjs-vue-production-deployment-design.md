@@ -181,6 +181,8 @@ Compose 方案复用仓库根目录 `docker-compose.yml`、`apps/server/Dockerfi
 3. `apps/web/.env.coolify` 中仍出现 `/api/v1`。教程以当前 NestJS 路由实现为准，不沿用已经失效的版本前缀。
 4. Docker 后端入口会自动执行 `prisma migrate deploy`。教程说明并发启动多个 Server 副本时，应使用独立迁移任务，避免每个副本同时执行迁移。
 5. 仓库已有 PM2 部署脚本，但本教程的原生主线按照用户要求采用 systemd；PM2 只在补充说明中列为替代方案。
+6. 当前仓库没有 `apps/server/prisma/migrations/`。教程把“在开发/发布流程生成、审核并提交基线迁移”列为生产部署阻断项，并分别说明空库应用基线和已有数据库登记基线的方法。
+7. 后端使用 `path.join(process.cwd(), FILE_UPLOAD_LOCATION)` 解析上传目录，现有 Compose 的绝对路径会被拼接到工作目录。教程在 systemd 中使用共享目录软链接，在当前容器 Workdir 中使用可解析到卷的相对路径。
 
 ## 7. 错误处理与回滚原则
 
@@ -205,6 +207,7 @@ Compose 方案复用仓库根目录 `docker-compose.yml`、`apps/server/Dockerfi
 8. shell 示例通过静态检查，不包含未定义变量直接删除目录等危险写法；
 9. 文档明确标出当前 Docker 健康检查和前端生产 API 配置的漂移风险；
 10. 不要求读者参考未提供的外部私有配置才能完成部署。
+11. 明确说明当前缺少 Prisma 基线迁移，且不使用 `db push` 或清库命令规避该阻断项。
 
 ## 9. 非目标
 

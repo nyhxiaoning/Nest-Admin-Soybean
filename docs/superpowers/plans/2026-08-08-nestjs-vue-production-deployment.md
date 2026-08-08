@@ -17,6 +17,7 @@
 - Build Vue into `apps/web/dist` and start NestJS from `apps/server/dist/src/main.js`.
 - Never copy secrets from tracked or untracked environment files; all credentials and keys use clearly marked example values.
 - Production database changes use `prisma migrate deploy`; never recommend `prisma:seed`, `prisma:init`, `prisma:reset`, or `prisma db push --force-reset` in production.
+- Treat the current absence of `apps/server/prisma/migrations/` as a deployment blocker: create and review a baseline migration outside production before using `prisma migrate deploy`.
 - Proxy `/api/`, `/profile/`, and `/public/` without stripping their path prefixes, and configure Vue history fallback with `try_files`.
 - Document both systemd and full Docker Compose as complete, independently executable deployment paths.
 - Do not modify runtime code, Dockerfiles, Compose files, or environment files in this documentation task.
@@ -121,7 +122,7 @@ LOG_LEVEL=info
 CRYPTO_ENABLED=false
 ```
 
-Provide a frontend build override that sets `VITE_SERVICE_BASE_URL=` and `VITE_APP_BASE_API=/api`, disables Vite proxying, and keeps history mode. This matches `getServiceBaseURL()`, which concatenates both values, and also gives SSE/WebSocket code the `/api` prefix. Explain build-time immutability of Vite variables, the `apps/server/upload` symlink to the shared upload directory, and `chmod 600` for the backend environment file.
+Provide an `apps/web/.env.prod.local` build override that sets `VITE_SERVICE_BASE_URL=` and `VITE_APP_BASE_API=/api`, disables Vite proxying, and keeps history mode. This matches `getServiceBaseURL()`, which concatenates both values, and also gives SSE/WebSocket code the `/api` prefix. Explain build-time immutability of Vite variables, the `apps/server/upload` symlink to the shared upload directory, and `chmod 600` for the backend environment file.
 
 - [ ] **Step 6: Verify chapters 1–4 contain current project paths and no secret values**
 
@@ -280,6 +281,8 @@ pnpm exec prisma migrate deploy
 ```
 
 Document `prisma:seed:migration` as a separately reviewed project data patch, not an automatic schema migration. Put destructive initialization commands in a “never run in production” warning table.
+
+Before that policy, document that the repository currently has no Prisma migrations directory. Provide a reviewed baseline workflow for a disposable development database/new installation and `prisma migrate resolve --applied <baseline>` for an existing database whose schema has already been verified to match.
 
 - [ ] **Step 4: Write the complete systemd deployment procedure in chapter 8**
 
