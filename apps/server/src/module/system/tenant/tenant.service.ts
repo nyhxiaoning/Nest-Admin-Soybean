@@ -1,7 +1,7 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { StructuredLoggerService } from 'src/infrastructure/logging/structured-logger.service';
 import { Prisma } from '@prisma/client';
-import { Result, ResponseCode } from 'src/shared/response';
+import { ResponseCode, Result } from 'src/shared/response';
 import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { SYS_USER_TYPE } from 'src/shared/constants/index';
 import { BusinessException } from 'src/shared/exceptions';
@@ -9,15 +9,19 @@ import { ExportTable } from 'src/shared/utils/export';
 import { Response } from 'express';
 import {
   CreateTenantRequestDto,
-  UpdateTenantRequestDto,
   ListTenantRequestDto,
   SyncTenantPackageRequestDto,
   TenantResponseDto,
+  UpdateTenantRequestDto,
 } from './dto/index';
 import { toDto, toDtoList } from 'src/shared/utils/serialize.util';
 import { IgnoreTenant } from 'src/tenant/decorators/tenant.decorator';
 import { TenantContext } from 'src/tenant/context/tenant.context';
-import { InjectTransactionHost, Transactional, PrismaTransactionHost } from 'src/core/decorators/transactional.decorator';
+import {
+  InjectTransactionHost,
+  PrismaTransactionHost,
+  Transactional,
+} from 'src/core/decorators/transactional.decorator';
 import { Idempotent } from 'src/core/decorators/idempotent.decorator';
 import { Lock } from 'src/core/decorators/lock.decorator';
 import { RedisService } from 'src/module/common/redis/redis.service';
@@ -58,7 +62,9 @@ export class TenantService {
   ) {
     this.logger.setContext(TenantService.name);
   }
-  private get prisma() { return this.txHost.tx; }
+  private get prisma() {
+    return this.txHost.tx;
+  }
 
   /**
    * 创建新租户
@@ -376,21 +382,30 @@ export class TenantService {
         select: { tenantId: true, companyName: true },
       });
 
-      this.logger.info({ action: 'tenant.syncDict.tenantsFound', message: `找到 ${tenants.length} 个租户需要同步字典` });
+      this.logger.info({
+        action: 'tenant.syncDict.tenantsFound',
+        message: `找到 ${tenants.length} 个租户需要同步字典`,
+      });
 
       // 获取超级管理员租户的字典类型
       const dictTypes = await this.prisma.sysDictType.findMany({
         where: { tenantId: TenantContext.SUPER_TENANT_ID, delFlag: DelFlagEnum.NORMAL },
       });
 
-      this.logger.info({ action: 'tenant.syncDict.dictTypesFound', message: `找到 ${dictTypes.length} 个字典类型需要同步` });
+      this.logger.info({
+        action: 'tenant.syncDict.dictTypesFound',
+        message: `找到 ${dictTypes.length} 个字典类型需要同步`,
+      });
 
       let syncedCount = 0;
       let skippedCount = 0;
 
       // 为每个租户同步字典类型
       for (const tenant of tenants) {
-        this.logger.info({ action: 'tenant.syncDict.syncing', message: `正在为租户 ${tenant.companyName}(${tenant.tenantId}) 同步字典` });
+        this.logger.info({
+          action: 'tenant.syncDict.syncing',
+          message: `正在为租户 ${tenant.companyName}(${tenant.tenantId}) 同步字典`,
+        });
 
         for (const dictType of dictTypes) {
           // 检查该租户是否已有此字典类型
@@ -447,7 +462,9 @@ export class TenantService {
                   skipDuplicates: true, // 跳过重复记录
                 });
               } catch (dataError) {
-                this.logger.warn(`为租户 ${tenant.tenantId} 同步字典数据时出错: ${dataError.message}`, { action: 'tenant.syncDict.dataError' });
+                this.logger.warn(`为租户 ${tenant.tenantId} 同步字典数据时出错: ${dataError.message}`, {
+                  action: 'tenant.syncDict.dataError',
+                });
               }
             }
 
@@ -458,7 +475,10 @@ export class TenantService {
         }
       }
 
-      this.logger.info({ action: 'tenant.syncDict.complete', message: `字典同步完成: 新增 ${syncedCount} 个，跳过 ${skippedCount} 个` });
+      this.logger.info({
+        action: 'tenant.syncDict.complete',
+        message: `字典同步完成: 新增 ${syncedCount} 个，跳过 ${skippedCount} 个`,
+      });
 
       return Result.ok({
         message: `同步完成`,
@@ -561,21 +581,30 @@ export class TenantService {
         select: { tenantId: true, companyName: true },
       });
 
-      this.logger.info({ action: 'tenant.syncConfig.tenantsFound', message: `找到 ${tenants.length} 个租户需要同步配置` });
+      this.logger.info({
+        action: 'tenant.syncConfig.tenantsFound',
+        message: `找到 ${tenants.length} 个租户需要同步配置`,
+      });
 
       // 获取超级管理员租户的配置
       const configs = await this.prisma.sysConfig.findMany({
         where: { tenantId: TenantContext.SUPER_TENANT_ID, delFlag: DelFlagEnum.NORMAL },
       });
 
-      this.logger.info({ action: 'tenant.syncConfig.configsFound', message: `找到 ${configs.length} 个配置项需要同步` });
+      this.logger.info({
+        action: 'tenant.syncConfig.configsFound',
+        message: `找到 ${configs.length} 个配置项需要同步`,
+      });
 
       let syncedCount = 0;
       const skippedCount = 0;
 
       // 为每个租户同步配置（使用批量操作）
       for (const tenant of tenants) {
-        this.logger.info({ action: 'tenant.syncConfig.syncing', message: `正在为租户 ${tenant.companyName}(${tenant.tenantId}) 同步配置` });
+        this.logger.info({
+          action: 'tenant.syncConfig.syncing',
+          message: `正在为租户 ${tenant.companyName}(${tenant.tenantId}) 同步配置`,
+        });
 
         // 批量创建配置（跳过已存在的）
         try {
@@ -596,14 +625,19 @@ export class TenantService {
 
           syncedCount += result.count;
         } catch (configError) {
-          this.logger.warn(`为租户 ${tenant.tenantId} 同步配置时出错: ${configError.message}`, { action: 'tenant.syncConfig.error' });
+          this.logger.warn(`为租户 ${tenant.tenantId} 同步配置时出错: ${configError.message}`, {
+            action: 'tenant.syncConfig.error',
+          });
         }
 
         // 清除租户配置缓存
         await this.redisService.del(`${CacheEnum.SYS_CONFIG_KEY}${tenant.tenantId}`);
       }
 
-      this.logger.info({ action: 'tenant.syncConfig.complete', message: `配置同步完成: 新增 ${syncedCount} 个，跳过 ${skippedCount} 个` });
+      this.logger.info({
+        action: 'tenant.syncConfig.complete',
+        message: `配置同步完成: 新增 ${syncedCount} 个，跳过 ${skippedCount} 个`,
+      });
 
       return Result.ok({
         message: '同步完成',
@@ -741,7 +775,10 @@ export class TenantService {
       await this.redisService.set(loginKey, userData);
     }
 
-    this.logger.info({ action: 'tenant.switch', message: `用户 ${user.userName} 从租户 ${originalTenantId} 切换到租户 ${targetTenantId}` });
+    this.logger.info({
+      action: 'tenant.switch',
+      message: `用户 ${user.userName} 从租户 ${originalTenantId} 切换到租户 ${targetTenantId}`,
+    });
 
     return Result.ok({
       success: true,
@@ -783,7 +820,10 @@ export class TenantService {
     // 删除切换记录
     await this.redisService.del(redisKey);
 
-    this.logger.info({ action: 'tenant.restore', message: `用户 ${user.userName} 恢复到原租户 ${switchOriginal.originalTenantId}` });
+    this.logger.info({
+      action: 'tenant.restore',
+      message: `用户 ${user.userName} 恢复到原租户 ${switchOriginal.originalTenantId}`,
+    });
 
     return Result.ok({
       success: true,

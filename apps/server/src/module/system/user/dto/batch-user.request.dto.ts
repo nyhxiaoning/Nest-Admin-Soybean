@@ -1,17 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
   IsArray,
-  IsString,
-  IsOptional,
-  IsNumber,
   IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
   Length,
   ValidateNested,
-  ArrayMinSize,
-  ArrayMaxSize,
 } from 'class-validator';
-import { StatusEnum, StatusEnumSchema, SexEnum, SexEnumSchema } from 'src/shared/enums';
+import { SexEnum, SexEnumSchema, StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 import { IsStrongPassword } from 'src/shared/validators/password.validator';
 
 /**

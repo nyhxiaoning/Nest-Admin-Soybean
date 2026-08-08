@@ -1,6 +1,6 @@
-import { IsString, IsEnum, Length, IsOptional } from 'class-validator';
+import { IsEnum, IsOptional, IsString, Length } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEnum, StatusEnumSchema, NoticeTypeEnum, NoticeTypeEnumSchema } from 'src/shared/enums';
+import { NoticeTypeEnum, NoticeTypeEnumSchema, StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 
 export class CreateNoticeRequestDto {
   @ApiProperty({ required: true, description: '公告标题' })

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@/infrastructure/prisma';
-import { Result, ResponseCode } from '@/shared/response';
+import { ResponseCode, Result } from '@/shared/response';
 import { BusinessException } from '@/shared/exceptions/business.exception';
 import { TenantContext } from '@/tenant/context/tenant.context';
 import { GenHistory, Prisma } from '@prisma/client';

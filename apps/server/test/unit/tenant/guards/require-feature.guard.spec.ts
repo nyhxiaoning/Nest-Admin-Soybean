@@ -4,10 +4,7 @@ import { Reflector } from '@nestjs/core';
 import { RequireFeatureGuard } from '@/tenant/guards/require-feature.guard';
 import { FeatureToggleService } from '@/tenant/services/feature-toggle.service';
 import { TenantContext } from '@/tenant/context/tenant.context';
-import {
-  REQUIRE_FEATURE_KEY,
-  RequireFeatureOptions,
-} from '@/tenant/decorators/require-feature.decorator';
+import { REQUIRE_FEATURE_KEY, RequireFeatureOptions } from '@/tenant/decorators/require-feature.decorator';
 
 describe('RequireFeatureGuard', () => {
   let guard: RequireFeatureGuard;

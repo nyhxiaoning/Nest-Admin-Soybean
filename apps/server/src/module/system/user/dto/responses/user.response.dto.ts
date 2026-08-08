@@ -3,12 +3,12 @@ import { Expose } from 'class-transformer';
 import { BaseResponseDto } from 'src/shared/dto/base.response.dto';
 import { DateFormat } from 'src/shared/decorators/date-format.decorator';
 import {
-  StatusEnum,
-  StatusEnumSchema,
-  SexEnum,
-  SexEnumSchema,
   DataScopeEnum,
   DataScopeEnumSchema,
+  SexEnum,
+  SexEnumSchema,
+  StatusEnum,
+  StatusEnumSchema,
 } from 'src/shared/enums';
 
 /**

@@ -6,7 +6,7 @@ import { PrismaService } from '@/infrastructure/prisma';
 import { AppConfigService } from '@/config/app-config.service';
 import { FileAccessService } from '@/module/system/file-manager/services/file-access.service';
 import { VersionService } from '@/module/upload/services/version.service';
-import { createConfigMock, ConfigMock } from 'test/mocks/config-mock';
+import { ConfigMock, createConfigMock } from 'test/mocks/config-mock';
 import { TenantContext } from '@/tenant/context/tenant.context';
 import { BusinessException } from '@/shared/exceptions';
 

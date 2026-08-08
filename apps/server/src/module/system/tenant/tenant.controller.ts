@@ -1,23 +1,23 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Res, Query } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Res } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { TenantService } from './tenant.service';
 import {
   CreateTenantRequestDto,
-  UpdateTenantRequestDto,
+  CreateTenantResultResponseDto,
+  DeleteTenantResultResponseDto,
   ListTenantRequestDto,
+  SyncTenantConfigResultResponseDto,
+  SyncTenantDictResultResponseDto,
   SyncTenantPackageRequestDto,
-  TenantResponseDto,
+  SyncTenantPackageResultResponseDto,
   TenantListResponseDto,
-  TenantSwitchResponseDto,
+  TenantResponseDto,
   TenantRestoreResponseDto,
   TenantSelectListResponseDto,
-  CreateTenantResultResponseDto,
-  UpdateTenantResultResponseDto,
-  DeleteTenantResultResponseDto,
-  SyncTenantDictResultResponseDto,
-  SyncTenantPackageResultResponseDto,
-  SyncTenantConfigResultResponseDto,
+  TenantSwitchResponseDto,
   TenantSwitchStatusResponseDto,
+  UpdateTenantRequestDto,
+  UpdateTenantResultResponseDto,
 } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-permission.decorator';
 import { NotRequireAuth } from 'src/module/system/user/user.decorator';

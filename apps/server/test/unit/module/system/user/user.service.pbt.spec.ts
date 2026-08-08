@@ -29,7 +29,7 @@ import { UserExportService } from '@/module/system/user/services/user-export.ser
 import { UserCrudService } from '@/module/system/user/services/user-crud.service';
 import { UserBatchService } from '@/module/system/user/services/user-batch.service';
 import { UserQueryService } from '@/module/system/user/services/user-query.service';
-import { DelFlagEnum, StatusEnum, DataScopeEnum } from '@/shared/enums/index';
+import { DataScopeEnum, DelFlagEnum, StatusEnum } from '@/shared/enums/index';
 
 describe('UserService Property-Based Tests', () => {
   let service: UserService;

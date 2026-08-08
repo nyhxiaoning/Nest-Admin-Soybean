@@ -1,18 +1,11 @@
-import {
-  Injectable,
-  NestInterceptor,
-  CallHandler,
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, HttpException, HttpStatus, Injectable, NestInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { PrismaService } from 'src/infrastructure/prisma';
 import {
   OPTIMISTIC_LOCK_KEY,
-  OptimisticLockOptions,
   OptimisticLockException,
+  OptimisticLockOptions,
 } from 'src/core/decorators/optimistic-lock.decorator';
 
 /**

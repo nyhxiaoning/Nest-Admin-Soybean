@@ -1,6 +1,6 @@
-import { IsString, IsEnum, Length, IsOptional, IsInt, Min, IsArray } from 'class-validator';
+import { IsArray, IsEnum, IsInt, IsOptional, IsString, Length, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEnum, StatusEnumSchema, DeviceTypeEnum, DeviceTypeEnumSchema } from 'src/shared/enums';
+import { DeviceTypeEnum, DeviceTypeEnumSchema, StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 
 export class CreateClientRequestDto {
   @ApiProperty({ required: true, description: '客户端key' })

@@ -4,7 +4,7 @@
  */
 import { Test, TestingModule } from '@nestjs/testing';
 import { HealthController } from '@/module/monitor/health/health.controller';
-import { HealthCheckService, MemoryHealthIndicator, DiskHealthIndicator } from '@nestjs/terminus';
+import { DiskHealthIndicator, HealthCheckService, MemoryHealthIndicator } from '@nestjs/terminus';
 import { PrismaHealthIndicator } from '@/observability/health/prisma.health';
 import { RedisHealthIndicator } from '@/observability/health/redis.health';
 import { InfoService } from '@/module/monitor/health/info.service';

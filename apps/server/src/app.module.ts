@@ -1,4 +1,4 @@
-import { Module, Global, MiddlewareConsumer, NestModule } from '@nestjs/common';
+import { Global, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppConfigService } from './config/app-config.service';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -8,11 +8,11 @@ import configuration from './config/index';
 import { validate } from './config/env.validation';
 import { AppConfigModule } from './config/app-config.module';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { JwtAuthGuard, PermissionGuard, RolesGuard, CustomThrottlerGuard } from './core/guards';
-import { TenantGuard, TenantModule, ClsModule } from './tenant';
+import { CustomThrottlerGuard, JwtAuthGuard, PermissionGuard, RolesGuard } from './core/guards';
+import { ClsModule, TenantGuard, TenantModule } from './tenant';
 import { CryptoModule, DecryptInterceptor } from './security/crypto';
 import { LoggerModule } from './infrastructure/logging';
-import { MetricsModule, MetricsInterceptor } from './observability/metrics';
+import { MetricsInterceptor, MetricsModule } from './observability/metrics';
 import { TracingModule } from './observability/tracing';
 import { GlobalExceptionFilter } from './core/filters/global-exception.filter';
 import { ResponseInterceptor } from './core/interceptors/response.interceptor';
@@ -28,6 +28,7 @@ import { SystemModule } from './module/system/system.module';
 import { CommonModule } from './module/common/common.module';
 import { MonitorModule } from './module/monitor/monitor.module';
 import { ResourceModule } from './module/resource/resource.module';
+import { LiteratureModule } from './module/literature/literature.module';
 import { PrismaModule } from './infrastructure/prisma';
 import { ResilienceModule } from './resilience/circuit-breaker/resilience.module';
 
@@ -118,6 +119,7 @@ import { ResilienceModule } from './resilience/circuit-breaker/resilience.module
     SystemModule,
     MonitorModule,
     ResourceModule,
+    LiteratureModule,
   ],
   providers: [
     // 全局异常过滤器 (通过 DI 注册，支持完整依赖注入)

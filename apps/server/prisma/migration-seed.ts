@@ -156,6 +156,140 @@ async function syncCodegenMenus() {
   }
 }
 
+/**
+ * 文学编辑室菜单（已存在库同步）
+ * 父菜单按 path/menuName 查找，子菜单按 component 幂等 upsert，并同步角色与租户套餐。
+ */
+async function syncLiteratureMenus() {
+  const parent = await prisma.sysMenu.findFirst({
+    where: {
+      tenantId: '000000',
+      OR: [{ menuName: '文学编辑室' }, { parentId: 0, path: 'literature' }],
+    },
+    orderBy: { menuId: 'asc' },
+  });
+
+  const parentData = {
+    tenantId: '000000',
+    menuName: '文学编辑室',
+    parentId: 0,
+    orderNum: 9,
+    path: 'literature',
+    component: null,
+    query: '',
+    isFrame: '1',
+    isCache: '0',
+    menuType: 'M',
+    visible: '0',
+    status: '0',
+    perms: '',
+    icon: 'mdi:feather',
+    remark: '文学编辑室目录',
+    delFlag: '0',
+  };
+
+  let parentMenuId: number;
+
+  if (parent) {
+    parentMenuId = parent.menuId;
+    await prisma.sysMenu.update({
+      where: { menuId: parent.menuId },
+      data: { ...parentData, updateBy: 'system' },
+    });
+  } else {
+    await prisma.$queryRaw`
+      SELECT setval(
+        pg_get_serial_sequence('sys_menu', 'menu_id'),
+        COALESCE((SELECT MAX(menu_id) FROM sys_menu), 1),
+        true
+      )
+    `;
+    const created = await prisma.sysMenu.create({
+      data: { ...parentData, createBy: 'system', updateBy: 'system' },
+    });
+    parentMenuId = created.menuId;
+  }
+
+  const pageMenus = [
+    { menuName: '文稿工作台', orderNum: 1, path: 'workbench', component: 'literature/workbench/index', perms: 'literature:workbench:list', icon: 'mdi:pencil-box-outline', remark: '文稿工作台菜单' },
+    { menuName: '我的稿件', orderNum: 2, path: 'manuscripts', component: 'literature/manuscripts/index', perms: 'literature:manuscript:list', icon: 'mdi:file-document-multiple-outline', remark: '我的稿件菜单' },
+    { menuName: '常用素材库', orderNum: 3, path: 'materials', component: 'literature/materials/index', perms: 'literature:material:list', icon: 'mdi:format-quote-open', remark: '常用素材库菜单' },
+    { menuName: '标签管理', orderNum: 4, path: 'tags', component: 'literature/tags/index', perms: 'literature:tag:list', icon: 'mdi:tag-multiple-outline', remark: '标签管理菜单' },
+    { menuName: '编辑室设置', orderNum: 5, path: 'settings', component: 'literature/settings/index', perms: 'literature:setting:list', icon: 'mdi:cog-outline', remark: '编辑室设置菜单' },
+  ] as const;
+
+  const pageMenuIds: number[] = [];
+
+  for (const page of pageMenus) {
+    const existing = await prisma.sysMenu.findFirst({
+      where: {
+        tenantId: '000000',
+        OR: [
+          { component: page.component },
+          { parentId: parentMenuId, path: page.path },
+          { parentId: parentMenuId, menuName: page.menuName },
+        ],
+      },
+      orderBy: { menuId: 'asc' },
+    });
+
+    const data = {
+      tenantId: '000000',
+      parentId: parentMenuId,
+      ...page,
+      query: '',
+      isFrame: '1',
+      isCache: '0',
+      menuType: 'C',
+      visible: '0',
+      status: '0',
+      delFlag: '0',
+      updateBy: 'system',
+    };
+
+    const menu = existing
+      ? await prisma.sysMenu.update({ where: { menuId: existing.menuId }, data })
+      : await prisma.sysMenu.create({ data: { ...data, createBy: 'system' } });
+
+    pageMenuIds.push(menu.menuId);
+  }
+
+  // 为所有已分配父菜单的角色补充分配子菜单
+  const assignedRoles = await prisma.sysRoleMenu.findMany({
+    where: { menuId: parentMenuId },
+    select: { roleId: true },
+  });
+
+  if (assignedRoles.length > 0) {
+    await prisma.sysRoleMenu.createMany({
+      data: assignedRoles.flatMap(({ roleId }) => pageMenuIds.map((menuId) => ({ roleId, menuId }))),
+      skipDuplicates: true,
+    });
+  }
+
+  // 为包含父菜单的租户套餐补充分配子菜单
+  const tenantPackages = await prisma.sysTenantPackage.findMany({
+    where: { menuIds: { not: null } },
+    select: { packageId: true, menuIds: true },
+  });
+
+  for (const tenantPackage of tenantPackages) {
+    const packageMenuIds = (tenantPackage.menuIds || '')
+      .split(',')
+      .map(Number)
+      .filter(Number.isFinite);
+
+    if (!packageMenuIds.includes(parentMenuId)) continue;
+
+    await prisma.sysTenantPackage.update({
+      where: { packageId: tenantPackage.packageId },
+      data: { menuIds: [...new Set([...packageMenuIds, ...pageMenuIds])].join(',') },
+    });
+  }
+
+  console.log(`✅ 文学编辑室菜单同步完成（父菜单 ${parentMenuId}，子菜单 ${pageMenuIds.length} 个）`);
+}
+
 async function main() {
   console.log('🌱 开始导入迁移表种子数据...\n');
 
@@ -306,6 +440,10 @@ async function main() {
   // ==================== 代码生成器菜单 ====================
   console.log('📝 同步代码生成器菜单...');
   await syncCodegenMenus();
+
+  // ==================== 文学编辑室菜单 ====================
+  console.log('📝 同步文学编辑室菜单...');
+  await syncLiteratureMenus();
 
   // ==================== 租户配额表 ====================
   console.log('📝 导入租户配额...');

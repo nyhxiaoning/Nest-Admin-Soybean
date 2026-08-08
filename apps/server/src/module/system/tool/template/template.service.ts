@@ -1,22 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@/infrastructure/prisma';
-import { Result, ResponseCode } from '@/shared/response';
+import { ResponseCode, Result } from '@/shared/response';
 import { BusinessException } from '@/shared/exceptions/business.exception';
 import { TenantContext } from '@/tenant/context/tenant.context';
 import { DelFlagEnum, StatusEnum } from '@/shared/enums';
-import { Prisma, GenTemplateGroup, GenTemplate } from '@prisma/client';
+import { GenTemplate, GenTemplateGroup, Prisma } from '@prisma/client';
 import {
-  CreateTemplateGroupDto,
-  UpdateTemplateGroupDto,
-  ListTemplateGroupRequestDto,
   CreateTemplateDto,
-  UpdateTemplateDto,
-  ListTemplateRequestDto,
-  ValidateTemplateDto,
-  ImportTemplateGroupDto,
+  CreateTemplateGroupDto,
   ExportTemplateGroupDto,
-  TemplateLanguage,
+  ImportTemplateGroupDto,
+  ListTemplateGroupRequestDto,
+  ListTemplateRequestDto,
   TemplateContextDto,
+  TemplateLanguage,
+  UpdateTemplateDto,
+  UpdateTemplateGroupDto,
+  ValidateTemplateDto,
 } from './dto';
 
 /**
@@ -780,7 +780,10 @@ export class TemplateService {
     for (const template of dto.templates) {
       const validateResult = this.validateTemplateSyntax(template.content);
       if (!validateResult.valid) {
-        throw new BusinessException(ResponseCode.PARAM_INVALID, `模板 "${template.name}" 语法错误: ${validateResult.message}`);
+        throw new BusinessException(
+          ResponseCode.PARAM_INVALID,
+          `模板 "${template.name}" 语法错误: ${validateResult.message}`,
+        );
       }
     }
 

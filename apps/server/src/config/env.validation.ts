@@ -5,11 +5,11 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Matches,
   Max,
   Min,
-  validateSync,
-  Matches,
   MinLength,
+  validateSync,
 } from 'class-validator';
 
 /**

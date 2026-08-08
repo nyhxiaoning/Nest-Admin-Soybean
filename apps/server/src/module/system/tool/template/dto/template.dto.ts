@@ -1,18 +1,18 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
-  IsString,
-  IsOptional,
-  IsNotEmpty,
-  IsInt,
-  IsEnum,
-  IsBoolean,
+  ArrayMinSize,
   IsArray,
-  Min,
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
   Max,
   MaxLength,
+  Min,
   MinLength,
   ValidateNested,
-  ArrayMinSize,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PageQueryDto } from '@/shared/dto';

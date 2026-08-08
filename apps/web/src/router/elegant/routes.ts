@@ -65,6 +65,64 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'literature',
+    path: '/literature',
+    component: 'layout.base',
+    meta: {
+      title: 'literature'
+    },
+    children: [
+      {
+        name: 'literature_manuscripts',
+        path: '/literature/manuscripts',
+        component: 'view.literature_manuscripts',
+        meta: {
+          title: 'literature_manuscripts'
+        }
+      },
+      {
+        name: 'literature_materials',
+        path: '/literature/materials',
+        component: 'view.literature_materials',
+        meta: {
+          title: 'literature_materials'
+        }
+      },
+      {
+        name: 'literature_print',
+        path: '/literature/print/:id',
+        component: 'view.literature_print',
+        meta: {
+          title: 'literature_print'
+        }
+      },
+      {
+        name: 'literature_settings',
+        path: '/literature/settings',
+        component: 'view.literature_settings',
+        meta: {
+          title: 'literature_settings'
+        }
+      },
+      {
+        name: 'literature_tags',
+        path: '/literature/tags',
+        component: 'view.literature_tags',
+        meta: {
+          title: 'literature_tags'
+        }
+      },
+      {
+        name: 'literature_workbench',
+        path: '/literature/workbench',
+        component: 'view.literature_workbench',
+        meta: {
+          title: 'literature_workbench'
+        }
+      }
+    ]
+  },
+  {
     name: 'login',
     path: '/login',
     component: 'layout.blank$view.login',

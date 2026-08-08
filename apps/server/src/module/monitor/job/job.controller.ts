@@ -1,18 +1,18 @@
-import { Controller, Get, Post, Body, Delete, Param, Put, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, Res } from '@nestjs/common';
 import { Response } from 'express';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JobService } from './job.service';
 import { CreateJobDto, ListJobRequestDto } from './dto/create-job.dto';
 import { RequirePermission } from 'src/core/decorators/require-permission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
 import {
+  ChangeJobStatusResultResponseDto,
+  CreateJobResultResponseDto,
+  DeleteJobResultResponseDto,
   JobListResponseDto,
   JobResponseDto,
-  CreateJobResultResponseDto,
-  UpdateJobResultResponseDto,
-  DeleteJobResultResponseDto,
-  ChangeJobStatusResultResponseDto,
   RunJobResultResponseDto,
+  UpdateJobResultResponseDto,
 } from 'src/module/monitor/dto/responses';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';

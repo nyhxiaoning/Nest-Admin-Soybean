@@ -11,7 +11,7 @@ import { GenerateUUID } from 'src/shared/utils/index';
 import { LoginRequestDto, RegisterRequestDto } from 'src/module/main/dto/requests';
 import { UserType } from '../dto/user';
 import { ClientInfoDto } from 'src/core/decorators/common.decorator';
-import { CacheEvict, Cacheable } from 'src/core/decorators/redis.decorator';
+import { Cacheable, CacheEvict } from 'src/core/decorators/redis.decorator';
 import { Captcha } from 'src/core/decorators/captcha.decorator';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { UserRepository } from '../user.repository';

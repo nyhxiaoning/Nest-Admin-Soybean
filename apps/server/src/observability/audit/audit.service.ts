@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
-import { SysAuditLog, Prisma } from '@prisma/client';
+import { Prisma, SysAuditLog } from '@prisma/client';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import { TenantContext } from '../../tenant/context/tenant.context';
 

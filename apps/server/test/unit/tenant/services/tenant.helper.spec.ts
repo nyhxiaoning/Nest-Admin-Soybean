@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TenantHelper, SUPER_TENANT_ID, hasTenantField } from '@/tenant/services/tenant.helper';
+import { hasTenantField, SUPER_TENANT_ID, TenantHelper } from '@/tenant/services/tenant.helper';
 import { TenantContext } from '@/tenant/context/tenant.context';
 import { AppConfigService } from '@/config/app-config.service';
 

@@ -1,6 +1,6 @@
 import * as fc from 'fast-check';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuditService, AuditLogData, AuditLogRecord } from '@/observability/audit/audit.service';
+import { AuditLogData, AuditLogRecord, AuditService } from '@/observability/audit/audit.service';
 import { PrismaService } from '@/infrastructure/prisma/prisma.service';
 import { ClsService } from 'nestjs-cls';
 

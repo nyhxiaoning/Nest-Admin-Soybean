@@ -16,7 +16,9 @@
     "naive-ui-admin",
     "UnoCSS"
   ],
-  "contributors": ["linlingqin77"],
+  "contributors": [
+    "linlingqin77"
+  ],
   "engines": {
     "node": ">=20.19.0",
     "pnpm": ">=10.5.0"
@@ -75,6 +77,7 @@
     "highlight.js": "^11.11.1",
     "jsencrypt": "^3.3.2",
     "json5": "2.2.3",
+    "md-editor-v3": "^6.5.6",
     "monaco-editor": "^0.52.2",
     "naive-ui": "2.43.1",
     "nprogress": "0.2.0",

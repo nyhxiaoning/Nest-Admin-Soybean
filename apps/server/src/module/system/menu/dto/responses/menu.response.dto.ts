@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import { BaseResponseDto } from 'src/shared/dto/base.response.dto';
-import { StatusEnum, StatusEnumSchema, MenuTypeEnum, MenuTypeEnumSchema } from 'src/shared/enums';
+import { MenuTypeEnum, MenuTypeEnumSchema, StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 
 /**
  * 菜单基础响应 DTO

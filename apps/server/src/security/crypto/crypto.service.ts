@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CryptoException } from 'src/shared/exceptions';
 import { AppConfigService } from 'src/config/app-config.service';
 import { RedisService } from 'src/module/common/redis/redis.service';
@@ -255,12 +255,12 @@ export class CryptoService implements OnModuleInit {
   private async validateNonce(nonce: string): Promise<void> {
     const nonceKey = `crypto:nonce:${nonce}`;
     const exists = await this.redisService.get(nonceKey);
-    
+
     if (exists) {
       this.logger.warn(`Replay attack detected: nonce ${nonce} already used`);
       throw new BadRequestException('请求已过期或重复，请重新提交');
     }
-    
+
     // 将nonce存储到Redis，设置TTL
     await this.redisService.set(nonceKey, '1', this.NONCE_TTL);
   }
@@ -273,7 +273,7 @@ export class CryptoService implements OnModuleInit {
   private validateTimestamp(timestamp: number): void {
     const now = Date.now();
     const diff = Math.abs(now - timestamp);
-    
+
     if (diff > this.TIMESTAMP_TOLERANCE) {
       this.logger.warn(`Timestamp out of range: ${timestamp}, current: ${now}, diff: ${diff}ms`);
       throw new BadRequestException('请求时间戳无效，请检查系统时间');

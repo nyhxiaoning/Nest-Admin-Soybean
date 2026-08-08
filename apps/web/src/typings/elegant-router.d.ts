@@ -26,6 +26,13 @@ declare module "@elegant-router/types" {
     "500": "/500";
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
+    "literature": "/literature";
+    "literature_manuscripts": "/literature/manuscripts";
+    "literature_materials": "/literature/materials";
+    "literature_print": "/literature/print/:id";
+    "literature_settings": "/literature/settings";
+    "literature_tags": "/literature/tags";
+    "literature_workbench": "/literature/workbench";
     "login": "/login";
     "monitor": "/monitor";
     "monitor_cache": "/monitor/cache";
@@ -110,6 +117,7 @@ declare module "@elegant-router/types" {
     | "500"
     | "home"
     | "iframe-page"
+    | "literature"
     | "login"
     | "monitor"
     | "social-callback"
@@ -141,6 +149,12 @@ declare module "@elegant-router/types" {
     | "social-callback"
     | "user-center"
     | "home"
+    | "literature_manuscripts"
+    | "literature_materials"
+    | "literature_print"
+    | "literature_settings"
+    | "literature_tags"
+    | "literature_workbench"
     | "monitor_cache"
     | "monitor_cache_list"
     | "monitor_job-log"

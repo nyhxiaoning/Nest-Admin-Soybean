@@ -1,12 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import {
-  RequireQuotaGuard,
-  RequireQuotaOptions,
-  REQUIRE_QUOTA_KEY,
-} from '@/tenant/guards/require-quota.guard';
-import { TenantQuotaService, QuotaResource } from '@/tenant/services/quota.service';
+import { REQUIRE_QUOTA_KEY, RequireQuotaGuard, RequireQuotaOptions } from '@/tenant/guards/require-quota.guard';
+import { QuotaResource, TenantQuotaService } from '@/tenant/services/quota.service';
 import { TenantContext } from '@/tenant/context/tenant.context';
 
 describe('RequireQuotaGuard', () => {

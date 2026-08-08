@@ -1,19 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@/infrastructure/prisma';
-import { Result, ResponseCode } from '@/shared/response';
+import { ResponseCode, Result } from '@/shared/response';
 import { BusinessException } from '@/shared/exceptions/business.exception';
 import { TenantContext } from '@/tenant/context/tenant.context';
 import { DelFlagEnum, StatusEnum } from '@/shared/enums';
-import { Prisma, GenDataSource } from '@prisma/client';
+import { GenDataSource, Prisma } from '@prisma/client';
 import * as crypto from 'crypto';
 import {
   CreateDataSourceDto,
-  UpdateDataSourceDto,
+  DatabaseType,
+  DbColumnDto,
+  DbTableDto,
   ListDataSourceRequestDto,
   TestConnectionDto,
-  DatabaseType,
-  DbTableDto,
-  DbColumnDto,
+  UpdateDataSourceDto,
 } from './dto';
 
 // 数据源密码加密密钥（生产环境应从配置中读取）

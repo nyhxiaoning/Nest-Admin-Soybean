@@ -6,7 +6,7 @@ import { CacheEnum } from 'src/shared/enums/index';
 import { ResponseCode, Result } from 'src/shared/response';
 import { SUPER_ADMIN_USER_ID } from 'src/shared/constants/index';
 import { UserType } from '../dto/user';
-import { UpdateProfileRequestDto, UpdatePwdRequestDto, ResetPwdRequestDto } from '../dto/index';
+import { ResetPwdRequestDto, UpdateProfileRequestDto, UpdatePwdRequestDto } from '../dto/index';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { UserRepository } from '../user.repository';
 import { TokenBlacklistService } from 'src/security/login/token-blacklist.service';
@@ -89,7 +89,11 @@ export class UserProfileService {
     message: '密码正在重置中，请稍后重试',
   })
   async resetPwd(body: ResetPwdRequestDto) {
-    BusinessException.throwIf(body.userId === SUPER_ADMIN_USER_ID, '超级管理员密码不能通过此接口重置', ResponseCode.BUSINESS_ERROR);
+    BusinessException.throwIf(
+      body.userId === SUPER_ADMIN_USER_ID,
+      '超级管理员密码不能通过此接口重置',
+      ResponseCode.BUSINESS_ERROR,
+    );
     if (body.password) {
       body.password = bcrypt.hashSync(body.password, bcrypt.genSaltSync(10));
     }

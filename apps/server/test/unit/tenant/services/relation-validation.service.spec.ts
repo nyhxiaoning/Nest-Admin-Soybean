@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import {
-  RelationValidationService,
-  RelationValidationResult,
   DependencyCheckResult,
+  RelationValidationResult,
+  RelationValidationService,
 } from '@/tenant/services/relation-validation.service';
 import { PrismaService } from '@/infrastructure/prisma';
 import { TenantContext } from '@/tenant/context/tenant.context';

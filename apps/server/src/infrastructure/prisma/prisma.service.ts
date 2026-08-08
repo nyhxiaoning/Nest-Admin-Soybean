@@ -68,22 +68,25 @@ function createExtendedPrismaClient(
 
   // 使用 $extends 链式扩展替代已弃用的 $use 中间件
   // 顺序：软删除过滤 → 租户过滤 → 慢查询监控
-  return baseClient.$extends(createSoftDeleteExtension()).$extends(createTenantExtension()).$extends(
-    createSlowQueryExtension(
-      {
-        threshold: DEFAULT_SLOW_QUERY_THRESHOLD,
-        enabled: true,
-      },
-      (log) => {
-        // 存储慢查询日志用于监控和分析
-        slowQueryLogs.push(log);
-        // 保持最近 100 条慢查询记录
-        if (slowQueryLogs.length > 100) {
-          slowQueryLogs.shift();
-        }
-      },
-    ),
-  );
+  return baseClient
+    .$extends(createSoftDeleteExtension())
+    .$extends(createTenantExtension())
+    .$extends(
+      createSlowQueryExtension(
+        {
+          threshold: DEFAULT_SLOW_QUERY_THRESHOLD,
+          enabled: true,
+        },
+        (log) => {
+          // 存储慢查询日志用于监控和分析
+          slowQueryLogs.push(log);
+          // 保持最近 100 条慢查询记录
+          if (slowQueryLogs.length > 100) {
+            slowQueryLogs.shift();
+          }
+        },
+      ),
+    );
 }
 
 @Injectable()
@@ -99,10 +102,14 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     }
 
     // 调试日志：输出完整配置（密码隐藏）
-    this.logger.debug(`[DEBUG] PostgreSQL Config - host: ${pgConfig.host}, port: ${pgConfig.port}, database: ${pgConfig.database}, user: ${pgConfig.username}, ssl: ${pgConfig.ssl}, schema: ${pgConfig.schema}`);
+    this.logger.debug(
+      `[DEBUG] PostgreSQL Config - host: ${pgConfig.host}, port: ${pgConfig.port}, database: ${pgConfig.database}, user: ${pgConfig.username}, ssl: ${pgConfig.ssl}, schema: ${pgConfig.schema}`,
+    );
 
     const connectionString = PrismaService.buildConnectionString(pgConfig);
-    this.logger.debug(`[DEBUG] Prisma 连接字符串（密码已隐藏）: ${connectionString.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')}`);
+    this.logger.debug(
+      `[DEBUG] Prisma 连接字符串（密码已隐藏）: ${connectionString.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')}`,
+    );
 
     this._client = createExtendedPrismaClient(connectionString, this.slowQueryLogs);
   }

@@ -1,11 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { DelFlagEnum } from 'src/shared/enums/index';
-import { InjectTransactionHost, Transactional, PrismaTransactionHost } from 'src/core/decorators/transactional.decorator';
+import {
+  InjectTransactionHost,
+  PrismaTransactionHost,
+  Transactional,
+} from 'src/core/decorators/transactional.decorator';
 import { Idempotent } from 'src/core/decorators/idempotent.decorator';
 import { SYS_USER_TYPE } from 'src/shared/constants/index';
 import { Result } from 'src/shared/response';
-import { BatchCreateUserRequestDto, BatchDeleteUserRequestDto, BatchResultResponseDto, BatchResultItemResponseDto } from '../dto/index';
+import {
+  BatchCreateUserRequestDto,
+  BatchDeleteUserRequestDto,
+  BatchResultItemResponseDto,
+  BatchResultResponseDto,
+} from '../dto/index';
 
 import { UserRepository } from '../user.repository';
 
@@ -24,7 +33,9 @@ export class UserBatchService {
     @InjectTransactionHost() private readonly txHost: PrismaTransactionHost,
     private readonly userRepo: UserRepository,
   ) {}
-  private get prisma() { return this.txHost.tx; }
+  private get prisma() {
+    return this.txHost.tx;
+  }
 
   /**
    * 批量创建用户

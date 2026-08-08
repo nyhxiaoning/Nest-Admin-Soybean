@@ -1,4 +1,4 @@
-import { IsString, IsEnum, Length, IsOptional, IsEmail } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { SexEnum, SexEnumSchema } from 'src/shared/enums';
 import { IsStrongPassword } from 'src/shared/validators/password.validator';

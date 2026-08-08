@@ -1,42 +1,42 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Put,
-  Param,
-  Query,
-  Res,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
   Request,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { Response } from 'express';
 import { RequirePermission } from 'src/core/decorators/require-permission.decorator';
 import { RequireRole } from 'src/core/decorators/require-role.decorator';
 import { UploadService } from 'src/module/upload/upload.service';
 import {
-  CreateUserRequestDto,
-  UpdateUserRequestDto,
-  ListUserRequestDto,
-  ChangeUserStatusRequestDto,
-  ResetPwdRequestDto,
-  UpdateProfileRequestDto,
-  UpdatePwdRequestDto,
+  AuthRoleResponseDto,
   BatchCreateUserRequestDto,
   BatchDeleteUserRequestDto,
   BatchResultResponseDto,
-  UserResponseDto,
-  UserListResponseDto,
-  UserDetailResponseDto,
-  UserProfileResponseDto,
-  UserAvatarResponseDto,
-  AuthRoleResponseDto,
+  ChangeUserStatusRequestDto,
+  CreateUserRequestDto,
   CurrentUserInfoResponseDto,
+  ListUserRequestDto,
+  ResetPwdRequestDto,
+  UpdateProfileRequestDto,
+  UpdatePwdRequestDto,
+  UpdateUserRequestDto,
+  UserAvatarResponseDto,
+  UserDetailResponseDto,
+  UserListResponseDto,
   UserOptionSelectResponseDto,
+  UserProfileResponseDto,
+  UserResponseDto,
 } from './dto/index';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Result } from 'src/shared/response';

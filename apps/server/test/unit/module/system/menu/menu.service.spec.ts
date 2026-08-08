@@ -6,7 +6,7 @@ import { PrismaService } from '@/infrastructure/prisma';
 import { MenuRepository } from '@/module/system/menu/menu.repository';
 import { UserService } from '@/module/system/user/user.service';
 import { RedisService } from '@/module/common/redis/redis.service';
-import { StatusEnum, DelFlagEnum } from '@/shared/enums/index';
+import { DelFlagEnum, StatusEnum } from '@/shared/enums/index';
 import { ResponseCode } from '@/shared/response';
 
 describe('MenuService', () => {

@@ -1,9 +1,9 @@
 import * as fc from 'fast-check';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ExecutionContext, CallHandler } from '@nestjs/common';
+import { CallHandler, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { of, delay } from 'rxjs';
-import { LockInterceptor, LOCK_KEY, LockOptions, LockAcquireException } from '@/core/decorators/lock.decorator';
+import { delay, of } from 'rxjs';
+import { LOCK_KEY, LockAcquireException, LockInterceptor, LockOptions } from '@/core/decorators/lock.decorator';
 import { RedisService } from '@/module/common/redis/redis.service';
 
 /**

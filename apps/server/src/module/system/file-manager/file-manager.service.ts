@@ -1,28 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { StructuredLoggerService } from 'src/infrastructure/logging/structured-logger.service';
-import { Result, ResponseCode } from 'src/shared/response';
+import { ResponseCode, Result } from 'src/shared/response';
 import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { BusinessException } from 'src/shared/exceptions';
 import {
   CreateFolderRequestDto,
-  UpdateFolderRequestDto,
-  ListFolderRequestDto,
-  ListFileRequestDto,
-  MoveFileRequestDto,
-  RenameFileRequestDto,
   CreateShareRequestDto,
   GetShareRequestDto,
+  ListFileRequestDto,
+  ListFolderRequestDto,
+  MoveFileRequestDto,
+  RenameFileRequestDto,
+  UpdateFolderRequestDto,
 } from './dto/requests';
 import {
-  FolderResponseDto,
-  FolderTreeNodeResponseDto,
+  AccessTokenResponseDto,
+  CreateShareResultResponseDto,
   FileResponseDto,
   FileVersionResponseDto,
-  ShareResponseDto,
-  CreateShareResultResponseDto,
-  StorageStatsResponseDto,
-  AccessTokenResponseDto,
+  FolderResponseDto,
+  FolderTreeNodeResponseDto,
   RestoreVersionResultResponseDto,
+  ShareResponseDto,
+  StorageStatsResponseDto,
 } from './dto/responses';
 import { toDto, toDtoList } from 'src/shared/utils/serialize.util';
 import { TenantContext } from 'src/tenant/context/tenant.context';
@@ -37,7 +37,11 @@ import { Response } from 'express';
 import { FileAccessService } from './services/file-access.service';
 import { VersionService } from 'src/module/upload/services/version.service';
 import { AppConfigService } from 'src/config/app-config.service';
-import { InjectTransactionHost, Transactional, PrismaTransactionHost } from 'src/core/decorators/transactional.decorator';
+import {
+  InjectTransactionHost,
+  PrismaTransactionHost,
+  Transactional,
+} from 'src/core/decorators/transactional.decorator';
 
 /**
  * 文件夹树节点类型
@@ -57,7 +61,9 @@ export class FileManagerService {
   ) {
     this.logger.setContext(FileManagerService.name);
   }
-  private get prisma() { return this.txHost.tx; }
+  private get prisma() {
+    return this.txHost.tx;
+  }
 
   // ==================== 文件夹管理 ====================
 
@@ -200,7 +206,10 @@ export class FileManagerService {
           delFlag: true,
         },
       });
-      this.logger.warn(`文件夹 ${folderId} 下有 ${hasFiles} 个文件`, { action: 'fileManager.deleteFolder.hasFiles', files });
+      this.logger.warn(`文件夹 ${folderId} 下有 ${hasFiles} 个文件`, {
+        action: 'fileManager.deleteFolder.hasFiles',
+        files,
+      });
     }
 
     BusinessException.throwIf(hasFiles > 0, '该文件夹下存在文件，无法删除', ResponseCode.DATA_IN_USE);
@@ -335,7 +344,12 @@ export class FileManagerService {
       { where },
     );
 
-    return Result.page(toDtoList(FileResponseDto, rows as Record<string, unknown>[]), total, query.pageNum, query.pageSize);
+    return Result.page(
+      toDtoList(FileResponseDto, rows as Record<string, unknown>[]),
+      total,
+      query.pageNum,
+      query.pageSize,
+    );
   }
 
   /**
@@ -432,7 +446,10 @@ export class FileManagerService {
           },
         });
 
-        this.logger.info({ action: 'fileManager.deleteFile', message: `删除文件: ${file.fileName}, 大小: ${fileSizeMB}MB` });
+        this.logger.info({
+          action: 'fileManager.deleteFile',
+          message: `删除文件: ${file.fileName}, 大小: ${fileSizeMB}MB`,
+        });
       }
     }
 
@@ -444,7 +461,10 @@ export class FileManagerService {
           storageUsed: { decrement: totalSizeMB },
         },
       });
-      this.logger.info({ action: 'fileManager.storageDecrement', message: `租户${tenantId}存储使用量减少${totalSizeMB}MB` });
+      this.logger.info({
+        action: 'fileManager.storageDecrement',
+        message: `租户${tenantId}存储使用量减少${totalSizeMB}MB`,
+      });
     }
 
     return Result.ok();
@@ -687,7 +707,10 @@ export class FileManagerService {
         },
       });
 
-      this.logger.info({ action: 'fileManager.restoreFile', message: `恢复文件: ${file.fileName}, 大小: ${fileSizeMB}MB` });
+      this.logger.info({
+        action: 'fileManager.restoreFile',
+        message: `恢复文件: ${file.fileName}, 大小: ${fileSizeMB}MB`,
+      });
     }
 
     return Result.ok();
@@ -857,7 +880,10 @@ export class FileManagerService {
     // 检查并清理旧版本
     await this.versionService.checkAndCleanOldVersions(baseId);
 
-    this.logger.info({ action: 'fileManager.restoreVersion', message: `恢复版本: 从版本${targetVersion.version}创建新版本${newVersion}` });
+    this.logger.info({
+      action: 'fileManager.restoreVersion',
+      message: `恢复版本: 从版本${targetVersion.version}创建新版本${newVersion}`,
+    });
 
     return Result.ok(
       toDto(RestoreVersionResultResponseDto, {
@@ -987,7 +1013,10 @@ export class FileManagerService {
           const filePath = path.join(baseDir, relativePath);
           if (fs.existsSync(filePath)) {
             archive.file(filePath, { name: file.fileName });
-            this.logger.info({ action: 'fileManager.batchDownload.addFile', message: `添加文件到压缩包: ${file.fileName}` });
+            this.logger.info({
+              action: 'fileManager.batchDownload.addFile',
+              message: `添加文件到压缩包: ${file.fileName}`,
+            });
           }
         }
       }

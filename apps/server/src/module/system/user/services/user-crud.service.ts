@@ -6,13 +6,22 @@ import { toDto, toDtoList } from 'src/shared/utils/index';
 import { PaginationHelper } from 'src/shared/utils/pagination.helper';
 import { UserResponseDto } from '../dto/responses';
 
-import { CacheEnum, DelFlagEnum, DataScopeEnum } from 'src/shared/enums/index';
-import { InjectTransactionHost, Transactional, PrismaTransactionHost } from 'src/core/decorators/transactional.decorator';
+import { CacheEnum, DataScopeEnum, DelFlagEnum } from 'src/shared/enums/index';
+import {
+  InjectTransactionHost,
+  PrismaTransactionHost,
+  Transactional,
+} from 'src/core/decorators/transactional.decorator';
 import { Idempotent } from 'src/core/decorators/idempotent.decorator';
 import { Lock } from 'src/core/decorators/lock.decorator';
-import { SYS_USER_TYPE, SUPER_ADMIN_USER_ID, SUPER_ADMIN_ROLE_ID } from 'src/shared/constants/index';
-import { Result, ResponseCode } from 'src/shared/response';
-import { CreateUserRequestDto, UpdateUserRequestDto, ListUserRequestDto, ChangeUserStatusRequestDto } from '../dto/index';
+import { SUPER_ADMIN_ROLE_ID, SUPER_ADMIN_USER_ID, SYS_USER_TYPE } from 'src/shared/constants/index';
+import { ResponseCode, Result } from 'src/shared/response';
+import {
+  ChangeUserStatusRequestDto,
+  CreateUserRequestDto,
+  ListUserRequestDto,
+  UpdateUserRequestDto,
+} from '../dto/index';
 
 import { DeptService } from 'src/module/system/dept/dept.service';
 import { UserType } from '../dto/user';
@@ -42,7 +51,9 @@ export class UserCrudService {
     private readonly roleService: RoleService,
     private readonly deptService: DeptService,
   ) {}
-  private get prisma() { return this.txHost.tx; }
+  private get prisma() {
+    return this.txHost.tx;
+  }
 
   // ==================== 私有辅助方法 ====================
 
@@ -353,7 +364,14 @@ export class UserCrudService {
     }
 
     // 构造更新数据，排除不应直接更新的字段
-    const { password, dept, roles, roleIds: _roleIds, postIds: _postIds, ...cleanUpdateData } = rest as Record<string, unknown>;
+    const {
+      password,
+      dept,
+      roles,
+      roleIds: _roleIds,
+      postIds: _postIds,
+      ...cleanUpdateData
+    } = rest as Record<string, unknown>;
     const updateData = cleanUpdateData as Prisma.SysUserUpdateInput;
 
     const data = await this.prisma.sysUser.update({

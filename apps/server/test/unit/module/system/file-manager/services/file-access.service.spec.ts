@@ -5,7 +5,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { FileAccessService } from '@/module/system/file-manager/services/file-access.service';
 import { AppConfigService } from '@/config/app-config.service';
-import { createConfigMock, ConfigMock } from 'test/mocks/config-mock';
+import { ConfigMock, createConfigMock } from 'test/mocks/config-mock';
 
 describe('FileAccessService', () => {
   let service: FileAccessService;

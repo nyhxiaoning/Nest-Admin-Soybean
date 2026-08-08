@@ -1,16 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
-  IsOptional,
-  IsInt,
-  IsString,
-  IsEnum,
-  Min,
-  Max,
-  IsDateString,
-  ValidateNested,
   IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+  ValidateNested,
 } from 'class-validator';
-import { Type, Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 /**
  * 排序方向枚举

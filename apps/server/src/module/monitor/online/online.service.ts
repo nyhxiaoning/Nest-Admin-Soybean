@@ -3,7 +3,7 @@ import { Result } from 'src/shared/response';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { CacheEnum } from 'src/shared/enums/index';
 import { Paginate, toDtoList } from 'src/shared/utils/index';
-import { OnlineUserResponseDto, OnlineListDto } from './dto/index';
+import { OnlineListDto, OnlineUserResponseDto } from './dto/index';
 
 @Injectable()
 export class OnlineService {

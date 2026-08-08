@@ -100,11 +100,7 @@ export class MfaService {
     const qrCode = await QRCode.toDataURL(otpauthUrl);
 
     // 临时保存密钥（验证后才正式绑定）
-    await this.redisService.set(
-      `${MFA_CACHE_PREFIX.SETUP}${userId}`,
-      secret.base32,
-      this.SETUP_TTL * 1000,
-    );
+    await this.redisService.set(`${MFA_CACHE_PREFIX.SETUP}${userId}`, secret.base32, this.SETUP_TTL * 1000);
 
     this.logger.log(`TOTP setup generated for userId=${userId}`);
 
@@ -180,11 +176,7 @@ export class MfaService {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
     // 保存到 Redis
-    await this.redisService.set(
-      `${MFA_CACHE_PREFIX.SMS_CODE}${userId}`,
-      code,
-      this.SMS_CODE_TTL * 1000,
-    );
+    await this.redisService.set(`${MFA_CACHE_PREFIX.SMS_CODE}${userId}`, code, this.SMS_CODE_TTL * 1000);
 
     this.logger.log(`SMS MFA code generated for userId=${userId}, phone=${phone}`);
 
@@ -252,11 +244,7 @@ export class MfaService {
    * 设置 MFA 验证通过
    */
   private async setMfaVerified(userId: number): Promise<void> {
-    await this.redisService.set(
-      `${MFA_CACHE_PREFIX.VERIFIED}${userId}`,
-      'true',
-      this.VERIFIED_TTL * 1000,
-    );
+    await this.redisService.set(`${MFA_CACHE_PREFIX.VERIFIED}${userId}`, 'true', this.VERIFIED_TTL * 1000);
   }
 
   /**

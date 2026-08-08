@@ -1,6 +1,6 @@
-import { PartialType, OmitType } from '@nestjs/swagger';
+import { OmitType, PartialType } from '@nestjs/swagger';
 import { CreateTenantRequestDto } from './create-tenant.request.dto';
-import { IsNumber, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateTenantRequestDto extends PartialType(

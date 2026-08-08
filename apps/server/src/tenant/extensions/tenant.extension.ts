@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { Logger, ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, Logger } from '@nestjs/common';
 import { TenantContext } from '../context/tenant.context';
 import { hasTenantField, SUPER_TENANT_ID } from '../constants/tenant-models';
 

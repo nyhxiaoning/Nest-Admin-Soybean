@@ -1,7 +1,7 @@
 import * as Lodash from 'lodash';
 import * as ExcelJS from 'exceljs';
 import { Response } from 'express';
-import { StatusEnum, SexEnum, DelFlagEnum } from 'src/shared/enums/index';
+import { DelFlagEnum, SexEnum, StatusEnum } from 'src/shared/enums/index';
 import { StaticLogger } from './static-logger.util';
 
 /**

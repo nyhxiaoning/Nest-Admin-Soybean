@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { BaseResponseDto } from 'src/shared/dto/base.response.dto';
-import { StatusEnum, StatusEnumSchema, NoticeTypeEnum, NoticeTypeEnumSchema } from 'src/shared/enums';
+import { NoticeTypeEnum, NoticeTypeEnumSchema, StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 
 /**
  * 通知公告响应 DTO

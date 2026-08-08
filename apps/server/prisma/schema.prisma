@@ -1105,3 +1105,99 @@ model SysOss {
   @@index([fileName])
   @@map("sys_oss")
 }
+
+/// 文学编辑室 - 文稿
+model LitManuscript {
+  manuscriptId Int       @id @default(autoincrement()) @map("manuscript_id")
+  tenantId     String    @default("000000") @map("tenant_id") @db.VarChar(20)
+  userId       Int       @map("user_id")
+  title        String    @db.VarChar(200)
+  content      String    @default("") @db.Text
+  wordCount    Int       @default(0) @map("word_count")
+  status       String    @default("0") @map("status") @db.Char(1)
+  remark       String?   @db.VarChar(500)
+  delFlag      String    @default("0") @map("del_flag") @db.Char(1)
+  createBy     String    @default("") @map("create_by") @db.VarChar(64)
+  createTime   DateTime? @map("create_time") @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(6)
+  updateBy     String    @default("") @map("update_by") @db.VarChar(64)
+  updateTime   DateTime? @map("update_time") @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(6)
+
+  tags LitManuscriptTag[]
+
+  @@index([tenantId, userId, status, delFlag])
+  @@index([tenantId, userId, delFlag, createTime])
+  @@map("lit_manuscript")
+}
+
+/// 文学编辑室 - 素材
+model LitMaterial {
+  materialId Int       @id @default(autoincrement()) @map("material_id")
+  tenantId   String    @default("000000") @map("tenant_id") @db.VarChar(20)
+  userId     Int       @map("user_id")
+  type       String    @db.Char(1)
+  content    String    @db.Text
+  source     String?   @db.VarChar(200)
+  remark     String?   @db.VarChar(500)
+  delFlag    String    @default("0") @map("del_flag") @db.Char(1)
+  createBy   String    @default("") @map("create_by") @db.VarChar(64)
+  createTime DateTime? @map("create_time") @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(6)
+  updateBy   String    @default("") @map("update_by") @db.VarChar(64)
+  updateTime DateTime? @map("update_time") @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(6)
+
+  @@index([tenantId, userId, type, delFlag])
+  @@index([tenantId, userId, delFlag, createTime])
+  @@map("lit_material")
+}
+
+/// 文学编辑室 - 标签
+model LitTag {
+  tagId      Int       @id @default(autoincrement()) @map("tag_id")
+  tenantId   String    @default("000000") @map("tenant_id") @db.VarChar(20)
+  userId     Int       @map("user_id")
+  tagName    String    @map("tag_name") @db.VarChar(50)
+  color      String    @default("#2080f0") @db.VarChar(20)
+  delFlag    String    @default("0") @map("del_flag") @db.Char(1)
+  createBy   String    @default("") @map("create_by") @db.VarChar(64)
+  createTime DateTime? @map("create_time") @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(6)
+  updateBy   String    @default("") @map("update_by") @db.VarChar(64)
+  updateTime DateTime? @map("update_time") @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(6)
+
+  manuscripts LitManuscriptTag[]
+
+  @@unique([tenantId, userId, tagName], name: "unique_user_lit_tag")
+  @@index([tenantId, userId, delFlag])
+  @@map("lit_tag")
+}
+
+/// 文学编辑室 - 文稿标签关联
+model LitManuscriptTag {
+  id           Int @id @default(autoincrement())
+  manuscriptId Int @map("manuscript_id")
+  tagId        Int @map("tag_id")
+
+  manuscript LitManuscript @relation(fields: [manuscriptId], references: [manuscriptId], onDelete: Cascade)
+  tag        LitTag        @relation(fields: [tagId], references: [tagId], onDelete: Cascade)
+
+  @@unique([manuscriptId, tagId])
+  @@index([tagId])
+  @@map("lit_manuscript_tag")
+}
+
+/// 文学编辑室 - 编辑室设置
+model LitSetting {
+  settingId        Int       @id @default(autoincrement()) @map("setting_id")
+  tenantId         String    @default("000000") @map("tenant_id") @db.VarChar(20)
+  userId           Int       @map("user_id")
+  fontSize         Int       @default(16) @map("font_size")
+  fontFamily       String    @default("") @map("font_family") @db.VarChar(100)
+  autosave         String    @default("1") @db.Char(1)
+  autosaveInterval Int       @default(30) @map("autosave_interval")
+  exportFormat     String    @default("md") @map("export_format") @db.Char(2)
+  createBy         String    @default("") @map("create_by") @db.VarChar(64)
+  createTime       DateTime? @map("create_time") @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(6)
+  updateBy         String    @default("") @map("update_by") @db.VarChar(64)
+  updateTime       DateTime? @map("update_time") @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp(6)
+
+  @@unique([tenantId, userId])
+  @@map("lit_setting")
+}

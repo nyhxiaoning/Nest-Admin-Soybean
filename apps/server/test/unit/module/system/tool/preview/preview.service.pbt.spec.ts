@@ -6,7 +6,7 @@
  */
 import * as fc from 'fast-check';
 import { PreviewService } from '@/module/system/tool/preview/preview.service';
-import { PreviewFileDto, FileTreeNodeDto } from '@/module/system/tool/dto/responses/preview.response.dto';
+import { FileTreeNodeDto, PreviewFileDto } from '@/module/system/tool/dto/responses/preview.response.dto';
 
 describe('PreviewService - Property Tests', () => {
   let service: PreviewService;

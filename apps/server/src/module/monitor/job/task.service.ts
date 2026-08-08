@@ -5,7 +5,7 @@ import { JobLogService } from './job-log.service';
 import { BusinessException } from 'src/shared/exceptions/index';
 import { ResponseCode } from 'src/shared/response';
 import { PrismaService } from 'src/infrastructure/prisma';
-import { StatusEnum, DelFlagEnum } from 'src/shared/enums/index';
+import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { IgnoreTenant } from 'src/tenant/decorators/tenant.decorator';
 import { TenantContext } from 'src/tenant/context/tenant.context';
 import { NoticeService } from 'src/module/system/notice/notice.service';

@@ -4,7 +4,7 @@ import { toDtoList } from 'src/shared/utils/index';
 import { PaginationHelper } from 'src/shared/utils/pagination.helper';
 import { UserResponseDto } from '../dto/responses';
 
-import { DelFlagEnum, DataScopeEnum } from 'src/shared/enums/index';
+import { DataScopeEnum, DelFlagEnum } from 'src/shared/enums/index';
 import { Result } from 'src/shared/response';
 import { ListUserRequestDto } from '../dto/index';
 

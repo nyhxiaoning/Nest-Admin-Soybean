@@ -4,13 +4,17 @@ import { DelFlagEnum, StatusEnum } from 'src/shared/enums/index';
 import { ResponseCode, Result } from 'src/shared/response';
 import { toDtoList } from 'src/shared/utils/serialize.util';
 import { PaginationHelper } from 'src/shared/utils/pagination.helper';
-import { InjectTransactionHost, Transactional, PrismaTransactionHost } from 'src/core/decorators/transactional.decorator';
+import {
+  InjectTransactionHost,
+  PrismaTransactionHost,
+  Transactional,
+} from 'src/core/decorators/transactional.decorator';
 import { AllocatedListRequestDto } from '../dto/index';
 import { UserResponseDto } from '../dto/responses';
-import { AuthUserCancelDto, AuthUserCancelAllDto, AuthUserSelectAllDto } from 'src/module/system/role/dto/index';
+import { AuthUserCancelAllDto, AuthUserCancelDto, AuthUserSelectAllDto } from 'src/module/system/role/dto/index';
 import { UserRepository } from '../user.repository';
 import { RoleService } from 'src/module/system/role/role.service';
-import { SysDept, SysRole, SysUser, Prisma } from '@prisma/client';
+import { Prisma, SysDept, SysRole, SysUser } from '@prisma/client';
 
 type UserWithDept = SysUser & { dept?: SysDept | null };
 type UserWithRelations = UserWithDept & { roles?: SysRole[] };
@@ -27,7 +31,9 @@ export class UserRoleService {
     private readonly userRepo: UserRepository,
     private readonly roleService: RoleService,
   ) {}
-  private get prisma() { return this.txHost.tx; }
+  private get prisma() {
+    return this.txHost.tx;
+  }
 
   /**
    * 附加部门信息到用户列表

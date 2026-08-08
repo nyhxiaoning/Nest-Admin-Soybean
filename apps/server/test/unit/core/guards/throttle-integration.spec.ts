@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Controller, Get, INestApplication } from '@nestjs/common';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import request from 'supertest';
-import { ApiThrottle, ApiSkipThrottle } from '@/core/decorators/throttle.decorator';
+import { ApiSkipThrottle, ApiThrottle } from '@/core/decorators/throttle.decorator';
 import { CustomThrottlerGuard } from '@/core/guards/throttle.guard';
 
 /**

@@ -7,17 +7,17 @@ import { Cacheable } from 'src/core/decorators/redis.decorator';
 import { ExportTable } from 'src/shared/utils/export';
 import { toDto, toDtoList } from 'src/shared/utils/serialize.util';
 import {
-  CreateDictTypeRequestDto,
-  UpdateDictTypeRequestDto,
-  ListDictTypeRequestDto,
   CreateDictDataRequestDto,
-  UpdateDictDataRequestDto,
-  ListDictDataRequestDto,
-  DictTypeResponseDto,
+  CreateDictTypeRequestDto,
   DictDataResponseDto,
+  DictTypeResponseDto,
+  ListDictDataRequestDto,
+  ListDictTypeRequestDto,
+  UpdateDictDataRequestDto,
+  UpdateDictTypeRequestDto,
 } from './dto/index';
 import { RedisService } from 'src/module/common/redis/redis.service';
-import { DictTypeRepository, DictDataRepository } from './dict.repository';
+import { DictDataRepository, DictTypeRepository } from './dict.repository';
 import { InjectTransactionHost, PrismaTransactionHost } from 'src/core/decorators/transactional.decorator';
 
 @Injectable()
@@ -28,7 +28,9 @@ export class DictService {
     private readonly dictTypeRepo: DictTypeRepository,
     private readonly dictDataRepo: DictDataRepository,
   ) {}
-  private get prisma() { return this.txHost.tx; }
+  private get prisma() {
+    return this.txHost.tx;
+  }
   async createType(createDictTypeDto: CreateDictTypeRequestDto) {
     await this.dictTypeRepo.create(createDictTypeDto);
     return Result.ok();

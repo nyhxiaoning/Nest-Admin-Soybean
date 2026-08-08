@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LoginSecurityService, LoginSecurityConfig } from '@/security/login/login-security.service';
+import { LoginSecurityConfig, LoginSecurityService } from '@/security/login/login-security.service';
 import { RedisService } from '@/module/common/redis/redis.service';
 import { CacheEnum } from '@/shared/enums/index';
 

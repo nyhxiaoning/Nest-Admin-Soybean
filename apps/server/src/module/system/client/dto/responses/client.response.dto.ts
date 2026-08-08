@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform } from 'class-transformer';
 import { BaseResponseDto } from 'src/shared/dto/base.response.dto';
-import { StatusEnum, StatusEnumSchema, DeviceTypeEnum, DeviceTypeEnumSchema } from 'src/shared/enums';
+import { DeviceTypeEnum, DeviceTypeEnumSchema, StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 
 /**
  * 客户端响应 DTO

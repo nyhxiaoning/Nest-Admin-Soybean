@@ -1,13 +1,13 @@
 import {
-  IsString,
-  IsNumberString,
-  IsEnum,
-  IsPhoneNumber,
-  Min,
-  Length,
-  IsOptional,
   IsBoolean,
+  IsEnum,
   IsNumber,
+  IsNumberString,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  Length,
+  Min,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 

@@ -1,14 +1,14 @@
 import { Prisma } from '@prisma/client';
 import { TenantContext } from '@/tenant/context/tenant.context';
 import {
-  createTenantMiddleware,
   addTenantFilter,
+  createTenantMiddleware,
+  hasTenantField,
   setTenantId,
   setTenantIdForMany,
   setTenantIdForUpsert,
-  validateTenantOwnership,
-  hasTenantField,
   TENANT_MODELS,
+  validateTenantOwnership,
 } from '@/tenant.middleware';
 
 // 辅助函数：在租户上下文中运行测试

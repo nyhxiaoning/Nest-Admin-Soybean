@@ -1,8 +1,8 @@
-import { IsString, IsOptional, IsInt, IsEnum, IsArray, ValidateNested, ValidateIf, IsNotEmpty } from 'class-validator';
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, ValidateIf, ValidateNested } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { PageQueryDto } from '@/shared/dto';
-import { IsPascalCase, IsKebabCase } from '@/shared/validators';
+import { IsKebabCase, IsPascalCase } from '@/shared/validators';
 import { GenTableColumnUpdateDto } from './gen-table-column.dto';
 
 /**

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { BaseResponseDto } from 'src/shared/dto/base.response.dto';
-import { StatusEnum, StatusEnumSchema, DataScopeEnum, DataScopeEnumSchema } from 'src/shared/enums';
+import { DataScopeEnum, DataScopeEnumSchema, StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 import { DeptTreeNodeResponseDto } from 'src/shared/dto/dept-tree-node.response.dto';
 
 /**

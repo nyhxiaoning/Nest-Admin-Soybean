@@ -1,20 +1,20 @@
-import { Controller, Get, Post, Body, HttpCode, Logger, Headers } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiHeader } from '@nestjs/swagger';
+import { Body, Controller, Get, Headers, HttpCode, Logger, Post } from '@nestjs/common';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AppConfigService } from 'src/config/app-config.service';
 import { MainService } from './main.service';
 import { AuthLoginRequestDto, AuthRegisterRequestDto, SocialLoginRequestDto } from './dto/requests';
 import {
-  LoginTokenResponseDto,
+  AuthLogoutResponseDto,
+  AuthRegisterResultResponseDto,
   CaptchaCodeResponseDto,
   LoginTenantResponseDto,
-  UserInfoResponseDto,
+  LoginTokenResponseDto,
   PublicKeyResponseDto,
-  AuthRegisterResultResponseDto,
-  AuthLogoutResponseDto,
   SocialCallbackResponseDto,
+  UserInfoResponseDto,
 } from './dto/responses';
 import { createMath } from 'src/shared/utils/captcha';
-import { Result, ResponseCode } from 'src/shared/response';
+import { ResponseCode, Result } from 'src/shared/response';
 import { BusinessException } from 'src/shared/exceptions/business.exception';
 import { GenerateUUID } from 'src/shared/utils/index';
 import { RedisService } from 'src/module/common/redis/redis.service';
@@ -24,11 +24,11 @@ import { ConfigService as SysConfigService } from 'src/module/system/config/conf
 import { ClientInfo, ClientInfoDto } from 'src/core/decorators/common.decorator';
 import { NotRequireAuth, User, UserDto } from 'src/module/system/user/user.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { TenantContext, IgnoreTenant } from 'src/tenant';
-import { SkipDecrypt, CryptoService } from 'src/security/crypto';
+import { IgnoreTenant, TenantContext } from 'src/tenant';
+import { CryptoService, SkipDecrypt } from 'src/security/crypto';
 import { PrismaService } from 'src/infrastructure/prisma';
 import { TokenBlacklistService } from 'src/security/login/token-blacklist.service';
-import { ApiThrottle, ApiSkipThrottle } from 'src/core/decorators/throttle.decorator';
+import { ApiSkipThrottle, ApiThrottle } from 'src/core/decorators/throttle.decorator';
 
 /**
  * 认证控制器 - 匹配 Soybean 前端 API

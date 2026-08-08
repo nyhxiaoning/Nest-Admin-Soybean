@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
-import { StatusEnum, StatusEnumSchema, SexEnum, SexEnumSchema } from 'src/shared/enums';
+import { SexEnum, SexEnumSchema, StatusEnum, StatusEnumSchema } from 'src/shared/enums';
 import { DateFormat } from 'src/shared/decorators';
 
 /**

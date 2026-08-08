@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { MailLogService } from './mail-log.service';
 import { ListMailLogDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-permission.decorator';

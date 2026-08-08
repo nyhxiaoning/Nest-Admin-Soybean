@@ -1,10 +1,10 @@
-import { Controller, Get, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
 import { OnlineService } from './online.service';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { OnlineListDto } from './dto/index';
 import { RequirePermission } from 'src/core/decorators/require-permission.decorator';
 import { Api } from 'src/core/decorators/api.decorator';
-import { OnlineUserListResponseDto, ForceLogoutResultResponseDto } from 'src/module/monitor/dto/responses';
+import { ForceLogoutResultResponseDto, OnlineUserListResponseDto } from 'src/module/monitor/dto/responses';
 import { Operlog } from 'src/core/decorators/operlog.decorator';
 import { BusinessType } from 'src/shared/constants/business.constant';
 

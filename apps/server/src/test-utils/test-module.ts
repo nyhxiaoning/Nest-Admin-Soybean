@@ -5,7 +5,7 @@ import { AppConfigService } from 'src/config/app-config.service';
 import { RedisService } from 'src/module/common/redis/redis.service';
 import { createPrismaMock, PrismaMock } from './prisma-mock';
 import { createRedisMock, RedisMock } from './redis-mock';
-import { createConfigMock, ConfigMock } from './config-mock';
+import { ConfigMock, createConfigMock } from './config-mock';
 
 /**
  * 测试模块构建器
