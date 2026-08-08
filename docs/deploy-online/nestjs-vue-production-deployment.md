@@ -1472,8 +1472,452 @@ curl --fail http://127.0.0.1:3000/api/health/ready
 
 ## 九、日志与监控
 
+### 9.1 systemd 与 journald
+
+本文后端环境模板设置 `LOG_TO_FILE=false`，Pino 将结构化日志输出到标准输出，由 journald 统一收集：
+
+```bash
+sudo journalctl -u nest-admin-server -f
+sudo journalctl -u nest-admin-server --since "30 minutes ago" --no-pager
+sudo journalctl -u nest-admin-server -p warning --since today --no-pager
+sudo journalctl --disk-usage
+```
+
+生产环境应设置 journald 容量上限。创建 `/etc/systemd/journald.conf.d/nest-admin.conf`：
+
+```ini
+[Journal]
+SystemMaxUse=2G
+SystemKeepFree=1G
+MaxRetentionSec=30day
+Compress=yes
+```
+
+应用配置：
+
+```bash
+sudo systemctl restart systemd-journald
+sudo journalctl --disk-usage
+```
+
+日志中包含 `requestId`，出现接口异常时应以 `requestId` 串联 Nginx、NestJS 和审计日志。
+
+### 9.2 应用文件日志和 logrotate
+
+如果设置：
+
+```dotenv
+LOG_TO_FILE=true
+LOG_DIR=/var/log/nest-admin-soybean
+```
+
+项目会生成类似 `app-production-2026-08-08.log` 的 JSON 日志。创建 `/etc/logrotate.d/nest-admin-soybean`：
+
+```text
+/var/log/nest-admin-soybean/app-production-*.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+    su nestadmin nestadmin
+}
+```
+
+检查配置：
+
+```bash
+sudo logrotate --debug /etc/logrotate.d/nest-admin-soybean
+```
+
+不要同时无限保留 journald 和应用文件日志。确定一个主日志出口，并把长期归档发送到集中日志平台。
+
+### 9.3 Nginx 日志
+
+```bash
+sudo tail -f /var/log/nginx/nest-admin.access.log
+sudo tail -f /var/log/nginx/nest-admin.error.log
+sudo awk '$9 ~ /^5/ {print}' /var/log/nginx/nest-admin.access.log | tail -50
+```
+
+建议在 Nginx 日志格式中加入 `$request_id`，并把该值传入后端请求头，便于跨服务追踪。日志不得记录 Authorization、Cookie、密码或完整 Token。
+
+### 9.4 Docker 日志轮转
+
+`docker compose logs`：
+
+```bash
+docker compose --env-file .env -f docker-compose.production.yml logs -f --tail=200 server
+docker compose --env-file .env -f docker-compose.production.yml logs --since=30m postgres redis
+```
+
+给每个服务增加日志限制，避免 JSON 日志占满磁盘：
+
+```yaml
+logging:
+  driver: json-file
+  options:
+    max-size: "20m"
+    max-file: "5"
+```
+
+企业环境可以改用 Loki、ELK、OpenSearch 或云日志驱动。
+
+### 9.5 健康检查
+
+| 地址 | 检查内容 | 用途 |
+|---|---|---|
+| `/api/health/live` | 进程与内存 | 存活探针，失败时可重启进程 |
+| `/api/health/ready` | PostgreSQL、Redis | 就绪探针，失败时停止接流量 |
+| `/api/health` | 数据库、Redis、内存、磁盘 | 人工综合诊断 |
+| `/api/health/info` | 应用信息 | 内部排查 |
+
+建议每 30 秒检查一次，连续 3 次失败再告警。不要仅使用首页 HTTP 200 判断后端就绪。
+
+### 9.6 Prometheus 与 Grafana
+
+当前指标入口是 `/api/metrics`。Prometheus 示例：
+
+```yaml
+scrape_configs:
+  - job_name: nest-admin-server
+    metrics_path: /api/metrics
+    static_configs:
+      - targets: ["10.0.1.20:8080"]
+```
+
+指标地址当前不要求登录，因此必须限制在监控私网或 Nginx IP 白名单内。上线前直接查看一次输出，确认实际暴露的指标名称，再编写 PromQL；不要只根据源码中的服务名称猜测。
+
+项目还提供 `apps/server/monitoring/` 下的 Prometheus/Grafana 示例，但其中旧文档可能使用 `/metrics`。由于全局前缀为 `/api`，部署时应统一改为 `/api/metrics`。
+
+### 9.7 建议告警
+
+| 告警 | 建议阈值 |
+|---|---|
+| 应用不可用 | 就绪检查连续 3 次失败 |
+| HTTP 5xx | 5 分钟比例超过 2% |
+| P95 延迟 | 连续 10 分钟超过业务基线，例如 1 秒 |
+| Node.js 堆内存 | 超过限制的 80% 持续 10 分钟 |
+| 主机磁盘 | 使用率超过 80%，90% 紧急 |
+| PostgreSQL 连接 | 超过连接上限的 80% |
+| PostgreSQL 备份 | 24 小时没有成功备份 |
+| Redis 内存 | 超过 `maxmemory` 的 80% |
+| Redis 持久化 | AOF/RDB 最近一次保存失败 |
+| 队列积压 | 等待任务持续增长且消费速率为零 |
+| HTTPS 证书 | 剩余有效期小于 21 天 |
+
+阈值应根据真实业务基线调整，并进行一次告警演练。
+
 ## 十、安全加固清单
+
+### 10.1 主机与账号
+
+- [ ] NestJS 由无登录 shell 的 `nestadmin` 用户运行；
+- [ ] 部署账号不是日常 root 账号，只授予必要 sudo 命令；
+- [ ] SSH 禁用密码登录和 root 远程登录，使用密钥及堡垒机；
+- [ ] UFW/云安全组只开放 80、443 和受限来源的 SSH；
+- [ ] 安装并配置 Fail2ban 或等价防暴力破解措施；
+- [ ] 系统、Node.js、Nginx、Docker 定期安装安全更新；
+- [ ] 服务器启用时间同步，操作具备审计记录。
+
+UFW 示例：
+
+```bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow from 203.0.113.10 to any port 22 proto tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable
+sudo ufw status verbose
+```
+
+先把示例运维 IP 替换为真实固定出口 IP，并保留一个已登录 SSH 会话验证新规则，避免把自己锁在服务器外。
+
+### 10.2 应用与密钥
+
+- [ ] `JWT_SECRET` 至少包含 32 字节随机数据；
+- [ ] 数据库、Redis、JWT、客户端密钥互不复用；
+- [ ] 生产环境变量权限为 `600`，不在 Git 和发布包中；
+- [ ] 默认管理员密码、`USER_INITIAL_PASSWORD` 和种子客户端密钥已更换；
+- [ ] `CRYPTO_ENABLED` 前后端一致；启用时公私钥严格匹配；
+- [ ] 生产关闭 source map、调试日志和开发工具；
+- [ ] Swagger、指标、详细健康检查仅允许 VPN/内网访问；
+- [ ] 日志脱敏规则覆盖 Token、Cookie、密码、Secret、API Key；
+- [ ] CORS 只保留确有需要的来源；同域部署不依赖宽泛 CORS。
+
+当前 `main.ts` 使用 `cors: true`。同域正式环境建议后续单独修改为域名白名单，并完成登录、上传、SSE 和第三方回调回归测试。
+
+### 10.3 数据与网络
+
+- [ ] PostgreSQL 和 Redis 不暴露公网端口；
+- [ ] 数据库使用独立应用账号和最小权限；
+- [ ] 跨主机数据库连接启用 TLS；
+- [ ] Redis 开启认证、私网绑定和持久化；
+- [ ] 上传目录只允许应用用户写入，禁止执行上传文件；
+- [ ] 备份加密并保存到独立账号/区域；
+- [ ] 每季度至少执行一次恢复演练；
+- [ ] Docker 数据卷纳入备份，不把容器文件层当作持久化存储。
+
+### 10.4 Nginx 与 HTTPS
+
+- [ ] HTTP 全部跳转 HTTPS；
+- [ ] TLS 只启用受支持的安全协议和密码套件；
+- [ ] 证书续期定时器正常；
+- [ ] 设置合理的 `client_max_body_size` 和代理超时；
+- [ ] Vue 静态资源长期缓存，`index.html` 不缓存；
+- [ ] 添加 `nosniff`、Referrer-Policy、Frame-Options 等安全头；
+- [ ] 评估业务兼容性后再逐步启用严格 CSP 和 HSTS；
+- [ ] Nginx 不泄露版本信息，可设置 `server_tokens off`。
+
+### 10.5 供应链与发布
+
+- [ ] 使用 `pnpm install --frozen-lockfile`；
+- [ ] CI 执行测试、类型检查、依赖漏洞和镜像扫描；
+- [ ] 发布物记录 Git SHA、构建时间和依赖锁文件；
+- [ ] Docker 使用不可变 SHA 标签并限制基础镜像来源；
+- [ ] Prisma 迁移必须代码审查，破坏性 SQL 需要 DBA 审核；
+- [ ] 发布前保留数据库备份和上一稳定应用版本；
+- [ ] 生产服务器不临时安装未经锁定的 npm 包。
 
 ## 十一、回滚与版本管理
 
+### 11.1 版本目录规则
+
+systemd 使用：
+
+```text
+/opt/nest-admin-soybean/releases/20260808-120000-a1b2c3d
+/opt/nest-admin-soybean/releases/20260801-090000-9f8e7d6
+/opt/nest-admin-soybean/current -> releases/20260808-120000-a1b2c3d
+```
+
+每个发布版本应记录：
+
+- Git SHA 和 tag；
+- 构建机、Node.js、pnpm 版本；
+- 前端环境配置摘要，不记录密钥；
+- Prisma 迁移列表；
+- 数据库备份位置；
+- 部署人、时间和验收结果。
+
+至少保留两个已验证的应用版本。共享上传、日志、环境变量和数据库不得放进随版本切换的目录。
+
+### 11.2 systemd 应用回滚
+
+先确认上一版本目录存在：
+
+```bash
+readlink -f /opt/nest-admin-soybean/current
+ls -ld /opt/nest-admin-soybean/releases/20260801-090000-9f8e7d6
+```
+
+原子切换并验证：
+
+```bash
+sudo ln -s /opt/nest-admin-soybean/releases/20260801-090000-9f8e7d6 \
+  /opt/nest-admin-soybean/current.rollback
+sudo mv -Tf /opt/nest-admin-soybean/current.rollback \
+  /opt/nest-admin-soybean/current
+sudo systemctl restart nest-admin-server
+curl --fail http://127.0.0.1:8080/api/health/ready
+```
+
+随后验证登录、菜单、上传和关键写操作。不要因为应用已回滚就假设数据库也已回滚。
+
+### 11.3 Prisma 数据库回滚原则
+
+Prisma 迁移默认采用向前修复：
+
+1. 停止继续发布有问题的版本；
+2. 判断旧应用是否兼容新 Schema；
+3. 优先发布补偿迁移或兼容性代码；
+4. 只有发生不可补偿的数据破坏时才从已验证备份恢复；
+5. 恢复前保留故障现场备份和审计记录。
+
+禁止删除已经应用的迁移目录，禁止擅自修改生产 `_prisma_migrations` 表。表/字段删除应分阶段：先停止写入并发布兼容代码，再迁移数据，观察一个发布周期后才删除结构。
+
+### 11.4 Docker Compose 版本和回滚
+
+正式流水线推荐把 Compose 中的 `build` 替换为不可变镜像：
+
+```yaml
+services:
+  server:
+    image: registry.example.com/nest-admin-server:${RELEASE_SHA:?RELEASE_SHA must be set}
+  web:
+    image: registry.example.com/nest-admin-web:${RELEASE_SHA:?RELEASE_SHA must be set}
+```
+
+回滚时指定上一 SHA：
+
+```bash
+export RELEASE_SHA=9f8e7d6
+docker compose --env-file .env -f docker-compose.production.yml pull server web
+docker compose --env-file .env -f docker-compose.production.yml up -d server web
+docker compose --env-file .env -f docker-compose.production.yml ps
+curl --fail http://127.0.0.1:3000/api/health/ready
+```
+
+如果当前仍采用服务器本地构建，则检出上一审核 SHA 后重新构建。它比不可变镜像慢，也更容易受构建环境漂移影响。
+
+### 11.5 回滚验收清单
+
+- [ ] 应用和 Web 版本均切换到同一兼容版本；
+- [ ] 就绪检查通过；
+- [ ] Nginx 无持续 502/504；
+- [ ] 登录、Token 刷新和权限菜单正常；
+- [ ] 关键查询和写入正常；
+- [ ] 上传文件和历史文件均可访问；
+- [ ] 队列没有持续失败或重复消费；
+- [ ] 数据库迁移状态已记录；
+- [ ] 故障原因、处置和后续修复任务已登记。
+
 ## 十二、与本地开发环境差异对照
+
+### 12.1 差异表
+
+| 项目 | 本地开发 | systemd 生产 | Docker Compose 生产 |
+|---|---|---|---|
+| Node 进程 | `nest start --watch` | systemd 单进程 | Server 容器 |
+| 前端 | Vite Dev Server | Nginx 静态 `dist` | Web/Nginx 容器 |
+| 热更新 | 支持 | 不支持 | 不支持 |
+| 配置来源 | `.env.development`、`.env.dev` | `/etc/.../server.env`、构建时前端配置 | 根 `.env`、Compose environment、Vite coolify 配置 |
+| API 地址 | `http://localhost:8080/api` 或开发代理 | 同域 `/api` | 同域 `/api` |
+| API 前缀 | `/api` | `/api` | `/api` |
+| 数据库 | 本地 PostgreSQL | 系统/云 PostgreSQL | PostgreSQL 容器或云数据库 |
+| Redis DB | 默认开发 DB 2 | 默认生产 DB 0 | `REDIS_DB`，默认 0 |
+| 数据迁移 | `prisma migrate dev` | `prisma migrate deploy` | 入口或独立 Job 执行 `migrate deploy` |
+| 初始化 | 可重建本地库 | 禁止清库初始化 | 禁止清库初始化 |
+| 日志 | Pretty 控制台 | journald 或 JSON 文件 | Docker 日志驱动 |
+| HTTPS | 通常不启用 | 宿主机 Nginx + Certbot | 宿主机 Nginx + Certbot |
+| 上传文件 | 相对开发目录 | 共享持久目录软链接 | Docker volume |
+| Swagger/指标 | 可本机访问 | 内网/IP 白名单 | 内网/IP 白名单 |
+| source map | 可启用 | 关闭 | 关闭 |
+| 版本回滚 | Git 切换 | `current` 软链接 | 不可变镜像 SHA |
+| 自动重启 | Watch 模式 | systemd | `restart: unless-stopped` |
+
+> [!IMPORTANT]
+> Vite 配置是构建时配置。生产环境修改 `VITE_*` 后必须重新生成 `apps/web/dist` 或 Web 镜像，重启 Nginx 不能改变旧静态文件中的 API 地址。
+
+### 12.2 部署前检查清单
+
+- [ ] 目标 Git SHA 已在测试环境通过；
+- [ ] 根锁文件未变化或变化已审核；
+- [ ] Prisma Client 已重新生成；
+- [ ] 基线及增量迁移均已提交；
+- [ ] 迁移 SQL 已检查锁表、全表更新和破坏性操作；
+- [ ] 数据库备份已完成并验证目录；
+- [ ] Redis/数据库连接和 TLS 已验证；
+- [ ] 前端 `/api` 配置没有重复或旧 `/api/v1`；
+- [ ] systemd 或 Compose 健康检查使用 `/api/health/ready`；
+- [ ] 上传持久目录映射正确；
+- [ ] 上一稳定版本和回滚命令已准备；
+- [ ] DNS、证书、安全组和维护窗口已确认。
+
+### 12.3 部署后检查清单
+
+- [ ] systemd/Compose 所有服务状态正常；
+- [ ] 首页、静态资源和 Vue 子路由刷新正常；
+- [ ] 后端存活和就绪检查成功；
+- [ ] 管理员登录、刷新 Token、退出正常；
+- [ ] 动态路由和权限菜单完整；
+- [ ] PostgreSQL 迁移状态干净；
+- [ ] Redis 缓存与 Bull 队列无认证错误；
+- [ ] 上传、下载和历史附件正常；
+- [ ] Nginx、后端、数据库、Redis 无持续错误；
+- [ ] HTTPS、证书链、重定向和续期正常；
+- [ ] 监控采集和告警已恢复；
+- [ ] 部署记录已写入版本、迁移和备份信息。
+
+### 12.4 常见故障排查
+
+#### Nginx 返回 502
+
+```bash
+sudo systemctl status nest-admin-server --no-pager
+curl -v http://127.0.0.1:8080/api/health/live
+sudo tail -100 /var/log/nginx/nest-admin.error.log
+```
+
+检查 NestJS 是否监听 8080、Nginx 上游是否正确、容器 Web 端口是否只绑定到预期地址。
+
+#### 刷新 Vue 页面返回 404
+
+确认 Nginx 根目录指向当前版本的 `apps/web/dist`，并存在：
+
+```nginx
+try_files $uri $uri/ /index.html;
+```
+
+#### 前端请求出现 `/api/api` 或旧 `/api/v1`
+
+重新检查构建配置：
+
+```dotenv
+VITE_SERVICE_BASE_URL=
+VITE_APP_BASE_API=/api
+```
+
+修改后重新构建 Vue，不能只重启服务。
+
+#### Prisma 无法连接或迁移失败
+
+```bash
+cd /opt/nest-admin-soybean/current/apps/server
+pnpm exec prisma migrate status
+sudo journalctl -u nest-admin-server -n 200 --no-pager
+```
+
+核对 `DATABASE_URL` 和 `DB_*` 是否一致、密码是否 URL 编码、`DB_SSL` 是否符合数据库实际 TLS 配置，以及迁移目录是否随版本发布。
+
+#### Redis 认证失败
+
+```bash
+redis-cli -h 127.0.0.1 -p 6379 --askpass ping
+```
+
+核对 Redis ACL/default 用户、密码、逻辑 DB 和 key 前缀。不要用 `FLUSHDB` 诊断连接问题。
+
+#### 就绪检查失败
+
+先检查存活，再检查依赖：
+
+```bash
+curl -v http://127.0.0.1:8080/api/health/live
+curl -v http://127.0.0.1:8080/api/health/ready
+psql "$DATABASE_URL" -c 'select 1;'
+redis-cli -h "$REDIS_HOST" -p "$REDIS_PORT" --askpass ping
+```
+
+#### 上传成功但文件无法访问
+
+systemd 检查软链接和权限：
+
+```bash
+readlink -f /opt/nest-admin-soybean/current/apps/server/upload
+sudo -u nestadmin test -w /var/lib/nest-admin-soybean/uploads
+```
+
+Docker 检查容器解析后的目录和卷：
+
+```bash
+docker compose --env-file .env -f docker-compose.production.yml exec server \
+  node -e "const p=require('node:path');console.log(p.join(process.cwd(),process.env.FILE_UPLOAD_LOCATION))"
+docker compose --env-file .env -f docker-compose.production.yml exec server \
+  sh -c 'test -w /data/uploads'
+```
+
+### 12.5 最终上线判定
+
+只有同时满足以下条件才算部署完成：
+
+1. 用户通过 HTTPS 正常访问 Vue 页面；
+2. `/api`、`/profile`、`/public` 代理正确；
+3. 就绪检查持续成功；
+4. 登录、权限、上传和关键业务流程通过；
+5. 数据库迁移、初始数据和备份状态可追溯；
+6. 日志、指标和告警均正常；
+7. 回滚路径已验证且上一版本仍可用。
