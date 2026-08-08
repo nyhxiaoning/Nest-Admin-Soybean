@@ -489,7 +489,383 @@ chmod 600 .env
 
 ## 五、systemd 服务托管
 
+### 5.1 创建专用运行用户
+
+应用不得使用 root 运行：
+
+```bash
+sudo useradd --system --home /nonexistent --shell /usr/sbin/nologin nestadmin
+sudo install -d -m 755 -o nestadmin -g nestadmin /opt/nest-admin-soybean/releases
+sudo install -d -m 750 -o nestadmin -g nestadmin /var/lib/nest-admin-soybean/uploads
+sudo install -d -m 750 -o nestadmin -g nestadmin /var/log/nest-admin-soybean
+sudo install -d -m 750 -o root -g nestadmin /etc/nest-admin-soybean
+```
+
+推荐目录结构：
+
+```text
+/opt/nest-admin-soybean/
+├── current -> releases/20260808-120000
+├── releases/
+│   ├── 20260808-120000/
+│   └── 20260801-090000/
+└── shared/                    # 可选的共享配置链接目录
+
+/var/lib/nest-admin-soybean/
+└── uploads/                   # 永久数据，不随版本删除
+
+/etc/nest-admin-soybean/
+└── server.env                # 生产配置，root 管理
+```
+
+发布目录可以由部署账号上传，但最终应把所有权交给 `nestadmin`：
+
+```bash
+sudo chown -R nestadmin:nestadmin /opt/nest-admin-soybean/releases/20260808-120000
+sudo -u nestadmin ln -s /var/lib/nest-admin-soybean/uploads \
+  /opt/nest-admin-soybean/releases/20260808-120000/apps/server/upload
+```
+
+### 5.2 确认 Node.js 绝对路径
+
+```bash
+command -v node
+node --version
+```
+
+下方示例使用 `/usr/bin/node`。如果 `command -v node` 返回其他路径，必须同步修改 `ExecStart`。不要让 systemd 依赖交互式 shell 中的 nvm 初始化脚本。
+
+### 5.3 创建 systemd 单元
+
+创建 `/etc/systemd/system/nest-admin-server.service`：
+
+```ini
+[Unit]
+Description=Nest-Admin-Soybean NestJS API
+Documentation=https://admin.example.com
+After=network-online.target postgresql.service redis-server.service
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=nestadmin
+Group=nestadmin
+WorkingDirectory=/opt/nest-admin-soybean/current/apps/server
+EnvironmentFile=/etc/nest-admin-soybean/server.env
+ExecStart=/usr/bin/node dist/src/main.js
+
+Restart=on-failure
+RestartSec=5
+
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/nest-admin-soybean /var/log/nest-admin-soybean /opt/nest-admin-soybean/current/apps/server/public
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
+```
+
+说明：
+
+- `Restart=on-failure`：异常退出时自动重启，人工正常停止时不反复拉起；
+- `KillSignal=SIGTERM`：与项目 `enableShutdownHooks()` 配合，允许 Prisma、Redis 和日志优雅关闭；
+- `ProtectSystem=strict`：应用不能随意修改系统文件；
+- `ReadWritePaths`：只开放上传和应用日志目录；
+- 数据库或 Redis 使用云服务时，`After` 中的本地服务名可以删除。
+
+### 5.4 启动和设置开机自启
+
+首次启用：
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now nest-admin-server
+sudo systemctl status nest-admin-server --no-pager
+```
+
+验证后端：
+
+```bash
+curl --fail --silent --show-error http://127.0.0.1:8080/api/health/live
+curl --fail --silent --show-error http://127.0.0.1:8080/api/health/ready
+```
+
+`live` 只验证进程存活；`ready` 同时验证 PostgreSQL 和 Redis。发布切流必须以 `ready` 成功为准。
+
+### 5.5 常用管理命令
+
+```bash
+# 状态
+sudo systemctl status nest-admin-server --no-pager
+
+# 重启新版本
+sudo systemctl restart nest-admin-server
+
+# 优雅停止/启动
+sudo systemctl stop nest-admin-server
+sudo systemctl start nest-admin-server
+
+# 本次启动日志
+sudo journalctl -u nest-admin-server -b --no-pager
+
+# 持续查看日志
+sudo journalctl -u nest-admin-server -f
+
+# 最近 200 行错误上下文
+sudo journalctl -u nest-admin-server -n 200 --no-pager
+```
+
+修改单元文件后必须执行 `daemon-reload`；只修改环境文件时直接重启服务即可。
+
+### 5.6 systemd 启动失败排查
+
+按以下顺序检查：
+
+```bash
+sudo systemd-analyze verify /etc/systemd/system/nest-admin-server.service
+sudo -u nestadmin test -r /opt/nest-admin-soybean/current/apps/server/dist/src/main.js
+sudo -u nestadmin test -w /var/lib/nest-admin-soybean/uploads
+sudo journalctl -u nest-admin-server -n 200 --no-pager
+```
+
+常见原因：
+
+- `ExecStart` 中 Node.js 路径错误；
+- `current` 软链接指向不存在的版本；
+- 环境文件缺少必填的 `NODE_ENV` 或 `DATABASE_URL`；
+- `DB_*` 与 `DATABASE_URL` 指向不同数据库；
+- Redis 密码或逻辑 DB 不正确；
+- 发布目录缺少 `node_modules` 或 Prisma Client；
+- 上传软链接不存在或权限不足。
+
 ## 六、Nginx 反向代理与 HTTPS
+
+### 6.1 安装并检查 Nginx
+
+```bash
+sudo apt update
+sudo apt install -y nginx
+sudo systemctl enable --now nginx
+sudo nginx -t
+```
+
+Ubuntu 站点配置目录通常是 `/etc/nginx/sites-available` 和 `/etc/nginx/sites-enabled`。
+
+### 6.2 systemd 方案完整 Nginx 配置
+
+创建 `/etc/nginx/sites-available/nest-admin-soybean.conf`：
+
+```nginx
+server {
+    listen 80;
+    listen [::]:80;
+    server_name admin.example.com;
+
+    root /opt/nest-admin-soybean/current/apps/web/dist;
+    index index.html;
+
+    client_max_body_size 50m;
+
+    access_log /var/log/nginx/nest-admin.access.log;
+    error_log  /var/log/nginx/nest-admin.error.log warn;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+
+    # Vite 带 hash 的静态资源可长期缓存。
+    location /assets/ {
+        try_files $uri =404;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # index.html 不缓存，便于及时发现新版本。
+    location = /index.html {
+        try_files $uri =404;
+        add_header Cache-Control "no-store, no-cache, must-revalidate";
+    }
+
+    # Vue Router 使用 history 模式，刷新子路由时回退到 index.html。
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # SSE 长连接。若 VITE_APP_SSE=N，可删除此块并由通用 API 规则处理。
+    location ^~ /api/resource/sse {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 3600s;
+    }
+
+    # 不带 URI 的 proxy_pass 会保留原始 /api/... 路径。
+    location /api/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 10s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    location /profile/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /public/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+> [!IMPORTANT]
+> `proxy_pass http://127.0.0.1:8080;` 末尾不要增加 `/`。增加 URI 后会改变路径替换语义，可能把 `/api/...` 错误地转成 `/...`。
+
+启用站点：
+
+```bash
+sudo ln -s /etc/nginx/sites-available/nest-admin-soybean.conf \
+  /etc/nginx/sites-enabled/nest-admin-soybean.conf
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+如果默认站点抢占请求，可以在确认目标文件后取消它的启用链接：
+
+```bash
+sudo unlink /etc/nginx/sites-enabled/default
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+### 6.3 Docker Compose 方案宿主机 Nginx
+
+Web 容器内部已负责 Vue 静态文件和向 Server 容器代理。宿主机只代理到 Web 容器：
+
+```nginx
+server {
+    listen 80;
+    listen [::]:80;
+    server_name admin.example.com;
+
+    client_max_body_size 50m;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 3600s;
+    }
+}
+```
+
+Compose 中应把 Web 端口只绑定到回环地址，避免绕过 HTTPS 网关。生产覆盖文件应使用：
+
+```yaml
+services:
+  web:
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3000}:80"
+```
+
+仓库当前 `docker-compose.yml` 使用 `${WEB_PORT:-3000}:80`，会监听所有网卡。上线前应通过 Compose 覆盖文件收紧绑定。
+
+### 6.4 限制 Swagger、指标和详细健康检查
+
+不要把 Swagger 和 Prometheus 指标无条件暴露到公网。把以下规则放在通用 `location /api/` 之前：
+
+```nginx
+location ^~ /api/swagger-ui {
+    allow 10.0.0.0/8;
+    deny all;
+    proxy_pass http://127.0.0.1:8080;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+location = /api/metrics {
+    allow 10.0.0.0/8;
+    deny all;
+    proxy_pass http://127.0.0.1:8080;
+}
+
+location = /api/health/ready {
+    allow 127.0.0.1;
+    allow 10.0.0.0/8;
+    deny all;
+    proxy_pass http://127.0.0.1:8080;
+}
+```
+
+将示例网段替换为实际堡垒机、VPN 或监控系统网段。Docker 方案需要把上游改为 `127.0.0.1:3000`，或在 Web 容器的 Nginx 内做同等限制。
+
+### 6.5 申请 HTTPS 证书
+
+先确认 DNS 已生效且 HTTP 可以访问：
+
+```bash
+curl -I http://admin.example.com
+sudo nginx -t
+```
+
+安装并签发：
+
+```bash
+sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d admin.example.com
+```
+
+Certbot 会生成 HTTPS 配置，并可选择把 HTTP 重定向到 HTTPS。验证：
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+curl -I https://admin.example.com
+sudo certbot renew --dry-run
+systemctl status certbot.timer --no-pager
+```
+
+HSTS 会让浏览器长期强制 HTTPS。确认域名及所有子域都已支持 HTTPS 后再增加 `includeSubDomains` 或 `preload`，避免配置错误导致站点长时间无法访问。
+
+### 6.6 上线后代理验证
+
+```bash
+curl --fail https://admin.example.com/
+curl --fail https://admin.example.com/api/health/live
+curl -I https://admin.example.com/profile/not-found-test
+```
+
+最后在浏览器中直接刷新一个 Vue 子路由，例如 `/system/user`。如果返回 Nginx 404，说明 `try_files` 或静态根目录不正确。
 
 ## 七、数据库与 Redis 生产加固
 
