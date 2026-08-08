@@ -1345,7 +1345,7 @@ services:
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       REDIS_DB: ${REDIS_DB:-0}
-      REDIS_KEY_PREFIX: nest-admin:
+      REDIS_KEY_PREFIX: "nest-admin:"
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       FILE_IS_LOCAL: "true"
       FILE_UPLOAD_LOCATION: ../../../data/uploads
