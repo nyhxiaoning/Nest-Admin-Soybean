@@ -4,10 +4,19 @@ import { defineComponent } from 'vue';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 import VForm3 from 'vform3-builds';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import BuildPage from '@/views/tool/build/index.vue';
 
 const buildPageSource = readFileSync(resolve('src/views/tool/build/index.vue'), 'utf8');
+
+const designerMethodMocks = {
+  clearDesigner: vi.fn(),
+  previewForm: vi.fn(),
+  importJson: vi.fn(),
+  exportJson: vi.fn(),
+  exportCode: vi.fn(),
+  generateSFC: vi.fn()
+};
 
 const VFormDesignerStub = defineComponent({
   name: 'VFormDesigner',
@@ -17,17 +26,57 @@ const VFormDesignerStub = defineComponent({
       default: undefined
     }
   },
-  template: '<div class="v-form-designer-stub" />'
+  setup(_, { expose }) {
+    expose(designerMethodMocks);
+  },
+  template: '<div class="v-form-designer-stub"><slot /></div>'
 });
+
+const ElDropdownStub = defineComponent({
+  name: 'ElDropdown',
+  emits: ['command'],
+  template: '<div class="action-dropdown"><slot /><slot name="dropdown" /></div>'
+});
+
+const ElDropdownMenuStub = defineComponent({
+  name: 'ElDropdownMenu',
+  template: '<div class="action-menu"><slot /></div>'
+});
+
+const ElDropdownItemStub = defineComponent({
+  name: 'ElDropdownItem',
+  props: {
+    command: { type: String, required: true },
+    divided: Boolean
+  },
+  template: '<button class="action-menu-item" :data-command="command"><slot /></button>'
+});
+
+const ElButtonStub = defineComponent({
+  name: 'ElButton',
+  template: '<button><slot /></button>'
+});
+
+function mountBuildPageWithStubs() {
+  const components = {
+    VFormDesigner: VFormDesignerStub,
+    ElDropdown: ElDropdownStub,
+    ElDropdownMenu: ElDropdownMenuStub,
+    ElDropdownItem: ElDropdownItemStub,
+    ElButton: ElButtonStub
+  };
+
+  return mount(BuildPage, {
+    global: {
+      components,
+      stubs: components
+    }
+  });
+}
 
 describe('tool/build page', () => {
   it('renders the designer directly without the legacy loader shell', () => {
-    const wrapper = mount(BuildPage, {
-      global: {
-        components: { VFormDesigner: VFormDesignerStub },
-        stubs: { VFormDesigner: VFormDesignerStub }
-      }
-    });
+    const wrapper = mountBuildPageWithStubs();
 
     expect(wrapper.find('.vform-designer-page').exists()).toBe(true);
     expect(wrapper.find('.v-form-designer-stub').exists()).toBe(true);
@@ -46,35 +95,54 @@ describe('tool/build page', () => {
   });
 
   it('enables the complete toolbar at a stable width', () => {
-    const wrapper = mount(BuildPage, {
-      global: {
-        components: { VFormDesigner: VFormDesignerStub },
-        stubs: { VFormDesigner: VFormDesignerStub }
-      }
-    });
+    const wrapper = mountBuildPageWithStubs();
     const designer = wrapper.findComponent(VFormDesignerStub);
 
     expect(designer.props('designerConfig')).toEqual({
-      toolbarMaxWidth: 650,
-      toolbarMinWidth: 650,
-      clearDesignerButton: true,
-      previewFormButton: true,
-      importJsonButton: true,
-      exportJsonButton: true,
-      exportCodeButton: true,
-      generateSFCButton: true
+      toolbarMaxWidth: 140,
+      toolbarMinWidth: 140,
+      clearDesignerButton: false,
+      previewFormButton: false,
+      importJsonButton: false,
+      exportJsonButton: false,
+      exportCodeButton: false,
+      generateSFCButton: false
     });
   });
 
-  it('renders all official toolbar actions with the real VForm plugin', () => {
+  it('renders one action menu and dispatches all commands to VForm', () => {
+    const wrapper = mountBuildPageWithStubs();
+
+    expect(wrapper.text()).toContain('表单操作');
+    expect(wrapper.findAll('.action-menu-item').map(item => item.text())).toEqual([
+      '预览',
+      '导入 JSON',
+      '导出 JSON',
+      '导出代码',
+      '生成 SFC',
+      '清空'
+    ]);
+
+    for (const command of [
+      'previewForm',
+      'importJson',
+      'exportJson',
+      'exportCode',
+      'generateSFC',
+      'clearDesigner'
+    ] as const) {
+      wrapper.findComponent(ElDropdownStub).vm.$emit('command', command);
+      expect(designerMethodMocks[command]).toHaveBeenCalledTimes(1);
+    }
+  });
+
+  it('renders the compact action trigger with the real VForm plugin', () => {
     const wrapper = mount(BuildPage, {
       global: {
         plugins: [ElementPlus, VForm3]
       }
     });
 
-    for (const action of ['清空', '预览', '导入JSON', '导出JSON', '导出代码', '生成SFC']) {
-      expect(wrapper.text()).toContain(action);
-    }
+    expect(wrapper.text()).toContain('表单操作');
   });
 });
