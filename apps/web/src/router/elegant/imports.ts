@@ -53,7 +53,6 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   "system_tenant-quota": () => import("@/views/system/tenant-quota/index.vue"),
   system_tenant: () => import("@/views/system/tenant/index.vue"),
   system_user: () => import("@/views/system/user/index.vue"),
-  tool_build: () => import("@/views/tool/build/index.vue"),
   tool_gen_datasource: () => import("@/views/tool/gen/datasource/index.vue"),
   tool_gen_history: () => import("@/views/tool/gen/history/index.vue"),
   tool_gen: () => import("@/views/tool/gen/index.vue"),

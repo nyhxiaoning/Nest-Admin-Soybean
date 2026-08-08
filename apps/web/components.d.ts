@@ -74,7 +74,10 @@ declare module 'vue' {
     'IconMaterialSymbols:listAltOutline': typeof import('~icons/material-symbols/list-alt-outline')['default']
     'IconMaterialSymbols:refresh': typeof import('~icons/material-symbols/refresh')['default']
     'IconMaterialSymbols:refreshRounded': typeof import('~icons/material-symbols/refresh-rounded')['default']
+<<<<<<< HEAD
     'IconMaterialSymbols:sendOutline': typeof import('~icons/material-symbols/send-outline')['default']
+=======
+>>>>>>> bb8f41a (12)
     'IconMaterialSymbols:syncOutline': typeof import('~icons/material-symbols/sync-outline')['default']
     'IconMaterialSymbols:uploadRounded': typeof import('~icons/material-symbols/upload-rounded')['default']
     'IconMaterialSymbols:warningOutlineRounded': typeof import('~icons/material-symbols/warning-outline-rounded')['default']
@@ -174,7 +177,10 @@ declare module 'vue' {
     NTree: typeof import('naive-ui')['NTree']
     NTreeSelect: typeof import('naive-ui')['NTreeSelect']
     NUpload: typeof import('naive-ui')['NUpload']
+<<<<<<< HEAD
     NUploadDragger: typeof import('naive-ui')['NUploadDragger']
+=======
+>>>>>>> bb8f41a (12)
     NWatermark: typeof import('naive-ui')['NWatermark']
     OssUpload: typeof import('./src/components/custom/oss-upload.vue')['default']
     PinToggler: typeof import('./src/components/common/pin-toggler.vue')['default']
@@ -266,7 +272,10 @@ declare global {
   const 'IconMaterialSymbols:listAltOutline': typeof import('~icons/material-symbols/list-alt-outline')['default']
   const 'IconMaterialSymbols:refresh': typeof import('~icons/material-symbols/refresh')['default']
   const 'IconMaterialSymbols:refreshRounded': typeof import('~icons/material-symbols/refresh-rounded')['default']
+<<<<<<< HEAD
   const 'IconMaterialSymbols:sendOutline': typeof import('~icons/material-symbols/send-outline')['default']
+=======
+>>>>>>> bb8f41a (12)
   const 'IconMaterialSymbols:syncOutline': typeof import('~icons/material-symbols/sync-outline')['default']
   const 'IconMaterialSymbols:uploadRounded': typeof import('~icons/material-symbols/upload-rounded')['default']
   const 'IconMaterialSymbols:warningOutlineRounded': typeof import('~icons/material-symbols/warning-outline-rounded')['default']
@@ -366,7 +375,10 @@ declare global {
   const NTree: typeof import('naive-ui')['NTree']
   const NTreeSelect: typeof import('naive-ui')['NTreeSelect']
   const NUpload: typeof import('naive-ui')['NUpload']
+<<<<<<< HEAD
   const NUploadDragger: typeof import('naive-ui')['NUploadDragger']
+=======
+>>>>>>> bb8f41a (12)
   const NWatermark: typeof import('naive-ui')['NWatermark']
   const OssUpload: typeof import('./src/components/custom/oss-upload.vue')['default']
   const PinToggler: typeof import('./src/components/common/pin-toggler.vue')['default']

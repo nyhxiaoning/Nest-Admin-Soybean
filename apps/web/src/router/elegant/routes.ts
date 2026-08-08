@@ -420,15 +420,6 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
-        name: 'tool_build',
-        path: '/tool/build',
-        component: 'view.tool_build',
-        meta: {
-          title: 'tool_build',
-          i18nKey: 'route.tool_build'
-        }
-      },
-      {
         name: 'tool_gen',
         path: '/tool/gen',
         meta: {

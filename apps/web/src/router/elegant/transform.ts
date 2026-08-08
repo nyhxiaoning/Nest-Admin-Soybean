@@ -209,7 +209,6 @@ const routeMap: RouteMap = {
   "system_tenant-quota": "/system/tenant-quota",
   "system_user": "/system/user",
   "tool": "/tool",
-  "tool_build": "/tool/build",
   "tool_gen": "/tool/gen",
   "tool_gen_datasource": "/tool/gen/datasource",
   "tool_gen_history": "/tool/gen/history",

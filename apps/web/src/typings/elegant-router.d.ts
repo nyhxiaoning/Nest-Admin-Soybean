@@ -63,7 +63,6 @@ declare module "@elegant-router/types" {
     "system_tenant-quota": "/system/tenant-quota";
     "system_user": "/system/user";
     "tool": "/tool";
-    "tool_build": "/tool/build";
     "tool_gen": "/tool/gen";
     "tool_gen_datasource": "/tool/gen/datasource";
     "tool_gen_history": "/tool/gen/history";
@@ -171,7 +170,6 @@ declare module "@elegant-router/types" {
     | "system_tenant-quota"
     | "system_tenant"
     | "system_user"
-    | "tool_build"
     | "tool_gen_datasource"
     | "tool_gen_history"
     | "tool_gen"
