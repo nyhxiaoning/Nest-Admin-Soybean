@@ -29,7 +29,6 @@ export function createStaticRoutes() {
     if (item.meta?.constant) {
       constantRoutes.push(item);
     } else {
-      debugger
       authRoutes.push(item);
     }
   });
