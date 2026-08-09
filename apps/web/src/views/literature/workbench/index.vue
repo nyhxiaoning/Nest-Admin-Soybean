@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, h } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   NButton,
   NCard,
@@ -19,6 +20,7 @@ import type { Api } from '@/typings/api';
 defineOptions({ name: 'LiteratureWorkbench' });
 
 const appStore = useAppStore();
+const router = useRouter();
 const loading = ref(false);
 const overview = ref<Api.Literature.WorkbenchOverview | null>(null);
 
@@ -32,7 +34,17 @@ const statCards = computed(() => [
 ]);
 
 const recentColumns = [
-  { title: '标题', key: 'title' },
+  {
+    title: '标题',
+    key: 'title',
+    minWidth: 200,
+    render: (row: Api.Literature.Manuscript) =>
+      h(
+        NButton,
+        { text: true, type: 'primary', onClick: () => openEditor(row.manuscriptId) },
+        { default: () => row.title || '无标题文稿' }
+      ),
+  },
   { title: '字数', key: 'wordCount', width: 80 },
   {
     title: '状态',
@@ -46,6 +58,11 @@ const recentColumns = [
   },
   { title: '更新时间', key: 'updateTime', width: 180 },
 ];
+
+function openEditor(id?: number) {
+  const query = id ? `?action=edit&id=${id}` : '?action=new';
+  router.push(`/literature/manuscripts${query}`);
+}
 
 function loadOverview() {
   loading.value = true;
@@ -65,7 +82,7 @@ onMounted(loadOverview);
   <NSpace vertical :size="16">
     <div class="flex items-center justify-between">
       <NText :depth="1" class="text-20px font-bold">文稿工作台</NText>
-      <NButton type="primary" @click="() => {}">新建文稿</NButton>
+      <NButton type="primary" @click="openEditor()">新建文稿</NButton>
     </div>
 
     <NSpin :show="loading">

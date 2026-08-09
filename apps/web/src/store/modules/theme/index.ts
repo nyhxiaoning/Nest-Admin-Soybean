@@ -230,7 +230,8 @@ export const useThemeStore = defineStore(SetupStoreId.Theme, () => {
   }
 
   // cache theme settings when page is closed or refreshed
-  useEventListener(window, 'beforeunload', () => {
+  // Chromium 131+ blocks 'unload'; use 'pagehide' instead (recommended replacement)
+  useEventListener(window, 'pagehide', () => {
     cacheThemeSettings();
   });
 

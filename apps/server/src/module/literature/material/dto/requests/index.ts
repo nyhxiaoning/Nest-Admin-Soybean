@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import { IsIn, IsInt, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { PageQueryDto } from 'src/shared/dto';
@@ -50,6 +51,7 @@ export class ListMaterialRequestDto extends PageQueryDto {
   @IsOptional()
   @IsString()
   @IsIn(MATERIAL_TYPES)
+  @Transform(({ value }) => (value === '' ? undefined : value))
   type?: string;
 
   @ApiProperty({ description: '内容关键词', required: false })

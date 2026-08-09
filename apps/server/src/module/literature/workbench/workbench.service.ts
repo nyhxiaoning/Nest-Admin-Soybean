@@ -26,7 +26,7 @@ export class WorkbenchService {
         this.manuscriptRepo.countByUserIdAndStatus(userId, ManuscriptStatus.ARCHIVED),
         this.manuscriptRepo.sumWordCountByUserId(userId),
         this.materialRepo.countByUserId(userId),
-        this.tagRepo.count({ where: { userId, delFlag: '0' } }),
+        this.tagRepo.count({ userId, delFlag: '0' }),
         this.manuscriptRepo.findRecentByUserId(userId, 10),
       ]);
 

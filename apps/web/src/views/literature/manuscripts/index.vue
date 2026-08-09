@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, h, createVNode } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import {
   NButton, NCard, NDataTable, NEmpty, NGrid, NGi,
   NInput, NPopconfirm, NSelect, NSpace, NSpin, NTag, NText, NTabs, NTabPane,
@@ -15,6 +16,8 @@ import ManuscriptEditorDrawer from './modules/manuscript-editor-drawer.vue';
 defineOptions({ name: 'LiteratureManuscripts' });
 
 const appStore = useAppStore();
+const route = useRoute();
+const router = useRouter();
 const loading = ref(false);
 const currentStatus = ref('0');
 const tagOptions = ref<Api.Literature.Tag[]>([]);
@@ -131,10 +134,22 @@ function onSubmitted() {
   loadData();
 }
 
+function handleRouteAction() {
+  const { action, id } = route.query;
+  if (action === 'new') {
+    edit(null as any);
+    router.replace({ query: {} });
+  } else if (action === 'edit' && id) {
+    edit(Number(id));
+    router.replace({ query: {} });
+  }
+}
+
 onMounted(async () => {
   const { data: tagsData } = await fetchTagList({ keyword: '' });
   tagOptions.value = tagsData?.rows || [];
   loadData();
+  handleRouteAction();
 });
 </script>
 

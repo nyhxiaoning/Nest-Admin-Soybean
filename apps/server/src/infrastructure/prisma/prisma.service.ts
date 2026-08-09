@@ -255,6 +255,21 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   get genHistory() {
     return this._client.genHistory;
   }
+  get litManuscript() {
+    return this._client.litManuscript;
+  }
+  get litMaterial() {
+    return this._client.litMaterial;
+  }
+  get litTag() {
+    return this._client.litTag;
+  }
+  get litSetting() {
+    return this._client.litSetting;
+  }
+  get litManuscriptTag() {
+    return this._client.litManuscriptTag;
+  }
 
   // ============ 代理 Prisma 核心方法 ============
   /**

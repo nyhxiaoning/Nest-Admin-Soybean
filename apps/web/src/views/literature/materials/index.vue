@@ -4,6 +4,7 @@ import { useAppStore } from '@/store/modules/app';
 import { fetchMaterialList, fetchMaterialRemove } from '@/service/api';
 import { NButton, NCard, NDataTable, NEmpty, NInput, NPopconfirm, NSpace, NSpin, NTabPane, NTabs, NTag, NText } from 'naive-ui';
 import type { Api } from '@/typings/api';
+import MaterialDrawer from './modules/material-drawer.vue';
 
 defineOptions({ name: 'LiteratureMaterials' });
 
@@ -15,6 +16,8 @@ const total = ref(0);
 const page = ref(1);
 const pageSize = ref(10);
 const keyword = ref('');
+const drawerVisible = ref(false);
+const editingMaterialId = ref<number | null>(null);
 
 const typeMap: Record<string, string> = { '0': '短句', '1': '金句', '2': '典故' };
 const typeTagColor: Record<string, string> = { '0': '#2d8cf0', '1': '#ff9900', '2': '#9a66e4' };
@@ -35,7 +38,7 @@ const columns = computed(() => [
     width: 140,
     render: (row: Api.Literature.Material) => h(NSpace, {},
       () => [
-        createVNode(NButton, { tertiary: true, size: 'small' }, { default: () => '编辑' }),
+        createVNode(NButton, { tertiary: true, size: 'small', onClick: () => openDrawer(row.materialId) }, { default: () => '编辑' }),
         createVNode(NPopconfirm, { onPositiveClick: () => handleRemove(row.materialId!) }, {
           trigger: () => createVNode(NButton, { tertiary: true, size: 'small', type: 'error' as const }, { default: () => '删除' }),
         }),
@@ -47,8 +50,15 @@ const columns = computed(() => [
 async function loadData() {
   loading.value = true;
   try {
-    const typeVal = activeTab.value === 'all' ? null : activeTab.value;
-    const res: any = await fetchMaterialList({ type: typeVal, keyword: keyword.value || undefined, pageNum: page.value, pageSize: pageSize.value });
+    const params: Api.Literature.MaterialSearchParams = {
+      keyword: keyword.value || undefined,
+      pageNum: page.value,
+      pageSize: pageSize.value,
+    };
+    if (activeTab.value !== 'all') {
+      params.type = activeTab.value as '0' | '1' | '2';
+    }
+    const res: any = await fetchMaterialList(params);
     data.value = res.data?.rows || [];
     total.value = res.data?.total || 0;
   } finally {
@@ -58,6 +68,17 @@ async function loadData() {
 
 async function handleRemove(id: number) {
   await fetchMaterialRemove(id);
+  loadData();
+}
+
+function openDrawer(id?: number) {
+  editingMaterialId.value = id ?? null;
+  drawerVisible.value = true;
+}
+
+function onSubmitted() {
+  drawerVisible.value = false;
+  editingMaterialId.value = null;
   loadData();
 }
 
@@ -75,7 +96,7 @@ onMounted(loadData);
       </NTabs>
       <div class="flex-1" />
       <NInput v-model:value="keyword" placeholder="搜索内容..." clearable style="width: 200px" @keyup.enter="loadData" />
-      <NButton type="primary" @click="() => {}">新增素材</NButton>
+      <NButton type="primary" @click="openDrawer()">新增素材</NButton>
     </div>
     <NCard :bordered="false">
       <NSpin :show="loading">
@@ -85,6 +106,8 @@ onMounted(loadData);
         <NEmpty v-else description="暂无素材" />
       </NSpin>
     </NCard>
+
+    <MaterialDrawer v-model:visible="drawerVisible" :material-id="editingMaterialId" @submitted="onSubmitted" />
   </NSpace>
 </template>
 

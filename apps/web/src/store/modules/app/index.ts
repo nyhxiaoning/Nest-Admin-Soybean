@@ -130,7 +130,8 @@ export const useAppStore = defineStore(SetupStoreId.App, () => {
   });
 
   // cache mixSiderFixed
-  useEventListener(window, 'beforeunload', () => {
+  // Chromium 131+ blocks 'unload'; use 'pagehide' instead (recommended replacement)
+  useEventListener(window, 'pagehide', () => {
     localStg.set('mixSiderFixed', mixSiderFixed.value ? 'Y' : 'N');
   });
 

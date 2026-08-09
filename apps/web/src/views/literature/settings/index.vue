@@ -1,13 +1,14 @@
 <script setup lang="tsx">
 import { NButton, NCard, NForm, NFormItem, NInputNumber, NRadioGroup, NRadioButton, NSlider, NSpace, NSpin, NStatistic, NText, NDescriptions, NDescriptionsItem } from 'naive-ui';
 import { computed, onMounted, ref, h } from 'vue';
-import { fetchSettingGet, fetchSettingUpdate } from '@/service/api';
+import { fetchSettingGet, fetchSettingUpdate, fetchWorkbenchOverview } from '@/service/api';
 import type { Api } from '@/typings/api';
 
 defineOptions({ name: 'LiteratureSettings' });
 
 const loading = ref(false);
 const saving = ref(false);
+const overview = ref<Api.Literature.WorkbenchOverview | null>(null);
 const setting = ref<Api.Literature.Setting>({
   settingId: 0,
   fontSize: 16,
@@ -16,6 +17,12 @@ const setting = ref<Api.Literature.Setting>({
   autosaveInterval: 30,
   exportFormat: 'md',
 });
+
+const storageStats = computed(() => [
+  { label: '文稿数量', value: (overview.value?.totalDrafts ?? 0) + (overview.value?.totalPublished ?? 0) + (overview.value?.totalArchived ?? 0) },
+  { label: '素材数量', value: overview.value?.totalMaterials ?? 0 },
+  { label: '标签数量', value: overview.value?.totalTags ?? 0 },
+]);
 
 const fontFamilies = [
   { label: '默认字体', value: '' },
@@ -50,7 +57,15 @@ async function saveSetting() {
   }
 }
 
-onMounted(loadSetting);
+onMounted(async () => {
+  loadSetting();
+  try {
+    const { data } = await fetchWorkbenchOverview();
+    overview.value = data;
+  } catch {
+    /* 概览拉取失败时存储统计保持 0 */
+  }
+});
 </script>
 
 <template>
@@ -62,7 +77,7 @@ onMounted(loadSetting);
         <NGi :span="24">
           <NCard title="编辑器偏好" :bordered="false">
             <NForm label-placement="top" :model="setting">
-              <NFormItem label="字体大小（{{setting.fontSize}}px）">
+              <NFormItem :label="`字体大小（${setting.fontSize}px）`">
                 <NSlider v-model:value="setting.fontSize" :min="12" :max="24" :step="1" />
               </NFormItem>
               <NFormItem label="字体族">
@@ -94,9 +109,7 @@ onMounted(loadSetting);
           </NCard>
           <NCard title="存储空间" :bordered="false" class="mt-16px">
             <NSpace vertical>
-              <NStatistic label="文稿数量" :value="0" />
-              <NStatistic label="素材数量" :value="0" />
-              <NStatistic label="标签数量" :value="0" />
+              <NStatistic v-for="stat in storageStats" :key="stat.label" :label="stat.label" :value="stat.value" />
             </NSpace>
           </NCard>
         </NGi>
