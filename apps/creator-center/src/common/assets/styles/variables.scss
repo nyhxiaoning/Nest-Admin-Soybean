@@ -1,0 +1,57 @@
+/**
+ * SCSS 变量定义
+ */
+:root {
+  // 主题色
+  --color-primary: #409eff;
+  --color-success: #67c23a;
+  --color-warning: #e6a23c;
+  --color-danger: #f56c6c;
+  --color-info: #909399;
+
+  // 文字色
+  --color-text-primary: #303133;
+  --color-text-regular: #606266;
+  --color-text-secondary: #909399;
+  --color-text-placeholder: #c0c4cc;
+
+  // 边框色
+  --color-border-light: #ebeef5;
+  --color-border-lighter: #f2f6fc;
+  --color-border-extra-light: #fafafa;
+
+  // 背景色
+  --color-bg-page: #f2f3f5;
+  --color-bg-white: #ffffff;
+
+  // 阴影
+  --box-shadow-light: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  --box-shadow-base: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+
+  // 圆角
+  --border-radius-small: 2px;
+  --border-radius-base: 4px;
+  --border-radius-large: 6px;
+
+  // 间距
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+}
+
+// 暗黑模式变量
+.dark {
+  --color-text-primary: #e5eaf3;
+  --color-text-regular: #cfd3dc;
+  --color-text-secondary: #a3a6ad;
+  --color-text-placeholder: #8d9095;
+
+  --color-border-light: #414243;
+  --color-border-lighter: #363637;
+  --color-border-extra-light: #2b2b2c;
+
+  --color-bg-page: #0a0a0a;
+  --color-bg-white: #141414;
+}

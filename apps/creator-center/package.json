@@ -1,0 +1,58 @@
+{
+  "name": "vue3-admin-vite",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --mode development --host",
+    "build:qa": "vite build --mode qa",
+    "build:us": "vite build --mode us ",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "format": "prettier --write src/",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.0",
+    "axios": "^1.7.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "element-plus": "^2.8.0",
+    "lucide-vue-next": "^1.0.0",
+    "pinia": "^2.2.0",
+    "reka-ui": "^2.9.2",
+    "tailwind-merge": "^3.5.0",
+    "vue": "^3.5.0",
+    "vue-i18n": "^9.14.0",
+    "vue-router": "^4.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/node": "^25.5.0",
+    "@typescript-eslint/eslint-plugin": "^8.6.0",
+    "@typescript-eslint/parser": "^8.6.0",
+    "@vitejs/plugin-vue": "^5.1.0",
+    "ali-oss": "6.22.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^9.11.0",
+    "eslint-plugin-vue": "^9.28.0",
+    "husky": "^9.1.0",
+    "lint-staged": "^15.2.0",
+    "postcss": "^8.4.0",
+    "prettier": "^3.3.0",
+    "sass": "^1.79.0",
+    "tailwindcss": "^3.4.0",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.6.0",
+    "unplugin-auto-import": "^0.18.0",
+    "unplugin-vue-components": "^0.27.0",
+    "vite": "^6.0.0",
+    "vite-plugin-vue-inspector": "^7.0.0",
+    "vue-tsc": "^2.1.0"
+  },
+  "lint-staged": {
+    "*.{vue,js,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}

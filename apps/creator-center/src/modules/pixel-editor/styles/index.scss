@@ -1,0 +1,781 @@
+/**
+ * Pixel Editor Styles
+ * 像素编辑器样式
+ * 从原始 pixelart_web_editor/css/styles.css 迁移
+ */
+
+/* ==================== CSS Variables (scoped to .pe-theme-host) ==================== */
+.pe-theme-host {
+  /* Dark theme (default) */
+  --pe-bg: #111318;
+  --pe-panel: #1b1f28;
+  --pe-panel-2: #252b36;
+  --pe-input-bg: #11151c;
+  --pe-line: #343c49;
+  --pe-panel-border: rgba(255, 255, 255, 0.08);
+  --pe-text: #f1f4f8;
+  --pe-muted: #a5afbd;
+  --pe-primary: #5bd08b;
+  --pe-primary-dark: #35ad68;
+  --pe-primary-text: #06150b;
+  --pe-active-bg: #246741;
+  --pe-active-soft: rgba(91, 208, 139, 0.14);
+  --pe-danger: #ff6a7f;
+  --pe-danger-text: #ff9cab;
+  --pe-danger-border: rgba(255, 106, 127, 0.55);
+  --pe-blue: #64a8ff;
+  --pe-canvas-bg: #030509;
+  --pe-brand-mark-bg: #0b0f15;
+  --pe-button-hover: #596576;
+  --pe-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  --pe-modal-backdrop: rgba(4, 6, 10, 0.72);
+}
+
+.pe-theme-host[data-theme="light"] {
+  --pe-bg: #f4f6f8;
+  --pe-panel: #ffffff;
+  --pe-panel-2: #edf1f5;
+  --pe-input-bg: #ffffff;
+  --pe-line: #cfd7e2;
+  --pe-panel-border: rgba(20, 30, 45, 0.12);
+  --pe-text: #182230;
+  --pe-muted: #637083;
+  --pe-primary: #2fb66f;
+  --pe-primary-dark: #20965a;
+  --pe-primary-text: #ffffff;
+  --pe-active-bg: #dff5e8;
+  --pe-active-soft: rgba(47, 182, 111, 0.16);
+  --pe-danger: #d83452;
+  --pe-danger-text: #b4233f;
+  --pe-danger-border: rgba(216, 52, 82, 0.5);
+  --pe-blue: #236fd6;
+  --pe-canvas-bg: #05070b;
+  --pe-brand-mark-bg: #e8edf4;
+  --pe-button-hover: #95a3b5;
+  --pe-shadow: 0 14px 34px rgba(30, 42, 60, 0.12);
+  --pe-modal-backdrop: rgba(16, 24, 38, 0.42);
+}
+
+/* ==================== Global Reset ==================== */
+.pe-app-shell * {
+  box-sizing: border-box;
+}
+
+.pe-app-shell {
+  min-height: 100vh;
+  padding: 16px;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--pe-bg);
+  color: var(--pe-text);
+}
+
+.pe-app-shell button,
+.pe-app-shell input,
+.pe-app-shell select,
+.pe-app-shell textarea {
+  font: inherit;
+}
+
+.pe-app-shell h1,
+.pe-app-shell h2,
+.pe-app-shell p {
+  margin-top: 0;
+}
+
+.pe-app-shell h1 {
+  font-size: 30px;
+  margin-bottom: 6px;
+}
+
+.pe-app-shell h2 {
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+/* ==================== Top Bar ==================== */
+.pe-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.pe-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pe-brand-mark {
+  width: 42px;
+  height: 42px;
+  display: block;
+  border-radius: 8px;
+  image-rendering: pixelated;
+  object-fit: contain;
+  background: var(--pe-brand-mark-bg);
+}
+
+.pe-brand strong,
+.pe-brand small {
+  display: block;
+}
+
+.pe-brand small {
+  color: var(--pe-muted);
+  margin-top: 2px;
+}
+
+.pe-topbar-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.pe-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.pe-project-name {
+  width: min(420px, 45vw);
+  font-weight: 700;
+}
+
+/* ==================== Buttons ==================== */
+.pe-app-shell button {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 11px;
+  color: var(--pe-text);
+  background: var(--pe-panel-2);
+  cursor: pointer;
+}
+
+.pe-app-shell button:hover {
+  border-color: var(--pe-button-hover);
+}
+
+.pe-app-shell button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pe-primary {
+  background: var(--pe-primary);
+  color: var(--pe-primary-text);
+  font-weight: 700;
+}
+
+.pe-primary:hover {
+  background: var(--pe-primary-dark);
+  border-color: var(--pe-primary);
+}
+
+.pe-secondary {
+  background: var(--pe-panel-2);
+}
+
+.pe-secondary.active {
+  background: var(--pe-active-bg);
+  border-color: var(--pe-primary);
+}
+
+.pe-danger-outline {
+  background: transparent;
+  border-color: var(--pe-danger-border);
+  color: var(--pe-danger-text);
+}
+
+.pe-wide {
+  width: 100%;
+  margin-top: 9px;
+}
+
+.pe-small {
+  padding: 6px 9px;
+}
+
+.pe-mini {
+  padding: 4px 7px;
+  font-size: 12px;
+}
+
+/* ==================== Panels ==================== */
+.pe-panel {
+  background: var(--pe-panel);
+  border: 1px solid var(--pe-panel-border);
+  border-radius: 8px;
+  box-shadow: var(--pe-shadow);
+  padding: 14px;
+}
+
+.pe-panel-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* ==================== Library View ==================== */
+.pe-library-view {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.pe-library-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 32px 0 20px;
+}
+
+.pe-library-head p,
+.pe-empty-library p,
+.pe-project-card p {
+  color: var(--pe-muted);
+}
+
+.pe-project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 14px;
+}
+
+.pe-project-card {
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 14px;
+  background: var(--pe-panel);
+  border: 1px solid var(--pe-panel-border);
+  border-radius: 8px;
+}
+
+.pe-project-card h2 {
+  margin-bottom: 4px;
+}
+
+.pe-project-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.pe-empty-library {
+  padding: 48px;
+  border: 1px dashed var(--pe-line);
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* ==================== Workspace ==================== */
+.pe-workspace {
+  display: grid;
+  grid-template-columns: 280px minmax(520px, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.pe-tools-panel {
+  position: sticky;
+  top: 14px;
+}
+
+.pe-tools-panel section + section {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--pe-line);
+}
+
+.pe-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.pe-tool {
+  min-height: 38px;
+  font-weight: 800;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+.pe-tool.active {
+  background: var(--pe-active-bg);
+  border-color: var(--pe-primary);
+}
+
+.pe-wide-tool {
+  width: 100%;
+  min-height: 38px;
+  font-size: inherit;
+}
+
+.pe-gap-top {
+  margin-top: 8px;
+}
+
+.pe-shape-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.pe-control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--pe-muted);
+  font-size: 13px;
+}
+
+.pe-control-row label {
+  white-space: nowrap;
+}
+
+.pe-control-row input[type="range"] {
+  padding: 0;
+  flex: 1;
+}
+
+.pe-control-row select,
+.pe-control-row input:not([type="color"]) {
+  flex: 1;
+}
+
+.pe-app-shell input,
+.pe-app-shell select,
+.pe-app-shell textarea {
+  border: 1px solid var(--pe-line);
+  border-radius: 8px;
+  padding: 8px 9px;
+  background: var(--pe-input-bg);
+  color: var(--pe-text);
+  min-width: 0;
+}
+
+.pe-app-shell textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.pe-hex-input {
+  width: 96px;
+  flex: none !important;
+}
+
+.pe-button-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pe-switch-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pe-muted);
+}
+
+.pe-palette {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.pe-swatch {
+  aspect-ratio: 1;
+  min-height: 24px;
+  padding: 0;
+  border: 1px solid var(--pe-panel-border);
+}
+
+.pe-swatch.active {
+  outline: 2px solid var(--pe-primary);
+  outline-offset: 2px;
+}
+
+/* ==================== Editor Panel ==================== */
+.pe-editor-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.pe-editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.pe-editor-toolbar span {
+  margin-left: 10px;
+  color: var(--pe-muted);
+  font-size: 13px;
+}
+
+.pe-status {
+  color: var(--pe-muted);
+  font-size: 13px;
+  text-align: right;
+}
+
+.pe-canvas-layer-row {
+  display: grid;
+  grid-template-columns: minmax(520px, 960px) minmax(260px, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.pe-canvas-stage {
+  padding: 14px;
+}
+
+.pe-canvas-coordinate {
+  min-height: 18px;
+  margin-bottom: 8px;
+  color: var(--pe-muted);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 13px;
+  text-align: right;
+}
+
+.pe-canvas-stage canvas {
+  width: min(100%, 960px);
+  height: auto;
+  aspect-ratio: 2 / 1;
+  display: block;
+  margin: 0;
+  background: var(--pe-canvas-bg);
+  border-radius: 8px;
+  image-rendering: pixelated;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.pe-preview-panel,
+.pe-layers-panel {
+  padding: 14px;
+}
+
+.pe-canvas-overview {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.pe-overview-scroll {
+  width: fit-content;
+  max-width: 100%;
+  max-height: min(56vh, 520px);
+  overflow: auto;
+  border: 1px solid var(--pe-line);
+  border-radius: 8px;
+  background: var(--pe-canvas-bg);
+  justify-self: start;
+}
+
+.pe-canvas-overview canvas {
+  display: block;
+  image-rendering: pixelated;
+  background: var(--pe-canvas-bg);
+  cursor: crosshair;
+}
+
+.pe-overview-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  color: var(--pe-muted);
+  font-size: 13px;
+}
+
+.pe-overview-zoom-control {
+  flex: 1 1 240px;
+  display: grid;
+  grid-template-columns: auto minmax(120px, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-width: min(100%, 240px);
+}
+
+.pe-overview-zoom-control span {
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.pe-overview-zoom-control input {
+  width: 100%;
+  padding: 0;
+}
+
+.pe-overview-actions > button {
+  flex: 0 0 auto;
+}
+
+.pe-overview-coordinate {
+  flex: 0 0 auto;
+  min-width: 70px;
+  min-height: 20px;
+  margin-left: auto;
+  text-align: right;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.pe-preview-play-btn {
+  margin: 0 0 10px;
+  min-width: 120px;
+}
+
+.pe-preview-panel canvas {
+  width: min(100%, 480px);
+  height: auto;
+  aspect-ratio: 2 / 1;
+  display: block;
+  background: var(--pe-canvas-bg);
+  border-radius: 8px;
+  image-rendering: auto;
+}
+
+.pe-layer-list {
+  display: grid;
+  gap: 8px;
+}
+
+.pe-layer-item {
+  display: grid;
+  grid-template-columns: auto 82px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  text-align: left;
+}
+
+.pe-layer-item.active {
+  border-color: var(--pe-primary);
+  background: var(--pe-active-soft);
+}
+
+/* ==================== Frames Panel ==================== */
+.pe-frames-panel {
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.pe-frame-strip-head {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.pe-frames-panel .pe-button-row,
+.pe-frames-panel .pe-frames-list {
+  margin-top: 0;
+}
+
+.pe-frames-list {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 4px 8px;
+  scroll-snap-type: x proximity;
+}
+
+.pe-frame-item {
+  flex: 0 0 186px;
+  display: grid;
+  grid-template-rows: 74px auto;
+  align-items: center;
+  justify-items: stretch;
+  gap: 8px;
+  text-align: center;
+  scroll-snap-align: start;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.pe-frame-item.active {
+  border-color: var(--pe-primary);
+  background: var(--pe-active-soft);
+}
+
+.pe-frame-item.dragging {
+  opacity: 0.55;
+}
+
+.pe-frame-item.drag-over {
+  border-color: #ffec27;
+  background: rgba(255, 236, 39, 0.12);
+}
+
+.pe-frame-item canvas {
+  width: 100%;
+  height: 74px;
+  image-rendering: pixelated;
+  background: #000;
+  border-radius: 6px;
+  border: 1px solid var(--pe-panel-border);
+}
+
+.pe-project-card canvas {
+  image-rendering: pixelated;
+  background: #000;
+  border-radius: 6px;
+  border: 1px solid var(--pe-panel-border);
+}
+
+.pe-frame-settings-bar {
+  padding: 12px 14px;
+}
+
+.pe-frame-settings-bar .pe-control-row {
+  max-width: 380px;
+  margin-top: 0;
+}
+
+/* ==================== Modal ==================== */
+.pe-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: var(--pe-modal-backdrop);
+}
+
+.pe-modal {
+  width: min(980px, 100%);
+  padding: 16px;
+  background: var(--pe-panel);
+  border: 1px solid var(--pe-line);
+  border-radius: 8px;
+  box-shadow: var(--pe-shadow);
+}
+
+.pe-import-grid {
+  display: grid;
+  grid-template-columns: minmax(420px, 1fr) 280px;
+  gap: 14px;
+  align-items: start;
+}
+
+.pe-import-crop-area,
+.pe-import-preview {
+  display: grid;
+  gap: 8px;
+}
+
+.pe-import-label-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--pe-muted);
+  font-size: 12px;
+}
+
+.pe-import-grid canvas {
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  background: var(--pe-canvas-bg);
+  border-radius: 8px;
+  border: 1px solid var(--pe-line);
+}
+
+.pe-import-crop-area canvas {
+  cursor: grab;
+  image-rendering: auto;
+  touch-action: none;
+}
+
+.pe-import-crop-area canvas:active {
+  cursor: grabbing;
+}
+
+.pe-import-preview canvas {
+  image-rendering: pixelated;
+}
+
+.pe-import-controls {
+  display: grid;
+  gap: 10px;
+}
+
+.pe-zoom-value {
+  min-width: 48px;
+  text-align: right;
+  color: var(--pe-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pe-import-hint {
+  margin: 0;
+  color: var(--pe-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 1120px) {
+  .pe-workspace {
+    grid-template-columns: 260px 1fr;
+  }
+
+  .pe-frames-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 780px) {
+  .pe-topbar,
+  .pe-topbar-right,
+  .pe-top-actions,
+  .pe-library-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pe-project-name {
+    width: 100%;
+  }
+
+  .pe-workspace,
+  .pe-canvas-layer-row,
+  .pe-import-grid,
+  .pe-project-card {
+    grid-template-columns: 1fr;
+  }
+
+  .pe-tools-panel {
+    position: static;
+  }
+}
+
+/* ==================== V-Cloak ==================== */
+[v-cloak] {
+  display: none;
+}

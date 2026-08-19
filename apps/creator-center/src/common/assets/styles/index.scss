@@ -1,0 +1,10 @@
+/**
+ * 全局样式入口文件
+ */
+@use 'tailwindcss/base';
+@use 'tailwindcss/components';
+@use 'tailwindcss/utilities';
+
+@use './variables.scss';
+@use './reset.scss';
+@use './common.scss';
