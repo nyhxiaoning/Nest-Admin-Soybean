@@ -1,0 +1,7 @@
+export { default as EditorNav } from './EditorNav.vue'
+export { default as EditorShell } from './EditorShell.vue'
+export { default as EditorTools } from '../editor-tools/EditorTools.vue'
+export { default as EditorWorkspace } from '../editor-workspace/EditorWorkspace.vue'
+export { default as CanvasLayout } from '../editor-workspace/CanvasLayout.vue'
+export { default as FramePanel } from '../editor-workspace/FramePanel.vue'
+export { default as EditorBody } from '../editor-workspace/EditorBody.vue'

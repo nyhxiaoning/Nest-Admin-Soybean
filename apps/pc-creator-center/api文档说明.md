@@ -1307,13 +1307,13 @@ function uploadStaticImageWithJson(
 }>
 ```
 
-**上传内容**：
+**上传内容**：注意这里错误了，，，，
 
 | 步骤 | 产物 | OSS Role | 返回字段 |
 |------|------|---------|---------|
 | 1 | 原始图片 | `COVER_IMAGE` | — |
 | 2 | RGB565 二进制 | `STATIC_BIN` | `binFileUrl` |
-| 3 | PNG 预览（64×16） | `STATIC_BIN` | `coverUrl` |
+| 3 | PNG 预览（32×16） | `STATIC_BIN` | `coverUrl` |
 | 4 | JSON 配置 | `EDITABLE_JSON` | `editableFileUrl` |
 
 ---
