@@ -40,6 +40,40 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'creator',
+    path: '/creator',
+    component: 'layout.base',
+    meta: {
+      title: 'creator'
+    },
+    children: [
+      {
+        name: 'creator_approval',
+        path: '/creator/approval',
+        component: 'view.creator_approval',
+        meta: {
+          title: 'creator_approval'
+        }
+      },
+      {
+        name: 'creator_publish-management',
+        path: '/creator/publish-management',
+        component: 'view.creator_publish-management',
+        meta: {
+          title: 'creator_publish-management'
+        }
+      },
+      {
+        name: 'creator_work',
+        path: '/creator/work',
+        component: 'view.creator_work',
+        meta: {
+          title: 'creator_work'
+        }
+      }
+    ]
+  },
+  {
     name: 'home',
     path: '/home',
     component: 'layout.base$view.home',

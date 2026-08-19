@@ -143,6 +143,46 @@ const dynamicConstantRoutes: ElegantRoute[] = [
     }
   },
   {
+    name: 'creator',
+    path: '/creator',
+    component: 'layout.base',
+    meta: {
+      title: 'creator',
+      i18nKey: 'route.creator',
+      icon: 'mdi:account-edit-outline',
+      order: 2
+    },
+    children: [
+      {
+        name: 'creator_work',
+        path: '/creator/work',
+        component: 'view.creator_work',
+        meta: {
+          title: 'creator_work',
+          i18nKey: 'route.creator_work'
+        }
+      },
+      {
+        name: 'creator_approval',
+        path: '/creator/approval',
+        component: 'view.creator_approval',
+        meta: {
+          title: 'creator_approval',
+          i18nKey: 'route.creator_approval'
+        }
+      },
+      {
+        name: 'creator_publish-management',
+        path: '/creator/publish-management',
+        component: 'view.creator_publish-management',
+        meta: {
+          title: 'creator_publish-management',
+          i18nKey: 'route.creator_publish-management'
+        }
+      }
+    ]
+  },
+  {
     name: 'user-center',                                   // 路由名称
     path: '/user-center',                                  // 路由路径
     component: 'layout.base$view.user-center',             // 组件：base 布局下的用户中心页

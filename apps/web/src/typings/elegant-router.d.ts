@@ -24,6 +24,10 @@ declare module "@elegant-router/types" {
     "403": "/403";
     "404": "/404";
     "500": "/500";
+    "creator": "/creator";
+    "creator_approval": "/creator/approval";
+    "creator_publish-management": "/creator/publish-management";
+    "creator_work": "/creator/work";
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login";
@@ -108,6 +112,7 @@ declare module "@elegant-router/types" {
     | "403"
     | "404"
     | "500"
+    | "creator"
     | "home"
     | "iframe-page"
     | "login"
@@ -140,6 +145,9 @@ declare module "@elegant-router/types" {
     | "login"
     | "social-callback"
     | "user-center"
+    | "creator_approval"
+    | "creator_publish-management"
+    | "creator_work"
     | "home"
     | "monitor_cache"
     | "monitor_cache_list"
