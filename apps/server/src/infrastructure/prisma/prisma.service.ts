@@ -200,6 +200,10 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   get sysOssConfig() {
     return this._client.sysOssConfig;
   }
+  /** PC Creator Center 独立用户模型。 */
+  get creatorUser() {
+    return this._client.creatorUser;
+  }
   get genTable() {
     return this._client.genTable;
   }

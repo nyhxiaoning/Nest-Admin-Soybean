@@ -1105,3 +1105,18 @@ model SysOss {
   @@index([fileName])
   @@map("sys_oss")
 }
+
+/// PC Creator Center 独立用户，不属于后台 SysUser、租户、角色或菜单体系。
+model CreatorUser {
+  id          String    @id @default(uuid()) @db.Uuid
+  phone       String    @unique @db.VarChar(11)
+  password    String?   @db.VarChar(200)
+  name        String    @db.VarChar(50)
+  status      String    @default("ACTIVE") @db.VarChar(20)
+  lastLoginAt DateTime? @map("last_login_at") @db.Timestamp(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@index([status])
+  @@map("creator_user")
+}

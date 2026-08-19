@@ -7,9 +7,9 @@ import { useUserStore } from "@/pinia/modules/user"
 import { getLocale } from "@/locales"
 
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? "",
+  baseURL: import.meta.env.VITE_API_URL_NEW ?? "",
   timeout: 50000,
-  withCredentials: true
+  // withCredentials: true
 })
 
 instance.interceptors.request.use((config) => {

@@ -30,6 +30,7 @@ import { MonitorModule } from './module/monitor/monitor.module';
 import { ResourceModule } from './module/resource/resource.module';
 import { PrismaModule } from './infrastructure/prisma';
 import { ResilienceModule } from './resilience/circuit-breaker/resilience.module';
+import { CreatorModule } from './module/creator/creator.module';
 
 @Global()
 @Module({
@@ -118,6 +119,7 @@ import { ResilienceModule } from './resilience/circuit-breaker/resilience.module
     SystemModule,
     MonitorModule,
     ResourceModule,
+    CreatorModule,
   ],
   providers: [
     // 全局异常过滤器 (通过 DI 注册，支持完整依赖注入)

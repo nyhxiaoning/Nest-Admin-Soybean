@@ -146,9 +146,9 @@ export default defineComponent({
         })
 
         // 判断一下：这里如果
-        userStore.setLogin(res?.result)
-        userStore.avatar = res?.result?.avatar
-        console.log(res?.result?.avatar, 'avatarrrrrr')
+        userStore.setLogin(res)
+        userStore.avatar = res?.avatar ? res?.avatar:''
+        console.log(res?.avatar, 'avatarrrrrr')
         ElMessage.success(t("common.pxm_login_success"))
         const redirect = typeof route.query.redirect === "string" ? route.query.redirect : "/works"
         router.replace(redirect)

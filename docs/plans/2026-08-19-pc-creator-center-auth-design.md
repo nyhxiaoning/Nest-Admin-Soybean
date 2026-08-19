@@ -25,18 +25,22 @@
 
 ```text
 apps/server/src/module/creator/
+├── auth/
+│   ├── controllers/
+│   ├── services/
+│   ├── dto/
+│   └── creator-auth.module.ts
+├── common/
+│   ├── constants/
+│   ├── decorators/
+│   ├── guards/
+│   ├── interfaces/
+│   └── index.ts
 ├── creator.module.ts
-└── auth/
-    ├── creator-auth.module.ts
-    ├── creator-auth.controller.ts
-    ├── creator-auth.service.ts
-    ├── creator-auth.constants.ts
-    ├── creator-jwt.guard.ts
-    ├── creator-user.decorator.ts
-    └── dto/
+└── README.md
 ```
 
-`CreatorModule` 注册到 `AppModule`。模块复用全局 Prisma、Redis、JWT 配置、bcrypt、统一响应与异常设施，但不依赖后台 `MainService`、`UserService` 或角色菜单服务。
+`CreatorModule` 注册到 `AppModule`。`auth` 保存登录业务实现，`common` 保存未来作品、团队、发布等 Creator 模块可以复用的 Session、Guard、装饰器和常量。模块复用全局 Prisma、Redis、JWT 配置、bcrypt、统一响应与异常设施，但不依赖后台 `MainService`、`UserService` 或角色菜单服务。
 
 ## 数据模型
 

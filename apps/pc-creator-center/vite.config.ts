@@ -66,7 +66,7 @@ export default defineConfig(({ mode }) => {
       proxy: {
         '/creator': {
           // target: env.VITE_API_URL.replace(/\/api$/, ''),
-          target: env.VITE_API_URL,
+          target: env.VITE_API_URL_NEW,
           changeOrigin: true,
           // rewrite: (path) => path.replace(/^\/creator/, ''),
         },
