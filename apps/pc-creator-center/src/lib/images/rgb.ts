@@ -7,7 +7,7 @@ enum UploadFileEnum {
   BASE64IMG = 11, //BASE64图片
 }
 
-export const convertImageToRGB565 = (imageFile: any, type: number) => {
+export const convertImageToRGB565 = (imageFile: any, type: UploadFileEnum) => {
   const targetWidth = 32,
     targetHeight = 16; //TODO 硬编码
   return new Promise((resolve, reject) => {
@@ -140,52 +140,78 @@ export const convertRgb565BlobToPng = (blob, targetWidth, targetHeight) => {
   });
 };
 
-export const convertHexArrayToPng = (colors: Array<string | null>, width, height) => {
-  const newArray = Array.from({ length: 512 }, (_, index) => colors[index]);
+const HEX_COLOR_PATTERN = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i;
+
+export const createRgbaData = (
+  colors: ReadonlyArray<string | null | undefined>,
+  width: number,
+  height: number
+): Uint8ClampedArray<ArrayBuffer> => {
+  if (
+    !Number.isInteger(width) ||
+    width <= 0 ||
+    !Number.isInteger(height) ||
+    height <= 0
+  ) {
+    throw new Error('Image width and height must be positive integers.');
+  }
+
+  // Typed arrays initialize to RGBA(0, 0, 0, 0), so skipped pixels stay transparent.
+  const rgbaData = new Uint8ClampedArray(new ArrayBuffer(width * height * 4));
+
+  for (let index = 0; index < width * height; index += 1) {
+    const color = colors[index]?.trim();
+    if (!color || !HEX_COLOR_PATTERN.test(color)) {
+      continue;
+    }
+
+    const rawHex = color.replace(/^#/, '');
+    const hex =
+      rawHex.length === 3
+        ? rawHex
+            .split('')
+            .map((digit) => digit + digit)
+            .join('')
+        : rawHex;
+    const position = index * 4;
+
+    rgbaData[position] = Number.parseInt(hex.slice(0, 2), 16);
+    rgbaData[position + 1] = Number.parseInt(hex.slice(2, 4), 16);
+    rgbaData[position + 2] = Number.parseInt(hex.slice(4, 6), 16);
+    rgbaData[position + 3] = 255;
+  }
+
+  return rgbaData;
+};
+
+export const convertHexArrayToPng = (
+  colors: ReadonlyArray<string | null | undefined>,
+  width: number,
+  height: number
+): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     try {
-      const rgbaData = new Uint8ClampedArray(width * height * 4);
-      newArray.forEach((hexColor, index) => {
-        if (!hexColor) {
-          hexColor = '#CACACA'; // 默认颜色
-        }
-        let cleanHex = hexColor.replace(/^#/, '');
-        if (cleanHex.length === 3) {
-          cleanHex = cleanHex
-            .split('')
-            .map((hex) => hex + hex)
-            .join('');
-        }
-
-        const r = parseInt(cleanHex.substr(0, 2), 16);
-        const g = parseInt(cleanHex.substr(2, 2), 16);
-        const b = parseInt(cleanHex.substr(4, 2), 16);
-        const pos = index * 4;
-
-        rgbaData[pos] = r;
-        rgbaData[pos + 1] = g;
-        rgbaData[pos + 2] = b;
-        rgbaData[pos + 3] = 255; // 透明度
-      });
+      const rgbaData = createRgbaData(colors, width, height);
 
       const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
       canvas.width = width;
       canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Failed to get 2D context'));
+        return;
+      }
 
       const imageData = new ImageData(rgbaData, width, height);
       ctx.putImageData(imageData, 0, 0);
 
-      // 解决某些浏览器渲染 bug
-      setTimeout(() => {
-        canvas.toBlob((pngBlob) => {
-          if (pngBlob) {
-            resolve(pngBlob);
-          } else {
-            reject(new Error('Failed to create PNG Blob'));
-          }
-        }, 'image/png');
-      }, 0);
+      canvas.toBlob((pngBlob) => {
+        if (pngBlob) {
+          resolve(pngBlob);
+        } else {
+          reject(new Error('Failed to create PNG Blob'));
+        }
+      }, 'image/png');
     } catch (error) {
       reject(error);
     }
