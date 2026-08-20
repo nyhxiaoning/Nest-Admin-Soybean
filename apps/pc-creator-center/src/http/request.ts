@@ -20,7 +20,7 @@ instance.interceptors.request.use((config) => {
   console.log(currentLengthStr, getLocale(), 'request---000')
   config.headers = config.headers || {}
   if (userStore.token) {
-    config.headers.token = userStore.token
+    config.headers.Authorization = `Bearer ${userStore.token}`
   }
 
   // 禁止修改标准化：headers
@@ -45,7 +45,11 @@ instance.interceptors.response.use(
       return data
     }
     if (data?.code === 200) {
-      return data
+      return {
+        ...data,
+        message: data.message ?? data.msg,
+        result: data.result ?? data.data,
+      }
     }
     if (data?.code === 401 || data?.code === 11101) {
       showError("登录已过期")

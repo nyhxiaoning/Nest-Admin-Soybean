@@ -40,12 +40,12 @@ export interface WorkSubmitRequest {
 /** 作品上传凭证请求 这个对应eidtorfile，这个还没有使用
  * 传入不同role即可，
  * COVER_IMAGE
- * GIF_FILE
+ * EDITABLE_JSON
  * GIF_FILE
  * STATIC_BIN
  */
 export interface CreatorUploadTokenRequest {
-  role: "COVER_IMAGE" | "GIF_FILE" | "GIF_FILE" | "STATIC_BIN"
+  role: "COVER_IMAGE" | "GIF_FILE" | "EDITABLE_JSON" | "STATIC_BIN"
   fileName?: string
   fileSize?: number
   fileType?: string
@@ -168,7 +168,7 @@ export interface WorkTagVO {
 }
 
 export function pageTagWorksApi() {
-  return request<{ result: WorkTagVO[] }>({
+  return request<WorkTagVO[]>({
     url: "/creator/work-tags",
     method: "get",
   })
@@ -226,11 +226,11 @@ export function deleteWorkApi(id: string) {
  * 获取 OSS 上传凭证
  * POST /api/creator/works/upload-token
  */
-export function getUploadTokenApi(typeRole: CreatorUploadTokenRequest) {
-  return request<OSSTokenVO>({
+export function getUploadTokenApi(data: CreatorUploadTokenRequest) {
+  return request<OSSTokenFullVO>({
     url: "/creator/works/upload-token",
     method: "post",
-    data: { role: typeRole },
+    data,
   })
 }
 
@@ -281,8 +281,8 @@ export interface OSSTokenFullVO {
   expiration: string
   token: string
   requestId?: string
-  path?: string
-  fullPath?: string
+  path: string
+  fullPath: string
 }
 
 /**
@@ -297,7 +297,3 @@ export function getWorkUploadTokenApi(role: FileRole, fileName?: string, fileSiz
     data: { role, fileName, fileSize },
   })
 }
-
-
-
-

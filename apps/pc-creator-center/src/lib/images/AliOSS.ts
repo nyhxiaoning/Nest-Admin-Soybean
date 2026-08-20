@@ -3,13 +3,21 @@ import OSS from 'ali-oss';
 
 import { getUploadTokenApi } from '@/api/works';
 
-export const createOssClient = async (type: string) => {
+export const createOssClient = async (
+  type: string | number,
+  fileName?: string,
+  fileSize?: number,
+  fileType?: string,
+) => {
   try {
-    const response = await getUploadTokenApi(type);
+    const role = normalizeUploadRole(type);
+    const response = await getUploadTokenApi({ role, fileName, fileSize, fileType });
     // console.log('获取oss配置成功', response);
     return {
       client: new OSS({
         region: response.result.region,
+        endpoint: response.result.endpoint,
+        authorizationV4: true,
         accessKeyId: response.result.accessKeyId,
         accessKeySecret: response.result.accessKeySecret,
         stsToken: response.result.token,
@@ -20,6 +28,13 @@ export const createOssClient = async (type: string) => {
     };
   } catch (err) {
     console.error('获取oss配置失败', err);
-    throw new Error(err);
+    throw err instanceof Error ? err : new Error(String(err));
   }
 };
+
+function normalizeUploadRole(type: string | number): 'COVER_IMAGE' | 'GIF_FILE' | 'EDITABLE_JSON' | 'STATIC_BIN' {
+  if (type === 'GIF_FILE' || type === 8) return 'GIF_FILE';
+  if (type === 'EDITABLE_JSON' || type === 9) return 'EDITABLE_JSON';
+  if (type === 'STATIC_BIN' || type === 6) return 'STATIC_BIN';
+  return 'COVER_IMAGE';
+}

@@ -15,6 +15,6 @@ import { CreatorAuthService } from './services/creator-auth.service';
   ],
   controllers: [CreatorAuthController],
   providers: [CreatorAuthService, CreatorJwtGuard],
-  exports: [CreatorAuthService, CreatorJwtGuard],
+  exports: [JwtModule, CreatorAuthService, CreatorJwtGuard],
 })
 export class CreatorAuthModule {}

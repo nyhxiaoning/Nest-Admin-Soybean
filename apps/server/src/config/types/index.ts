@@ -11,6 +11,7 @@ import { PermissionConfig } from './permission.config';
 import { GeneratorConfig } from './generator.config';
 import { UserConfig } from './user.config';
 import { ClientConfig } from './client.config';
+import { CreatorStorageConfig } from './creator-storage.config';
 
 /**
  * 完整的应用配置接口
@@ -59,6 +60,10 @@ export class Configuration {
   @ValidateNested()
   @Type(() => ClientConfig)
   client: ClientConfig;
+
+  @ValidateNested()
+  @Type(() => CreatorStorageConfig)
+  creatorStorage: CreatorStorageConfig;
 }
 
 // 导出所有配置类型
@@ -73,3 +78,4 @@ export * from './permission.config';
 export * from './generator.config';
 export * from './user.config';
 export * from './client.config';
+export * from './creator-storage.config';

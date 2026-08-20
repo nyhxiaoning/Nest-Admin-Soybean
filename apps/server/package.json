@@ -50,6 +50,8 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@alicloud/openapi-client": "^0.4.15",
+    "@alicloud/sts20150401": "^1.2.0",
     "@bull-board/express": "^6.15.0",
     "@bull-board/nestjs": "^6.15.0",
     "@nest-admin/types": "workspace:*",

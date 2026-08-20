@@ -13,6 +13,7 @@ import {
   UserConfig,
   ClientConfig,
   Configuration,
+  CreatorStorageConfig,
 } from './types';
 
 /**
@@ -117,6 +118,11 @@ export class AppConfigService {
    */
   get client(): ClientConfig {
     return this.configService.get('client', { infer: true });
+  }
+
+  /** PC Creator Center 阿里云 OSS/STS 配置。 */
+  get creatorStorage(): CreatorStorageConfig {
+    return this.configService.get('creatorStorage', { infer: true });
   }
 
   /**

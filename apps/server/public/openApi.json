@@ -38199,6 +38199,900 @@
           "PC Creator Center - 认证"
         ]
       }
+    },
+    "/api/creator/works": {
+      "get": {
+        "operationId": "CreatorWorksController_page",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "keyword",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "CREATED_AT",
+              "type": "string",
+              "enum": [
+                "CREATED_AT",
+                "LAST_VIEW_TIME",
+                "TITLE"
+              ]
+            }
+          },
+          {
+            "name": "direction",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "DESC",
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品"
+        ]
+      },
+      "post": {
+        "operationId": "CreatorWorksController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatorWorkSaveRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品"
+        ]
+      }
+    },
+    "/api/creator/works/upload-token": {
+      "post": {
+        "operationId": "CreatorWorksController_uploadToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatorUploadTokenRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品"
+        ]
+      }
+    },
+    "/api/creator/works/releases": {
+      "get": {
+        "operationId": "CreatorWorksController_releases",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "keyword",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "CREATED_AT",
+              "type": "string",
+              "enum": [
+                "CREATED_AT",
+                "LAST_VIEW_TIME",
+                "TITLE"
+              ]
+            }
+          },
+          {
+            "name": "direction",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "DESC",
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "OFFLINE",
+                "REVIEWING",
+                "REJECTED",
+                "PUBLISHED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品"
+        ]
+      }
+    },
+    "/api/creator/works/release-candidates": {
+      "get": {
+        "operationId": "CreatorWorksController_releaseCandidates",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "keyword",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "CREATED_AT",
+              "type": "string",
+              "enum": [
+                "CREATED_AT",
+                "LAST_VIEW_TIME",
+                "TITLE"
+              ]
+            }
+          },
+          {
+            "name": "direction",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "DESC",
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "OFFLINE",
+                "REVIEWING",
+                "REJECTED",
+                "PUBLISHED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品"
+        ]
+      }
+    },
+    "/api/creator/works/releases/{id}": {
+      "delete": {
+        "operationId": "CreatorWorksController_removeFromReleases",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品"
+        ]
+      }
+    },
+    "/api/creator/works/{id}": {
+      "get": {
+        "operationId": "CreatorWorksController_detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品"
+        ]
+      },
+      "put": {
+        "operationId": "CreatorWorksController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatorWorkSaveRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品"
+        ]
+      },
+      "delete": {
+        "operationId": "CreatorWorksController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品"
+        ]
+      }
+    },
+    "/api/creator/works/{id}/submit": {
+      "post": {
+        "operationId": "CreatorWorksController_submit",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatorWorkSubmitRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品"
+        ]
+      }
+    },
+    "/api/creator/works/{id}/submit-update": {
+      "post": {
+        "operationId": "CreatorWorksController_submitUpdate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatorWorkSubmitRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品"
+        ]
+      }
+    },
+    "/api/creator/works/{id}/withdraw": {
+      "post": {
+        "operationId": "CreatorWorksController_withdraw",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品"
+        ]
+      }
+    },
+    "/api/creator/works/{id}/unpublish": {
+      "post": {
+        "operationId": "CreatorWorksController_unpublish",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品"
+        ]
+      }
+    },
+    "/api/creator/work-tags": {
+      "get": {
+        "operationId": "CreatorWorkTagsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "tags": [
+          "PC Creator Center - 作品标签"
+        ]
+      }
+    },
+    "/api/creator/uploads/images": {
+      "post": {
+        "description": "图片暂存 7 天，支持所有 image/* MIME，单文件最大 10 MiB。",
+        "operationId": "CreatorImageUploadController_uploadImage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Creator 图片，支持格式: image/*，最大: 10 MiB"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Result"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/CreatorImageUploadResponseDto"
+                        }
+                      }
+                    }
+                  ],
+                  "example": {
+                    "code": 200,
+                    "msg": "操作成功",
+                    "data": {
+                      "fileId": "d2b5556b-8718-41ca-bab7-a2978993415e",
+                      "url": "http://localhost:8080/profile/creator/{creatorId}/images/2026/08/20/{fileId}.png",
+                      "originalName": "image.png",
+                      "contentType": "image/png",
+                      "size": 102400,
+                      "expiresAt": 1787810400000
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Creator 未登录或登录已过期",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "number",
+                      "example": 401
+                    },
+                    "msg": {
+                      "type": "string",
+                      "example": "Creator 未登录或登录已过期"
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "无权限访问",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "number",
+                      "example": 403
+                    },
+                    "msg": {
+                      "type": "string",
+                      "example": "没有操作权限"
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "图片超过 10 MiB",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "number",
+                      "example": 413
+                    },
+                    "msg": {
+                      "type": "string",
+                      "example": "图片超过 10 MiB"
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器内部错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "number",
+                      "example": 500
+                    },
+                    "msg": {
+                      "type": "string",
+                      "example": "系统异常"
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "暂存 Creator 图片",
+        "tags": [
+          "PC Creator Center - 暂存上传"
+        ]
+      }
+    },
+    "/api/creator/uploads/json": {
+      "post": {
+        "description": "保存前端下发的原始 JSON，最大 20 MiB，默认暂存 7 天。",
+        "operationId": "CreatorJsonUploadsController_store",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "example": {
+                  "version": 1,
+                  "layers": [
+                    {
+                      "id": "layer-1",
+                      "visible": true
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "操作成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Result"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/CreatorJsonUploadResponseDto"
+                        }
+                      }
+                    }
+                  ],
+                  "example": {
+                    "code": 200,
+                    "msg": "操作成功",
+                    "data": {
+                      "fileId": "d239f441-5eb8-4b91-9bf8-bc1c4f67c270",
+                      "url": "http://localhost:8080/profile/creator/{creatorId}/json/2026/08/20/{fileId}.json",
+                      "contentType": "application/json",
+                      "size": 48,
+                      "expiresAt": 1787810400000
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Creator 未登录或登录已过期",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "number",
+                      "example": 401
+                    },
+                    "msg": {
+                      "type": "string",
+                      "example": "Creator 未登录或登录已过期"
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "无权限访问",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "number",
+                      "example": 403
+                    },
+                    "msg": {
+                      "type": "string",
+                      "example": "没有操作权限"
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "JSON 请求体或序列化内容超过 20 MiB",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "number",
+                      "example": 413
+                    },
+                    "msg": {
+                      "type": "string",
+                      "example": "JSON 请求体或序列化内容超过 20 MiB"
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器内部错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "number",
+                      "example": 500
+                    },
+                    "msg": {
+                      "type": "string",
+                      "example": "系统异常"
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "summary": "将 JSON 内容暂存为可访问 URL",
+        "tags": [
+          "PC Creator Center - 暂存上传"
+        ]
+      }
     }
   },
   "info": {
@@ -49299,6 +50193,205 @@
             "type": "string"
           }
         }
+      },
+      "Object": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreatorWorkSaveRequestDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "兼容前端字段，服务端创建和更新时均忽略"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 100,
+            "pattern": "/\\S/"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "STATIC",
+              "GIF"
+            ]
+          },
+          "coverUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "gifFileUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "gifFileSize": {
+            "type": "number",
+            "minimum": 0
+          },
+          "editableFileUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "binFileUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "binFileSize": {
+            "type": "number",
+            "minimum": 0
+          },
+          "width": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4096
+          },
+          "height": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4096
+          },
+          "frameCount": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10000
+          },
+          "frameDelay": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 60000
+          },
+          "preview": {
+            "type": "string"
+          },
+          "publishStatus": {
+            "type": "string",
+            "enum": [
+              "OFFLINE",
+              "REVIEWING",
+              "REJECTED",
+              "PUBLISHED"
+            ],
+            "description": "兼容前端字段，服务端忽略"
+          },
+          "remark": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "CreatorUploadTokenRequestDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "enum": [
+              "COVER_IMAGE",
+              "GIF_FILE",
+              "EDITABLE_JSON",
+              "STATIC_BIN"
+            ],
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "fileSize": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 52428800
+          },
+          "fileType": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "CreatorWorkSubmitRequestDto": {
+        "type": "object",
+        "properties": {
+          "tagCode": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "remark": {
+            "type": "string",
+            "maxLength": 500
+          }
+        }
+      },
+      "CreatorImageUploadResponseDto": {
+        "type": "object",
+        "properties": {
+          "fileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "url": {
+            "type": "string"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string",
+            "example": "image/png"
+          },
+          "size": {
+            "type": "number",
+            "description": "文件大小，单位为字节"
+          },
+          "expiresAt": {
+            "type": "number",
+            "description": "暂存过期时间，Unix 毫秒时间戳"
+          }
+        },
+        "required": [
+          "fileId",
+          "url",
+          "originalName",
+          "contentType",
+          "size",
+          "expiresAt"
+        ]
+      },
+      "CreatorJsonUploadResponseDto": {
+        "type": "object",
+        "properties": {
+          "fileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "url": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string",
+            "example": "application/json"
+          },
+          "size": {
+            "type": "number",
+            "description": "序列化后的 UTF-8 字节数"
+          },
+          "expiresAt": {
+            "type": "number",
+            "description": "暂存过期时间，Unix 毫秒时间戳"
+          }
+        },
+        "required": [
+          "fileId",
+          "url",
+          "contentType",
+          "size",
+          "expiresAt"
+        ]
       }
     }
   }

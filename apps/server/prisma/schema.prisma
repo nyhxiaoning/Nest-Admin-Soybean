@@ -1116,7 +1116,124 @@ model CreatorUser {
   lastLoginAt DateTime? @map("last_login_at") @db.Timestamp(6)
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  works       CreatorWork[]
+  submissions CreatorWorkSubmission[]
 
   @@index([status])
   @@map("creator_user")
+}
+
+enum CreatorWorkType {
+  STATIC
+  GIF
+}
+
+enum CreatorWorkPublishStatus {
+  OFFLINE
+  REVIEWING
+  REJECTED
+  PUBLISHED
+}
+
+enum CreatorWorkSubmissionType {
+  PUBLISH
+  UPDATE
+}
+
+enum CreatorWorkSubmissionStatus {
+  REVIEWING
+  APPROVED
+  REJECTED
+  WITHDRAWN
+}
+
+/// PC Creator Center 作品主表，保存创作者当前编辑版本。
+model CreatorWork {
+  id                String                   @id @default(uuid()) @db.Uuid
+  creatorId         String                   @map("creator_id") @db.Uuid
+  title             String                   @db.VarChar(100)
+  type              CreatorWorkType          @default(STATIC)
+  coverUrl          String?                  @map("cover_url") @db.VarChar(1000)
+  gifFileUrl        String?                  @map("gif_file_url") @db.VarChar(1000)
+  gifFileSize       BigInt?                  @map("gif_file_size")
+  editableFileUrl   String?                  @map("editable_file_url") @db.VarChar(1000)
+  binFileUrl        String?                  @map("bin_file_url") @db.VarChar(1000)
+  binFileSize       BigInt?                  @map("bin_file_size")
+  width             Int?
+  height            Int?
+  frameCount        Int?                     @map("frame_count")
+  frameDelay        Int?                     @map("frame_delay")
+  preview           String?                  @db.Text
+  publishStatus     CreatorWorkPublishStatus @default(OFFLINE) @map("publish_status")
+  workVersion       Int                      @default(1) @map("work_version")
+  contentConsistent Boolean                  @default(true) @map("content_consistent")
+  publishedSnapshot Json?                    @map("published_snapshot")
+  submittedAt       DateTime?                @map("submitted_at") @db.Timestamp(6)
+  remark            String?                  @db.VarChar(500)
+  rejectedReason    String?                  @map("rejected_reason") @db.VarChar(500)
+  lastViewAt        DateTime?                @map("last_view_at") @db.Timestamp(6)
+  deletedAt         DateTime?                @map("deleted_at") @db.Timestamp(6)
+  createdAt         DateTime                 @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt         DateTime                 @updatedAt @map("updated_at") @db.Timestamp(6)
+  creator           CreatorUser              @relation(fields: [creatorId], references: [id], onDelete: Restrict)
+  tags              CreatorWorkTagRelation[]
+  submissions       CreatorWorkSubmission[]
+
+  @@index([creatorId, deletedAt, updatedAt])
+  @@index([creatorId, publishStatus, deletedAt])
+  @@index([creatorId, title])
+  @@map("creator_work")
+}
+
+/// PC Creator Center 作品发布标签。
+model CreatorWorkTag {
+  id        String                   @id @default(uuid()) @db.Uuid
+  name      String                   @db.VarChar(50)
+  tagCode   String                   @unique @map("tag_code") @db.VarChar(50)
+  enabled   Boolean                  @default(true)
+  sortOrder Int                      @default(0) @map("sort_order")
+  createdAt DateTime                 @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime                 @updatedAt @map("updated_at") @db.Timestamp(6)
+  works     CreatorWorkTagRelation[]
+
+  @@index([enabled, sortOrder])
+  @@map("creator_work_tag")
+}
+
+model CreatorWorkTagRelation {
+  id        String         @id @default(uuid()) @db.Uuid
+  workId    String         @map("work_id") @db.Uuid
+  tagId     String         @map("tag_id") @db.Uuid
+  createdAt DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
+  work      CreatorWork    @relation(fields: [workId], references: [id], onDelete: Cascade)
+  tag       CreatorWorkTag @relation(fields: [tagId], references: [id], onDelete: Restrict)
+
+  @@unique([workId, tagId])
+  @@index([tagId])
+  @@map("creator_work_tag_relation")
+}
+
+/// 作品发布或更新审核记录；snapshot 是提交时的不可变作品快照。
+model CreatorWorkSubmission {
+  id             String                      @id @default(uuid()) @db.Uuid
+  workId         String                      @map("work_id") @db.Uuid
+  creatorId      String                      @map("creator_id") @db.Uuid
+  type           CreatorWorkSubmissionType
+  status         CreatorWorkSubmissionStatus @default(REVIEWING)
+  version        Int
+  snapshot       Json
+  remark         String?                     @db.VarChar(500)
+  rejectedReason String?                     @map("rejected_reason") @db.VarChar(500)
+  auditorId      String?                     @map("auditor_id") @db.VarChar(64)
+  submittedAt    DateTime                    @default(now()) @map("submitted_at") @db.Timestamp(6)
+  auditedAt      DateTime?                   @map("audited_at") @db.Timestamp(6)
+  createdAt      DateTime                    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime                    @updatedAt @map("updated_at") @db.Timestamp(6)
+  work           CreatorWork                 @relation(fields: [workId], references: [id], onDelete: Restrict)
+  creator        CreatorUser                 @relation(fields: [creatorId], references: [id], onDelete: Restrict)
+
+  @@unique([workId, version])
+  @@index([workId, status, submittedAt])
+  @@index([creatorId, status, submittedAt])
+  @@map("creator_work_submission")
 }

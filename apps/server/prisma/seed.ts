@@ -4699,6 +4699,21 @@ async function main() {
     skipDuplicates: true,
   });
 
+  // PC Creator Center 作品发布标签（幂等）
+  const creatorWorkTags = [
+    { tagCode: 'ORIGINAL', name: '原创作品', sortOrder: 10 },
+    { tagCode: 'ANIMATION', name: '动态作品', sortOrder: 20 },
+    { tagCode: 'STATIC', name: '静态作品', sortOrder: 30 },
+    { tagCode: 'OTHER', name: '其他', sortOrder: 40 },
+  ];
+  for (const tag of creatorWorkTags) {
+    await prisma.creatorWorkTag.upsert({
+      where: { tagCode: tag.tagCode },
+      update: { name: tag.name, sortOrder: tag.sortOrder, enabled: true },
+      create: { ...tag, enabled: true },
+    });
+  }
+
   console.log('种子数据导入完成!');
 }
 

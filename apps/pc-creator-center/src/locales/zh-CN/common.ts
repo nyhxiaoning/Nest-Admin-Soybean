@@ -273,6 +273,7 @@ export default {
   pxm_editor_auto_saved: '已自动保存',
   pxm_editor_last_saved: '上次保存',
   pxm_editor_auto_save_failed: '自动保存失败，将重试',
+  pxm_editor_save_failed:'保存失败，请检查浏览器权限',
   pxm_editor_canvas_pixels_moved: '已移动画布像素',
   pxm_editor_pixels_edited: '已编辑像素',
   pxm_editor_transform_done: '已变换选区',

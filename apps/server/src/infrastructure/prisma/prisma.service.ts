@@ -204,6 +204,18 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   get creatorUser() {
     return this._client.creatorUser;
   }
+  get creatorWork() {
+    return this._client.creatorWork;
+  }
+  get creatorWorkTag() {
+    return this._client.creatorWorkTag;
+  }
+  get creatorWorkTagRelation() {
+    return this._client.creatorWorkTagRelation;
+  }
+  get creatorWorkSubmission() {
+    return this._client.creatorWorkSubmission;
+  }
   get genTable() {
     return this._client.genTable;
   }

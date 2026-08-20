@@ -35,6 +35,54 @@ class EnvironmentVariables {
   @IsString()
   DATABASE_URL: string;
 
+  @IsOptional()
+  @IsBoolean()
+  CREATOR_OSS_ENABLED?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(365)
+  CREATOR_LOCAL_IMAGE_TTL_DAYS?: number;
+
+  @IsOptional()
+  @IsString()
+  ALIBABA_CLOUD_ACCESS_KEY_ID?: string;
+
+  @IsOptional()
+  @IsString()
+  ALIBABA_CLOUD_ACCESS_KEY_SECRET?: string;
+
+  @IsOptional()
+  @IsString()
+  CREATOR_OSS_ROLE_ARN?: string;
+
+  @IsOptional()
+  @IsString()
+  CREATOR_OSS_REGION?: string;
+
+  @IsOptional()
+  @IsString()
+  CREATOR_OSS_BUCKET?: string;
+
+  @IsOptional()
+  @IsString()
+  CREATOR_OSS_ENDPOINT?: string;
+
+  @IsOptional()
+  @IsString()
+  CREATOR_OSS_STS_ENDPOINT?: string;
+
+  @IsOptional()
+  @IsString()
+  CREATOR_OSS_PUBLIC_BASE_URL?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(900)
+  @Max(3600)
+  CREATOR_OSS_STS_DURATION_SECONDS?: number;
+
   // ==================== 应用配置 ====================
 
   @IsOptional()

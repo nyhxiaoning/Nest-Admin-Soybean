@@ -108,6 +108,20 @@ export default () => {
       location: process.env.COS_LOCATION || '',
     },
 
+    creatorStorage: {
+      localImageTtlDays: num(process.env.CREATOR_LOCAL_IMAGE_TTL_DAYS, 7),
+      enabled: bool(process.env.CREATOR_OSS_ENABLED, false),
+      accessKeyId: process.env.ALIBABA_CLOUD_ACCESS_KEY_ID || '',
+      accessKeySecret: process.env.ALIBABA_CLOUD_ACCESS_KEY_SECRET || '',
+      roleArn: process.env.CREATOR_OSS_ROLE_ARN || '',
+      region: process.env.CREATOR_OSS_REGION || '',
+      bucket: process.env.CREATOR_OSS_BUCKET || '',
+      endpoint: process.env.CREATOR_OSS_ENDPOINT || '',
+      stsEndpoint: process.env.CREATOR_OSS_STS_ENDPOINT || 'sts.cn-hangzhou.aliyuncs.com',
+      publicBaseUrl: process.env.CREATOR_OSS_PUBLIC_BASE_URL || '',
+      stsDurationSeconds: num(process.env.CREATOR_OSS_STS_DURATION_SECONDS, 900),
+    },
+
     db: {
       postgresql: {
         host: process.env.DB_HOST || '127.0.0.1',

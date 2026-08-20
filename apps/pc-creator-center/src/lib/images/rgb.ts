@@ -7,7 +7,7 @@ enum UploadFileEnum {
   BASE64IMG = 11, //BASE64图片
 }
 
-export const convertImageToRGB565 = (imageFile: any, type: UploadFileEnum) => {
+export const convertImageToRGB565 = (imageFile: any, type: number) => {
   const targetWidth = 32,
     targetHeight = 16; //TODO 硬编码
   return new Promise((resolve, reject) => {

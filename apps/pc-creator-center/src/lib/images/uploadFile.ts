@@ -35,6 +35,7 @@ export enum UploadFileEnum {
   GIF = 'GIF_FILE', //GIF GIF_FILE
   EDITABLE_JSON = 9,// EDITABLE_JSON 编辑json
   STATIC_BIN = 6, //STATIC_BIN 静态图
+  BIN = 6, // 兼容旧的二进制文件调用
 
   OTHER = 10, //其他文件
   BASE64IMG = 11, //BASE64图片，这里使用7和12是一个BASE
@@ -217,16 +218,16 @@ export const uploadBase64Image = (file: string): Promise<AddArtifactParam> => {
     }
   });
 };
-const uploadFile = (file: any, name: string, uploadType: string): Promise<FileResponse> => {
+const uploadFile = (file: any, name: string, uploadType: string | number): Promise<FileResponse> => {
 
   // alert('uploadFile');
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
       // 配置当前的类型：
-      const ossConfig = await createOssClient(uploadType);
+      const ossConfig = await createOssClient(uploadType, name, file?.size, file?.type);
       const fileName = ossConfig.path + '/' + name;
-      const uploadResponse = await ossConfig.client.put(fileName, file, {});
+      await ossConfig.client.put(fileName, file, {});
       resolve({
         fileUrl: ossConfig.fullPath + '/' + name,
         fileSize: file.size,
@@ -240,12 +241,12 @@ const uploadFile = (file: any, name: string, uploadType: string): Promise<FileRe
 
 
 
-const uploadeditorJson = (data: any, name: string, uploadType: string): Promise<FileResponse> => {
+const uploadeditorJson = (data: any, name: string, uploadType: string | number): Promise<FileResponse> => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
       // 配置当前的类型：
-      const ossConfig = await createOssClient(uploadType);
+      const ossConfig = await createOssClient(uploadType, name, undefined, 'application/json');
 
       // 确保文件名以 .json 结尾
       let safeFileName = name;
@@ -261,7 +262,7 @@ const uploadeditorJson = (data: any, name: string, uploadType: string): Promise<
       const fileName = `${ossConfig.path}/${safeFileName}`;
 
       // 执行实际上传
-      const uploadResponse = await ossConfig.client.put(fileName, jsonBlob, {
+      await ossConfig.client.put(fileName, jsonBlob, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -489,7 +490,7 @@ export const checkFile = async (file: any, t: any) => {
 
       throw new Error(t('common.imgSizeError'));
     }
-    const img = await getImageDimensions(file);
+    await getImageDimensions(file);
     // const ratio = img.width / img.height;
     // if (Math.abs(ratio - 4) > 0.01) {
     //   ElMessage.error(t('common.imgSpecsError'))
@@ -525,7 +526,7 @@ export const uploadUserFile = (file: any, fileType: UploadFileEnum): Promise<Fil
     } else {
       const fileType = file.type;
       if (fileType === 'image/jpeg' || fileType === 'image/png') {
-        if (checkFileSize(file, AllowedArtifactTypes.IMAGE)) {
+        if (checkFileSize(file, AllowedArtifactTypes.IMAGE, t)) {
           reject(new Error(t('common.imgSizeError')));
         }
         getImageDimensions(file)
@@ -541,7 +542,7 @@ export const uploadUserFile = (file: any, fileType: UploadFileEnum): Promise<Fil
             reject(new Error(t('common.imgSpecsError')));
           });
       } else if (fileType === 'image/gif') {
-        if (checkFileSize(file, AllowedArtifactTypes.GIF)) {
+        if (checkFileSize(file, AllowedArtifactTypes.GIF, t)) {
           reject(new Error(t('common.gifSizeError')));
         }
         isGifSizeValid(file)
@@ -551,7 +552,7 @@ export const uploadUserFile = (file: any, fileType: UploadFileEnum): Promise<Fil
             }
             resolve(uploadGif(file));
           })
-          .catch((err) => {
+          .catch(() => {
             reject(new Error(t('common.gifSpecsError')));
           });
       } else {
@@ -566,12 +567,12 @@ export const uploadMutFile = (file: File): Promise<FileResponse> => {
   return new Promise((resolve, reject) => {
     const fileType = file.type;
     if (fileType === 'image/jpeg' || fileType === 'image/png') {
-      if (checkFileSize(file, AllowedArtifactTypes.IMAGE)) {
+      if (checkFileSize(file, AllowedArtifactTypes.IMAGE, t)) {
         reject(new Error(t('common.imgSizeError')));
       }
       resolve(uploadImage(file));
     } else if (fileType === 'image/gif') {
-      if (checkFileSize(file, AllowedArtifactTypes.GIF)) {
+      if (checkFileSize(file, AllowedArtifactTypes.GIF, t)) {
         reject(new Error(t('common.gifSizeError')));
       }
       isGifSizeValid(file)
@@ -581,7 +582,7 @@ export const uploadMutFile = (file: File): Promise<FileResponse> => {
           }
           resolve(uploadGif(file));
         })
-        .catch((err) => {
+        .catch(() => {
           reject(new Error(t('common.gifSpecsError')));
         });
     } else {

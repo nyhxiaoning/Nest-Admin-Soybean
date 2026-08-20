@@ -12,6 +12,7 @@ import { AppConfigService } from 'src/config/app-config.service';
 import { Logger as PinoLogger } from 'nestjs-pino';
 import path from 'path';
 import { writeFile } from 'fs/promises';
+import { json, urlencoded } from 'express';
 
 // API 版本信息
 const API_INFO = {
@@ -55,8 +56,19 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: true, // 开启跨域访问
     bufferLogs: true, // 缓冲日志
+    bodyParser: false,
   });
+  // bufferLogs缓冲日志，这个用来true：所有启动日志 + 运行时日志统一由你自定义日志接管，日志不会分家
+  // 只要 main.ts 里面替换了全局日志器（winston、pino、自定义 logger），就一定要开启
+  // 开启和不开启的表现：开启后，启动瞬间控制台看不到任何日志输出，直到 useLogger 之后日志一次性打出。
+  // 对于服务运行没有损耗。
   const config = app.get(AppConfigService);
+
+  // Creator JSON 暂存接口需要较大请求体；其他 JSON 接口保持 Express 默认 100 KiB 边界。
+  const apiPrefix = `/${config.app.prefix.replace(/^\/+|\/+$/g, '')}`;
+  app.use(`${apiPrefix}/creator/uploads/json`, json({ limit: '20mb' }));
+  app.use(json({ limit: '100kb' }));
+  app.use(urlencoded({ extended: true, limit: '100kb' }));
 
   // 使用 Pino Logger
   app.useLogger(app.get(PinoLogger));
