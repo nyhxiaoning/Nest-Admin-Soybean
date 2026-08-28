@@ -7,13 +7,14 @@ import {
 } from './Common.ts';
 import {
   colorsToBlob,
-  colorsToJsonBlob,
   compressImageTo64x16,
   convertHexArrayToPng,
   convertImageToRGB565,
   convertRgb565BlobToPng,
 } from './rgb.ts';
 import { WIDTH, HEIGHT } from '@/modules/pixel-editor/core/index'
+
+import { uploadsfileJson, uploadsImage } from './../../api/works.ts'
 
 import { createOssClient } from './AliOSS.ts';
 import { ElMessage } from 'element-plus'
@@ -217,65 +218,42 @@ export const uploadBase64Image = (file: string): Promise<AddArtifactParam> => {
     }
   });
 };
-const uploadFile = (file: any, name: string, uploadType: string): Promise<FileResponse> => {
+const uploadFile = async (file: unknown, name: string, uploadType: string): Promise<FileResponse> => {
+  if (!(file instanceof Blob)) {
+    throw new TypeError('上传内容必须是 File 或 Blob')
+  }
 
-  // alert('uploadFile');
-  // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve, reject) => {
-    try {
-      // 配置当前的类型：
-      const ossConfig = await createOssClient(uploadType);
-      const fileName = ossConfig.path + '/' + name;
-      const uploadResponse = await ossConfig.client.put(fileName, file, {});
-      resolve({
-        fileUrl: ossConfig.fullPath + '/' + name,
-        fileSize: file.size,
-      });
-    } catch (err) {
-      console.error('上传失败:', err);
-      reject(err);
+  if (file.type.toLowerCase().startsWith('image/')) {
+    const response = await uploadsImage(file, name)
+    return {
+      fileUrl: response.data.url,
+      fileSize: response.data.size,
     }
-  });
+  }
+
+  debugger
+
+  return 
+
+  const ossConfig = await createOssClient(uploadType)
+  const fileName = `${ossConfig.path}/${name}`
+  await ossConfig.client.put(fileName, file, {})
+  return {
+    fileUrl: `${ossConfig.fullPath}/${name}`,
+    fileSize: file.size,
+  }
 };
 
 
 
-const uploadeditorJson = (data: any, name: string, uploadType: string): Promise<FileResponse> => {
-  // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve, reject) => {
-    try {
-      // 配置当前的类型：
-      const ossConfig = await createOssClient(uploadType);
+const uploadeditorJson = async (data: unknown, _name: string, _uploadType: string): Promise<FileResponse> => {
+  const content = typeof data === 'string' ? JSON.parse(data) : data
+  const response = await uploadsfileJson(content)
 
-      // 确保文件名以 .json 结尾
-      let safeFileName = name;
-      if (!safeFileName.endsWith('.json')) {
-        safeFileName = `${safeFileName}.json`;
-      }
-
-      // 将数据转换为 Blob
-      const jsonString = typeof data === 'string' ? data : JSON.stringify(data);
-      const jsonBlob = new Blob([jsonString], { type: 'application/json' });
-
-      // 生成文件名
-      const fileName = `${ossConfig.path}/${safeFileName}`;
-
-      // 执行实际上传
-      const uploadResponse = await ossConfig.client.put(fileName, jsonBlob, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      resolve({
-        fileUrl: `${ossConfig.fullPath}/${safeFileName}`,
-        fileSize: jsonBlob.size,
-      });
-    } catch (err) {
-      console.error('上传编辑器JSON失败:', err);
-      reject(err);
-    }
-  });
+  return {
+    fileUrl: response.result.url,
+    fileSize: response.result.size,
+  }
 };
 
 export const uploadStaticImage = (file: File): Promise<AddArtifactParam> => {
@@ -296,10 +274,10 @@ export const uploadStaticImage = (file: File): Promise<AddArtifactParam> => {
       resolve({
         fileUrl: coverUploadRes.fileUrl,
         fileSize: coverUploadRes.fileSize,
-        binFileUrl: binUploadRes.fileUrl,
-        binSize: binUploadRes.fileSize,
+        // binFileUrl: binUploadRes.fileUrl,
+        // binSize: binUploadRes.fileSize,
         cover: pngUploadRes.fileUrl,
-        type: AllowedArtifactTypes.IMAGE,
+        // type: AllowedArtifactTypes.IMAGE,
       });
     } catch (error) {
       reject(error);
@@ -363,42 +341,31 @@ export const uploadStaticImageWithJson = async (
   });
 };
 
-export const uploadDoodle = (colors: Array<string | null>): Promise<any> => {
-  // alert('uploadDoodle');
-  // const { t } = useAppI18n()
-  console.log('上传涂鸦colors is', colors[0]);
-  // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve, reject) => {
-    try {
-      // 空像素统一保留为 null；PNG 会将其输出为完全透明像素。
-      const normalizedColors = Array.from(
-        { length: WIDTH * HEIGHT },
-        (_, index) => colors[index] || null
-      );
-      const jsonBlob = colorsToJsonBlob(normalizedColors);
-      const jsonFileUpload = await uploadFile(jsonBlob, doodleJsonFileName, 'STATIC_BIN');
-      const doodleImgBlob = await convertHexArrayToPng(
-        normalizedColors,
-        defaultImageSize.width,
-        defaultImageSize.height
-      );
-      const pngFileUpload = await uploadFile(doodleImgBlob, doodleImgFileName, 'STATIC_BIN');
-      const colorBlob = colorsToBlob(normalizedColors);
-      const binFileUpload = await uploadFile(colorBlob, binFileName, 'STATIC_BIN');
+export const uploadDoodle = async (colors: Array<string | null>): Promise<AddArtifactParam> => {
+  // 空像素统一保留为 null；PNG 会将其输出为完全透明像素。
+  const normalizedColors = Array.from(
+    { length: WIDTH * HEIGHT },
+    (_, index) => colors[index] || null
+  )
 
-      resolve({
-        fileUrl: jsonFileUpload.fileUrl,
-        fileSize: jsonFileUpload.fileSize,
-        binFileUrl: binFileUpload.fileUrl,
-        binSize: binFileUpload.fileSize,
-        cover: pngFileUpload.fileUrl
-        // type: AllowedArtifactTypes.DOODLE,
-      });
-    } catch (err) {
-      console.error('上传涂鸦失败:', err);
-      reject(err);
-    }
-  });
+  const jsonFileUpload = await uploadeditorJson(normalizedColors, doodleJsonFileName, 'EDITABLE_JSON')
+  const doodleImgBlob = await convertHexArrayToPng(
+    normalizedColors,
+    defaultImageSize.width,
+    defaultImageSize.height
+  )
+  const pngFileUpload = await uploadFile(doodleImgBlob, doodleImgFileName, 'STATIC_BIN')
+  const colorBlob = colorsToBlob(normalizedColors)
+  const binFileUpload = await uploadFile(colorBlob, binFileName, 'STATIC_BIN')
+
+  return {
+    fileUrl: jsonFileUpload.fileUrl,
+    fileSize: jsonFileUpload.fileSize,
+    // binFileUrl: binFileUpload.fileUrl,
+    // binSize: binFileUpload.fileSize,
+    cover: pngFileUpload.fileUrl,
+    type: AllowedArtifactTypes.DOODLE,
+  }
 };
 
 export const uploadGif = (file: Blob | File): Promise<AddArtifactParam> => {

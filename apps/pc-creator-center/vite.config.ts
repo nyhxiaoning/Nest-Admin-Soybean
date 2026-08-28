@@ -12,10 +12,6 @@ export default defineConfig(({ mode }) => {
   // 加载当前 mode 对应的环境变量
   const env = loadEnv(mode, process.cwd(), '')
 
-
-    console.log(env?.VITE_APP_ENV)
-  console.log(env?.VITE_APP_ENV)
-
   function useInspector() {
 
     if (env?.VITE_APP_ENV === 'development') {
@@ -23,8 +19,6 @@ export default defineConfig(({ mode }) => {
     }
 
   }
-
-  console.log('VITE_APP_ENV:', env?.VITE_APP_ENV)
 
   return {
     base: './',
@@ -62,13 +56,10 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3036,
       open: true,
-      // 👇 多环境动态代理（统一格式）
       proxy: {
-        '/creator': {
-          // target: env.VITE_API_URL.replace(/\/api$/, ''),
-          target: env.VITE_API_URL_NEW,
+        '/api': {
+          target: env.VITE_API_PROXY_TARGET,
           changeOrigin: true,
-          // rewrite: (path) => path.replace(/^\/creator/, ''),
         },
       },
     },

@@ -234,6 +234,55 @@ export function getUploadTokenApi(data: CreatorUploadTokenRequest) {
   })
 }
 
+
+/**
+ * 新增两个上传接口
+*/
+
+/**
+ * 上传json配置文件
+ * POST /api/creator/uploads/json
+ */
+export interface CreatorJsonUploadResponse {
+  fileId: string
+  url: string
+  contentType: "application/json"
+  size: number
+  expiresAt: number
+}
+
+export function uploadsfileJson(data: unknown) {
+  return request<CreatorJsonUploadResponse>({
+    url: "/creator/uploads/json",
+    method: "post",
+    data,
+  })
+}
+
+/**
+ * 上传图片文件后，返回一个图片地址
+ * POST /api/creator/uploads/images
+ */
+export interface CreatorImageUploadResponse {
+  fileId: string
+  url: string
+  originalName: string
+  contentType: string
+  size: number
+  expiresAt: number
+}
+
+export function uploadsImage(file: Blob, fileName: string) {
+  const data = new FormData()
+  data.append("file", file, fileName)
+
+  return request<CreatorImageUploadResponse>({
+    url: "/creator/uploads/images",
+    method: "post",
+    data,
+  })
+}
+
 // ==================== 发布管理接口 ====================
 
 /**
