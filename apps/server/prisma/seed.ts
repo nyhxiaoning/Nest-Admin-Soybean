@@ -8,6 +8,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { DEFAULT_CREATOR_WORK_TAGS } from '../src/module/creator/works/constants/creator-work-tag.defaults';
 
 const prisma = new PrismaClient();
 
@@ -4700,17 +4701,11 @@ async function main() {
   });
 
   // PC Creator Center 作品发布标签（幂等）
-  const creatorWorkTags = [
-    { tagCode: 'ORIGINAL', name: '原创作品', sortOrder: 10 },
-    { tagCode: 'ANIMATION', name: '动态作品', sortOrder: 20 },
-    { tagCode: 'STATIC', name: '静态作品', sortOrder: 30 },
-    { tagCode: 'OTHER', name: '其他', sortOrder: 40 },
-  ];
-  for (const tag of creatorWorkTags) {
+  for (const tag of DEFAULT_CREATOR_WORK_TAGS) {
     await prisma.creatorWorkTag.upsert({
       where: { tagCode: tag.tagCode },
-      update: { name: tag.name, sortOrder: tag.sortOrder, enabled: true },
-      create: { ...tag, enabled: true },
+      update: {},
+      create: { ...tag },
     });
   }
 
