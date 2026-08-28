@@ -1916,10 +1916,14 @@ async function loadWorkForEdit(workId: string): Promise<void> {
 
 // 从 URL 加载 JSON 数据
 async function fetchJsonFromUrl<T>(url: string): Promise<T> {
-  const response = await fetch(url)
+  const parsedUrl = new URL(url, window.location.origin)
+  const requestUrl = import.meta.env.DEV ? `${parsedUrl.pathname}${parsedUrl.search}` : parsedUrl.href
+  const response = await fetch(requestUrl)
+
   if (!response.ok) {
     throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`)
   }
+
   return response.json()
 }
 
