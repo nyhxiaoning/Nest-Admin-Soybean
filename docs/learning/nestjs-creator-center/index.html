@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NestJS Creator Center：认证、中间件与上传</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #172033;
+        --muted: #62708a;
+        --line: #dce3ef;
+        --paper: #f6f8fc;
+        --card: #ffffff;
+        --nav: #111827;
+        --primary: #2563eb;
+        --primary-soft: #e8f0ff;
+        --green: #16805d;
+        --green-soft: #e5f7f0;
+        --amber: #a45a06;
+        --amber-soft: #fff2dc;
+        --red: #b42318;
+        --red-soft: #ffebe9;
+        --purple: #6d43c0;
+        --purple-soft: #f0eaff;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body { margin: 0; color: var(--ink); background: var(--paper); }
+      button, textarea { font: inherit; }
+      button { cursor: pointer; }
+      a { color: var(--primary); text-underline-offset: 3px; }
+      code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+      code { color: #174291; }
+      h1, h2, h3 { letter-spacing: -0.02em; }
+      h1 { margin: 0 0 12px; font-size: clamp(28px, 4vw, 48px); line-height: 1.08; }
+      h2 { margin: 0 0 14px; font-size: clamp(23px, 3vw, 34px); }
+      h3 { margin: 0 0 9px; font-size: 18px; }
+      p { line-height: 1.75; }
+
+      .app { min-height: 100vh; display: grid; grid-template-columns: 250px minmax(0, 1fr); }
+      .sidebar {
+        position: sticky; top: 0; height: 100vh; padding: 28px 20px; color: #e5e7eb; background: var(--nav);
+        display: flex; flex-direction: column; gap: 24px;
+      }
+      .brand { font-weight: 760; color: #fff; line-height: 1.35; }
+      .brand small { display: block; margin-top: 7px; color: #9ca3af; font-weight: 500; }
+      .nav { display: grid; gap: 7px; }
+      .nav button {
+        width: 100%; border: 0; border-radius: 9px; padding: 10px 12px; color: #cbd5e1; background: transparent;
+        text-align: left;
+      }
+      .nav button:hover, .nav button.active { color: #fff; background: #263247; }
+      .sidebar-note { margin-top: auto; color: #9ca3af; font-size: 13px; line-height: 1.6; }
+      .main { min-width: 0; }
+      .hero {
+        padding: clamp(42px, 8vw, 90px) clamp(24px, 7vw, 90px); color: #fff;
+        background: radial-gradient(circle at 85% 15%, #315fc6 0, transparent 32%), linear-gradient(135deg, #15213c, #1f3b73);
+      }
+      .eyebrow { margin-bottom: 14px; color: #b9d2ff; font-size: 13px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+      .hero p { max-width: 760px; margin: 0; color: #dbe8ff; font-size: 17px; }
+      .hero-truth { margin-top: 24px; padding: 16px 18px; border-left: 4px solid #7fb0ff; background: rgba(255,255,255,.08); max-width: 820px; line-height: 1.7; }
+      .content { padding: 30px clamp(18px, 5vw, 70px) 80px; }
+      .lesson { display: none; max-width: 1100px; margin: 0 auto; animation: enter .22s ease; }
+      .lesson.active { display: block; }
+      @keyframes enter { from { opacity: 0; transform: translateY(5px); } }
+      .lead { max-width: 850px; color: var(--muted); font-size: 17px; }
+      .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 22px 0; }
+      .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .card { padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); box-shadow: 0 7px 24px rgba(31, 43, 68, .05); }
+      .card p:last-child { margin-bottom: 0; }
+      .label { display: inline-block; margin-bottom: 9px; padding: 4px 8px; border-radius: 6px; color: var(--primary); background: var(--primary-soft); font-size: 12px; font-weight: 750; }
+      .label.green { color: var(--green); background: var(--green-soft); }
+      .label.amber { color: var(--amber); background: var(--amber-soft); }
+      .label.purple { color: var(--purple); background: var(--purple-soft); }
+      .callout { margin: 22px 0; padding: 16px 18px; border-left: 4px solid var(--amber); background: var(--amber-soft); line-height: 1.75; }
+      .callout.danger { border-color: var(--red); background: var(--red-soft); }
+      .callout.success { border-color: var(--green); background: var(--green-soft); }
+      .source { margin-top: 12px; font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+      .source a { color: inherit; }
+
+      .pipeline { display: flex; align-items: stretch; gap: 7px; margin: 24px 0 16px; overflow-x: auto; padding-bottom: 5px; }
+      .pipe-step {
+        min-width: 124px; padding: 12px 10px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); background: var(--card);
+      }
+      .pipe-step.active { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+      .arrow { align-self: center; color: #93a0b5; font-weight: 800; }
+      .step-detail { min-height: 145px; padding: 20px; border-radius: 14px; color: #e8efff; background: #17223a; }
+      .step-detail h3 { color: #fff; }
+      .step-detail p { margin-bottom: 0; color: #cbd8f0; }
+      .step-actions { display: flex; gap: 8px; margin-top: 12px; }
+      .button { border: 1px solid var(--line); border-radius: 8px; padding: 9px 13px; color: var(--ink); background: var(--card); }
+      .button.primary { border-color: var(--primary); color: #fff; background: var(--primary); }
+
+      .flow { margin: 22px 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+      .flow-line { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding: 7px 0; }
+      .flow-node { min-width: 132px; padding: 10px 12px; border-radius: 9px; background: var(--primary-soft); text-align: center; font-size: 13px; font-weight: 700; }
+      .flow-node.security { background: var(--purple-soft); color: var(--purple); }
+      .flow-node.data { background: var(--green-soft); color: var(--green); }
+      .flow-node.io { background: var(--amber-soft); color: var(--amber); }
+      .flow-arrow { color: #8793a8; }
+      .table-wrap { margin: 20px 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+      table { width: 100%; border-collapse: collapse; background: var(--card); }
+      th, td { padding: 13px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; line-height: 1.55; }
+      th { color: #34415a; background: #edf2fa; font-size: 13px; }
+      tr:last-child td { border-bottom: 0; }
+      pre { margin: 16px 0; padding: 17px; overflow: auto; border-radius: 12px; color: #dbe8ff; background: #111a2c; font-size: 13px; line-height: 1.65; }
+      pre code { color: inherit; }
+      .path { display: block; margin: 7px 0; font-family: "SFMono-Regular", Consolas, monospace; font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+
+      .feynman { margin: 24px 0; padding: 20px; border: 2px dashed #a9b6ca; border-radius: 14px; background: #fbfcff; }
+      .feynman textarea { width: 100%; min-height: 110px; resize: vertical; padding: 12px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background: #fff; }
+      details { margin-top: 12px; }
+      summary { cursor: pointer; color: var(--primary); font-weight: 700; }
+      .quiz { margin: 18px 0; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+      .answers { display: grid; gap: 8px; margin-top: 12px; }
+      .answer { border: 1px solid var(--line); border-radius: 9px; padding: 11px 12px; background: #fff; text-align: left; }
+      .answer:hover { border-color: #8aaef4; }
+      .answer.correct { border-color: var(--green); color: var(--green); background: var(--green-soft); }
+      .answer.wrong { border-color: var(--red); color: var(--red); background: var(--red-soft); }
+      .feedback { min-height: 24px; margin-top: 10px; color: var(--muted); line-height: 1.6; }
+      .checklist { display: grid; gap: 10px; margin: 18px 0; }
+      .checklist label { padding: 12px 14px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); }
+      .footer { max-width: 1100px; margin: 55px auto 0; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+
+      @media (max-width: 880px) {
+        .app { grid-template-columns: 1fr; }
+        .sidebar { position: static; height: auto; padding: 16px; }
+        .nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .nav button { text-align: center; font-size: 12px; padding: 9px 5px; }
+        .sidebar-note { display: none; }
+        .hero { padding: 38px 22px; }
+        .content { padding: 25px 16px 60px; }
+        .grid, .grid.three { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 480px) {
+        .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .card, .flow, .quiz, .feynman { padding: 16px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">NestJS Creator Center<small>费曼式 0→1 学习路径</small></div>
+        <nav class="nav" aria-label="课程章节">
+          <button class="active" data-lesson="map">01 全景地图</button>
+          <button data-lesson="lifecycle">02 请求生命周期</button>
+          <button data-lesson="auth">03 Auth 鉴权</button>
+          <button data-lesson="middleware">04 Middleware</button>
+          <button data-lesson="upload">05 上传模块</button>
+          <button data-lesson="build">06 从零实现</button>
+          <button data-lesson="quiz">07 费曼检验</button>
+        </nav>
+        <div class="sidebar-note">学习规则：先尝试用自己的话解释，再展开参考答案。不会复述，就还没有真正掌握。</div>
+      </aside>
+
+      <main class="main">
+        <header class="hero">
+          <div class="eyebrow">Repository-grounded learning</div>
+          <h1>认证不是一个 Guard，上传也不是一个 Controller</h1>
+          <p>你要学的是一次请求如何穿过 NestJS 的各层，以及每一层为什么存在。所有讲解都映射到当前 Creator Center 代码。</p>
+          <div class="hero-truth"><strong>一句话模型：</strong>Middleware 整理“所有来访者”的请求；Guard 决定“这个人能不能进”；Interceptor 包围执行过程；Pipe 检查“带来的数据”；Controller 接单；Service 做业务；Storage/Repository 接触外部世界。</div>
+        </header>
+
+        <div class="content">
+          <section id="map" class="lesson active">
+            <h2>01｜先看全景：把 NestJS 想成一栋办公楼</h2>
+            <p class="lead">费曼法第一步不是背装饰器，而是把抽象概念压缩成你能讲给别人听的模型。</p>
+            <div class="grid three">
+              <article class="card"><span class="label">Module</span><h3>楼层与配线图</h3><p>声明这个业务区有哪些 Controller、Provider，以及需要从其他模块借哪些能力。它负责“装配”，不负责业务。</p></article>
+              <article class="card"><span class="label green">Controller</span><h3>前台接待</h3><p>理解 HTTP：路径、方法、Body、文件和响应。它把工作交给 Service，不应该堆复杂业务。</p></article>
+              <article class="card"><span class="label purple">Provider / Service</span><h3>真正办事的人</h3><p>通过依赖注入获得数据库、Redis、JWT 或 Storage，完成登录、校验和文件保存。</p></article>
+              <article class="card"><span class="label amber">Middleware</span><h3>大楼入口设施</h3><p>路由处理之前运行，适合解析请求体、限流、压缩、Cookie、请求 IP。它通常不知道最终 Controller 的业务语义。</p></article>
+              <article class="card"><span class="label">Guard</span><h3>门禁</h3><p>知道当前 Controller/Handler，返回能否继续。Creator JWT 校验放在这里，而不是 Middleware。</p></article>
+              <article class="card"><span class="label green">Interceptor</span><h3>执行传送带</h3><p>包住 Controller 的前后阶段。文件上传的 <code>FileInterceptor</code> 在进入方法前把 multipart 解析成 Multer File。</p></article>
+            </div>
+            <div class="callout"><strong>当前项目最容易误解的点：</strong><code>@NotRequireAuth()</code> 不是“此接口不鉴权”。它只让后台管理端的全局 <code>JwtAuthGuard</code> 放行；Creator Controller 随后用自己的 <code>CreatorJwtGuard</code> 鉴权。</div>
+            <div class="flow">
+              <h3>模块依赖关系</h3>
+              <div class="flow-line"><div class="flow-node">AppModule</div><span class="flow-arrow">→</span><div class="flow-node">CreatorModule</div><span class="flow-arrow">→</span><div class="flow-node">CreatorWorksModule</div><span class="flow-arrow">→</span><div class="flow-node data">CreatorStorageModule</div><span class="flow-arrow">→</span><div class="flow-node security">CreatorAuthModule</div></div>
+            </div>
+            <p class="source">源码：<a href="../../../apps/server/src/module/creator/creator.module.ts">creator.module.ts</a> · <a href="../../../apps/server/src/module/creator/storage/creator-storage.module.ts">creator-storage.module.ts</a></p>
+            <div class="feynman"><h3>复述 1</h3><p>假设你要向一个没学过 NestJS 的同事解释：为什么 Module 不是 Service？请用两句话写下来。</p><textarea aria-label="复述 Module 与 Service 的区别"></textarea><details><summary>展开参考解释</summary><p>Module 像装配清单，告诉 Nest 哪些对象要创建、如何互相可见；Service 是被创建出来执行具体业务的对象。Module 不接请求也不操作数据。</p></details></div>
+          </section>
+
+          <section id="lifecycle" class="lesson">
+            <h2>02｜一条请求到底先经过谁？</h2>
+            <p class="lead">点击每一步。只有能说清顺序，你才知道代码应该放到哪里。</p>
+            <div class="pipeline" id="pipeline" aria-label="NestJS 请求生命周期"></div>
+            <div class="step-detail" id="step-detail" aria-live="polite"></div>
+            <div class="step-actions"><button class="button" id="previous-step">上一步</button><button class="button primary" id="next-step">下一步</button></div>
+            <div class="callout success"><strong>核心顺序：</strong>Middleware → Guard → Interceptor（前）→ Pipe → Controller/Service → Interceptor（后）→ Exception Filter（发生异常时）。</div>
+            <div class="grid">
+              <article class="card"><h3>当前 Creator 图片请求</h3><p><code>rateLimit/compression/helmet</code> → 全局 Guards → <code>CreatorJwtGuard</code> → <code>FileInterceptor</code> → <code>@UploadedFile()</code> → UploadService → Storage。</p></article>
+              <article class="card"><h3>当前 Creator JSON 请求</h3><p>专用 20 MiB JSON Parser → 通用中间件 → Guards → Validation/Controller → <code>CreatorJsonStorage.store()</code>。</p></article>
+            </div>
+            <p class="source">装配位置：<a href="../../../apps/server/src/main.ts">main.ts</a> · <a href="../../../apps/server/src/app.module.ts">app.module.ts</a></p>
+            <div class="feynman"><h3>复述 2</h3><p>为什么“验证用户是否登录”更适合 Guard，而不是 Middleware？</p><textarea aria-label="复述 Guard 与 Middleware"></textarea><details><summary>展开参考解释</summary><p>Guard 能读取 ExecutionContext，知道当前 Controller、Handler 和装饰器元数据，因此能根据路由语义决定是否放行；Middleware 更靠近底层 HTTP，适合通用预处理，不适合表达路由权限策略。</p></details></div>
+          </section>
+
+          <section id="auth" class="lesson">
+            <h2>03｜Auth：JWT 是门票，Redis Session 是在场名单</h2>
+            <p class="lead">当前 Creator Auth 不是“只验 JWT”。它同时验证签名门票、服务端 Session 和数据库账号状态。</p>
+            <h3>登录链路</h3>
+            <div class="flow"><div class="flow-line"><div class="flow-node">POST /auth/login</div><span class="flow-arrow">→</span><div class="flow-node data">DTO + ValidationPipe</div><span class="flow-arrow">→</span><div class="flow-node">验证码或密码</div><span class="flow-arrow">→</span><div class="flow-node data">Prisma CreatorUser</div><span class="flow-arrow">→</span><div class="flow-node security">签发 JWT</div><span class="flow-arrow">→</span><div class="flow-node security">保存 Redis Session</div></div></div>
+            <div class="table-wrap"><table><thead><tr><th>材料</th><th>里面有什么</th><th>解决什么问题</th><th>失效方式</th></tr></thead><tbody><tr><td>JWT</td><td><code>sub</code>、<code>uuid</code>、<code>subjectType</code>、过期时间</td><td>证明 Token 由服务器签发且未被篡改</td><td>到期或签名错误</td></tr><tr><td>Redis Session</td><td>Creator 的 id、phone、name、sessionUuid</td><td>让服务器主动控制登录是否仍有效</td><td>退出登录删除、TTL 到期</td></tr><tr><td>数据库状态</td><td><code>creatorUser.status</code></td><td>账号被停用后立刻拒绝访问</td><td>状态不是 ACTIVE</td></tr></tbody></table></div>
+            <h3>受保护接口链路</h3>
+            <div class="flow"><div class="flow-line"><div class="flow-node">Authorization: Bearer</div><span class="flow-arrow">→</span><div class="flow-node security">verifyAsync</div><span class="flow-arrow">→</span><div class="flow-node security">subjectType</div><span class="flow-arrow">→</span><div class="flow-node security">Redis Session</div><span class="flow-arrow">→</span><div class="flow-node data">账号 ACTIVE</div><span class="flow-arrow">→</span><div class="flow-node">request.creatorUser</div><span class="flow-arrow">→</span><div class="flow-node">@CreatorUser()</div></div></div>
+            <div class="grid">
+              <article class="card"><span class="label purple">隔离后台 Token</span><p><code>subjectType === 'pc-creator-center'</code> 防止后台管理端 JWT 被 Creator 接口误接受。</p></article>
+              <article class="card"><span class="label green">主动注销</span><p>Logout 删除 Redis Session。即使 JWT 还没到期，下一次 Guard 也会拒绝。</p></article>
+              <article class="card"><span class="label amber">验证码防爆破</span><p>验证码 5 分钟、60 秒冷却、最多 5 次错误；密码连续失败会锁 15 分钟。</p></article>
+              <article class="card"><span class="label">请求用户</span><p>Guard 写入 <code>request.creatorUser</code>，参数装饰器只负责读取，不再次鉴权。</p></article>
+            </div>
+            <pre><code>// Controller 只声明“这扇门需要 Creator 门禁”
+@UseGuards(CreatorJwtGuard)
+async upload(@CreatorUser() session: CreatorSession) {
+  return this.service.doSomething(session.id)
+}</code></pre>
+            <p class="source">源码：<a href="../../../apps/server/src/module/creator/auth/services/creator-auth.service.ts">creator-auth.service.ts</a> · <a href="../../../apps/server/src/module/creator/common/guards/creator-jwt.guard.ts">creator-jwt.guard.ts</a> · <a href="../../../apps/server/src/module/creator/common/decorators/creator-user.decorator.ts">creator-user.decorator.ts</a></p>
+            <div class="callout danger"><strong>不要这样做：</strong>把密钥写入源码、把完整用户对象塞进 JWT、只解码不验签、只信 JWT 不检查服务端撤销能力、在日志中打印 Token。</div>
+          </section>
+
+          <section id="middleware" class="lesson">
+            <h2>04｜Middleware：先处理 HTTP，再谈业务</h2>
+            <p class="lead">当前 AppModule 的 <code>configure()</code> 没有注册 HTTP Middleware；主要中间件通过 <code>main.ts</code> 的 <code>app.use()</code> 安装。租户 middleware 是 Prisma 数据库中间件，不是 HTTP 中间件。</p>
+            <div class="table-wrap"><table><thead><tr><th>需求</th><th>应该放哪里</th><th>原因</th></tr></thead><tbody><tr><td>JSON Body 最大 20 MiB</td><td>Middleware / body parser</td><td>Controller 执行前必须先把字节解析为对象</td></tr><tr><td>当前用户是否登录</td><td>Guard</td><td>需要路由元数据和明确的放行/拒绝语义</td></tr><tr><td>手机号格式</td><td>DTO + Pipe</td><td>这是输入契约验证</td></tr><tr><td>multipart 文件解析</td><td>Interceptor</td><td>围绕 Handler，把流转换为 <code>Express.Multer.File</code></td></tr><tr><td>统一响应结构</td><td>Interceptor</td><td>在 Controller 返回后包装结果</td></tr><tr><td>业务异常转 HTTP 响应</td><td>Exception Filter</td><td>集中处理抛出的异常</td></tr></tbody></table></div>
+            <h3>为什么 JSON 上传必须先注册专用 parser？</h3>
+            <pre><code>// bodyParser: false 后，顺序由项目自己控制
+app.use('/api/creator/uploads/json', json({ limit: '20mb' }))
+app.use(json({ limit: '100kb' }))</code></pre>
+            <p>Express 按注册顺序处理。Creator JSON 路径先命中 20 MiB 解析器；普通接口仍受 100 KiB 边界保护。如果把通用 parser 放前面，大 JSON 会在到达 Controller 前直接失败。</p>
+            <h3>从零写一个 Nest Middleware</h3>
+            <pre><code>@Injectable()
+export class RequestContextMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    req.requestId ||= randomUUID()
+    next() // 不调用就不会继续
+  }
+}
+
+export class FeatureModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestContextMiddleware).forRoutes('creator')
+  }
+}</code></pre>
+            <div class="callout"><strong>判断口诀：</strong>“所有请求先整理”用 Middleware；“这扇门能不能进”用 Guard；“参数合不合法”用 Pipe；“执行前后都要插手”用 Interceptor。</div>
+            <p class="source">源码：<a href="../../../apps/server/src/main.ts">main.ts</a> · <a href="../../../apps/server/src/app.module.ts">app.module.ts</a></p>
+          </section>
+
+          <section id="upload" class="lesson">
+            <h2>05｜上传模块其实有三条完全不同的路</h2>
+            <p class="lead">“上传”只是用户看到的动作，服务器内部可能是 multipart、本地 JSON，或浏览器直传 OSS。三条路的数据流不同。</p>
+            <article class="card"><span class="label">A. 图片暂存：文件经过 Nest</span><div class="flow-line"><div class="flow-node">FormData(file)</div><span class="flow-arrow">→</span><div class="flow-node security">CreatorJwtGuard</div><span class="flow-arrow">→</span><div class="flow-node">FileInterceptor</div><span class="flow-arrow">→</span><div class="flow-node data">UploadService 校验</div><span class="flow-arrow">→</span><div class="flow-node io">LocalStorage.writeFile</div><span class="flow-arrow">→</span><div class="flow-node">/profile URL</div></div><p>Multer 给出内存中的 <code>buffer</code>。Service 再验证非空、<code>image/*</code> 和 10 MiB；Storage 用 Creator ID、UTC 日期和 UUID 生成不可猜冲突的路径，并用 <code>flag: 'wx'</code> 防覆盖。</p><span class="path">POST /api/creator/uploads/images</span></article>
+            <article class="card" style="margin-top:16px"><span class="label green">B. JSON 暂存：对象经过 Nest</span><div class="flow-line"><div class="flow-node">application/json</div><span class="flow-arrow">→</span><div class="flow-node">20 MiB Parser</div><span class="flow-arrow">→</span><div class="flow-node security">CreatorJwtGuard</div><span class="flow-arrow">→</span><div class="flow-node data">JSON.stringify</div><span class="flow-arrow">→</span><div class="flow-node io">写入 .json</div></div><p>这里没有 Multer。Body Parser 先产生对象，Storage 再序列化并按真实字节数检查 20 MiB，保存到 Creator 专属目录。</p><span class="path">POST /api/creator/uploads/json</span></article>
+            <article class="card" style="margin-top:16px"><span class="label purple">C. OSS 直传：文件不经过 Nest</span><div class="flow-line"><div class="flow-node">请求 upload-token</div><span class="flow-arrow">→</span><div class="flow-node security">Guard + 角色校验</div><span class="flow-arrow">→</span><div class="flow-node security">STS 临时凭证</div><span class="flow-arrow">→</span><div class="flow-node">浏览器 ali-oss</div><span class="flow-arrow">→</span><div class="flow-node io">OSS PutObject</div></div><p>后端生成 <code>creator/{creatorId}/{role}/{date}/{uuid}</code> 前缀，STS Policy 只允许该前缀下的 <code>PutObject</code>。浏览器拿短期凭证直传，降低应用服务器带宽和内存压力。</p><span class="path">POST /api/creator/works/upload-token</span></article>
+            <div class="table-wrap"><table><thead><tr><th>比较</th><th>本地图片</th><th>本地 JSON</th><th>OSS 直传</th></tr></thead><tbody><tr><td>文件字节经过 Nest</td><td>是</td><td>是（JSON 请求体）</td><td>否</td></tr><tr><td>解析工具</td><td>Multer / FileInterceptor</td><td>Express JSON Parser</td><td>Axios + ali-oss</td></tr><tr><td>权限边界</td><td>Creator Session 决定目录</td><td>Creator Session 决定目录</td><td>STS Policy 限制对象前缀</td></tr><tr><td>适用</td><td>小图片暂存</td><td>可编辑工程 JSON</td><td>生产大文件/云存储</td></tr></tbody></table></div>
+            <div class="callout danger"><strong>安全边界：</strong><code>image/*</code> 依赖客户端 MIME，且可能包含 SVG 等主动内容；生产环境应做内容嗅探/解码验证，并把用户上传静态域与应用域隔离。返回的 <code>/profile</code> 静态资源当前不是 Guard 保护的私有下载。</div>
+            <p class="source">源码：<a href="../../../apps/server/src/module/creator/storage/controllers/creator-image-upload.controller.ts">image controller</a> · <a href="../../../apps/server/src/module/creator/storage/services/creator-image-upload.service.ts">image service</a> · <a href="../../../apps/server/src/module/creator/storage/services/local-creator-image-storage.service.ts">local storage</a> · <a href="../../../apps/server/src/module/creator/works/services/creator-work-upload.service.ts">STS upload service</a></p>
+          </section>
+
+          <section id="build" class="lesson">
+            <h2>06｜从零实现：受保护的头像上传模块</h2>
+            <p class="lead">不要先复制代码。按“契约 → 装配 → 门禁 → 业务 → 外部实现 → 测试”的顺序写，你会更清楚每层为什么存在。</p>
+            <div class="checklist">
+              <label><input type="checkbox" /> 1. 定义请求与响应 DTO：客户端必须提供什么、得到什么？</label>
+              <label><input type="checkbox" /> 2. 定义 Storage 抽象：业务只需要 <code>store(userId, file)</code>。</label>
+              <label><input type="checkbox" /> 3. 实现 LocalStorage：路径、UUID、扩展名、不可覆盖写入。</label>
+              <label><input type="checkbox" /> 4. 实现 Service：空文件、大小、类型和业务规则。</label>
+              <label><input type="checkbox" /> 5. 实现 Controller：Guard、FileInterceptor、装饰器、响应。</label>
+              <label><input type="checkbox" /> 6. Module 注册 Provider，并用 <code>useExisting</code> 绑定抽象。</label>
+              <label><input type="checkbox" /> 7. 测试非法输入、Creator 目录隔离和有效上传。</label>
+            </div>
+            <h3>推荐目录</h3>
+            <pre><code>avatar/
+├── avatar.module.ts
+├── avatar.controller.ts
+├── avatar.service.ts
+├── dto/avatar-upload.response.dto.ts
+├── interfaces/avatar-storage.interface.ts
+└── storage/local-avatar-storage.ts</code></pre>
+            <h3>最小装配骨架</h3>
+            <pre><code>@Module({
+  imports: [CreatorAuthModule],
+  controllers: [AvatarController],
+  providers: [
+    AvatarService,
+    LocalAvatarStorage,
+    { provide: AvatarStorage, useExisting: LocalAvatarStorage },
+  ],
+})
+export class AvatarModule {}
+
+@Controller('creator/avatar')
+@NotRequireAuth()
+@IgnoreTenant()
+@UseGuards(CreatorJwtGuard)
+export class AvatarController {
+  @Post()
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 2 * 1024 * 1024 } }))
+  upload(@CreatorUser() session: CreatorSession, @UploadedFile() file: Express.Multer.File) {
+    return this.avatarService.upload(session.id, file)
+  }
+}</code></pre>
+            <div class="callout success"><strong>你真正学会的标准：</strong>把 LocalAvatarStorage 换成 OSSAvatarStorage 时，Controller 和 AvatarService 不需要改；把 Creator 鉴权换掉时，文件存储实现不需要改。这就是边界清晰。</div>
+          </section>
+
+          <section id="quiz" class="lesson">
+            <h2>07｜费曼检验：不要看答案先选</h2>
+            <p class="lead">每道题都对应实际代码决策。答错不是失败，而是精确发现知识缺口。</p>
+            <div class="quiz" data-correct="1"><h3>1. 为什么 Creator Controller 同时出现 <code>@NotRequireAuth()</code> 和 <code>@UseGuards(CreatorJwtGuard)</code>？</h3><div class="answers"><button class="answer">两个装饰器互相抵消</button><button class="answer">前者跳过后台 JWT，后者启用 Creator JWT</button><button class="answer">一个用于 Swagger，一个用于运行时</button></div><div class="feedback" aria-live="polite"></div></div>
+            <div class="quiz" data-correct="2"><h3>2. 图片 multipart 字节是谁转换成 <code>Express.Multer.File</code>？</h3><div class="answers"><button class="answer">CreatorJwtGuard</button><button class="answer">ValidationPipe</button><button class="answer">FileInterceptor / Multer</button></div><div class="feedback" aria-live="polite"></div></div>
+            <div class="quiz" data-correct="0"><h3>3. Logout 后 JWT 还没过期，为什么也不能继续访问？</h3><div class="answers"><button class="answer">Redis Session 已删除</button><button class="answer">浏览器自动修改了 JWT 签名</button><button class="answer">Prisma 删除了 CreatorUser</button></div><div class="feedback" aria-live="polite"></div></div>
+            <div class="quiz" data-correct="1"><h3>4. 哪个需求最适合 Middleware？</h3><div class="answers"><button class="answer">只有管理员能删除作品</button><button class="answer">为一类路由设置不同 JSON Body 大小</button><button class="answer">检查上传图片是不是 image/*</button></div><div class="feedback" aria-live="polite"></div></div>
+            <div class="quiz" data-correct="2"><h3>5. OSS 直传为什么比后端中转更适合大文件？</h3><div class="answers"><button class="answer">因为不需要鉴权</button><button class="answer">因为临时凭证拥有整个 Bucket 权限</button><button class="answer">文件不经过应用服务器，凭证又被前缀和时间限制</button></div><div class="feedback" aria-live="polite"></div></div>
+            <div class="feynman"><h3>最终复述</h3><p>请不用“框架就是这样规定的”这句话，向一个前端同事解释：登录后上传一张图片，从 Axios 到磁盘一共发生了什么？</p><textarea aria-label="最终费曼复述"></textarea><details><summary>检查是否覆盖关键节点</summary><p>你的解释应包含：Pinia Token → Axios Authorization → 全局后台 Guard 跳过 → CreatorJwtGuard 验 JWT/Redis/账号 → FileInterceptor/Multer → UploadedFile → Service 校验 → Storage 按 Creator ID 写入 → 返回静态 URL。能解释每一步的责任，就达到了第一阶段目标。</p></details></div>
+          </section>
+
+          <footer class="footer">资料依据：当前 Nest-Admin-Soybean checkout（2026-08-29）与 NestJS 官方文档。下一轮学习应从你的费曼复述中选择最薄弱的一环。</footer>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const navButtons = [...document.querySelectorAll('.nav button')]
+      const lessons = [...document.querySelectorAll('.lesson')]
+
+      function showLesson(id) {
+        lessons.forEach((lesson) => lesson.classList.toggle('active', lesson.id === id))
+        navButtons.forEach((button) => button.classList.toggle('active', button.dataset.lesson === id))
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+
+      navButtons.forEach((button) => button.addEventListener('click', () => showLesson(button.dataset.lesson)))
+
+      const lifecycleSteps = [
+        { name: 'Middleware', title: '1. 通用 HTTP 预处理', text: '最先接触请求。当前项目在 main.ts 中完成 JSON 解析、限流、压缩、Helmet、Cookie 和请求 IP 等工作。' },
+        { name: 'Guard', title: '2. 判断能否进入', text: '读取 ExecutionContext 和路由元数据。全局后台 Guards 先运行，CreatorJwtGuard 再验证 Creator Token、Redis Session 与账号状态。' },
+        { name: 'Interceptor 前', title: '3. 包围 Handler 的前半段', text: '可以计时、转换上下文或解析文件。Creator 图片的 FileInterceptor 在这里调用 Multer，生成 UploadedFile。' },
+        { name: 'Pipe', title: '4. 验证与转换参数', text: '全局 ValidationPipe 根据 DTO 装饰器验证 Body，并拒绝契约之外的字段；ParseUUIDPipe 验证路径 ID。' },
+        { name: 'Controller', title: '5. HTTP 接单', text: '把 Session、DTO 或文件交给 Service。Controller 应保持薄，不直接实现密码、Redis 或文件路径逻辑。' },
+        { name: 'Service', title: '6. 执行业务规则', text: '认证 Service 验证登录方式并创建 Session；Upload Service 检查类型、大小并调用 Storage。' },
+        { name: 'Interceptor 后', title: '7. 包装返回值', text: 'Observable 返回时按相反方向经过 Interceptor。项目的 ResponseInterceptor、MetricsInterceptor 会在这一层处理响应。' },
+        { name: 'Filter', title: '8. 异常出口', text: '任一步骤抛出异常时，GlobalExceptionFilter 把它转换为统一 HTTP 错误响应。成功请求不会凭空进入异常 Filter。' },
+      ]
+      const pipeline = document.getElementById('pipeline')
+      const detail = document.getElementById('step-detail')
+      let currentStep = 0
+
+      lifecycleSteps.forEach((step, index) => {
+        const button = document.createElement('button')
+        button.className = 'pipe-step'
+        button.textContent = step.name
+        button.addEventListener('click', () => renderStep(index))
+        pipeline.appendChild(button)
+        if (index < lifecycleSteps.length - 1) {
+          const arrow = document.createElement('span')
+          arrow.className = 'arrow'
+          arrow.textContent = '→'
+          pipeline.appendChild(arrow)
+        }
+      })
+
+      function renderStep(index) {
+        currentStep = (index + lifecycleSteps.length) % lifecycleSteps.length
+        const step = lifecycleSteps[currentStep]
+        document.querySelectorAll('.pipe-step').forEach((button, buttonIndex) => button.classList.toggle('active', buttonIndex === currentStep))
+        detail.innerHTML = `<h3>${step.title}</h3><p>${step.text}</p>`
+      }
+
+      document.getElementById('previous-step').addEventListener('click', () => renderStep(currentStep - 1))
+      document.getElementById('next-step').addEventListener('click', () => renderStep(currentStep + 1))
+      renderStep(0)
+
+      document.querySelectorAll('.quiz').forEach((quiz) => {
+        const correct = Number(quiz.dataset.correct)
+        const feedback = quiz.querySelector('.feedback')
+        quiz.querySelectorAll('.answer').forEach((answer, index) => {
+          answer.addEventListener('click', () => {
+            quiz.querySelectorAll('.answer').forEach((item) => item.classList.remove('correct', 'wrong'))
+            if (index === correct) {
+              answer.classList.add('correct')
+              feedback.textContent = '正确。请再用自己的话说出“为什么”，不要只记住选项。'
+            } else {
+              answer.classList.add('wrong')
+              quiz.querySelectorAll('.answer')[correct].classList.add('correct')
+              feedback.textContent = '这里暴露了一个知识缺口。回到对应章节，再解释一次各层职责。'
+            }
+          })
+        })
+      })
+    </script>
+  </body>
+</html>

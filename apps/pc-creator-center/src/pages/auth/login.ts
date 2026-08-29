@@ -171,7 +171,7 @@ export default defineComponent({
       // alert(JSON.stringify(account))
       try {
         let res = await sendLoginCodeApi(account)
-        // alert(JSON.stringify(res))
+        alert(JSON.stringify(res?.data))
         // 验证码倒计时
         startCountdown()
         ElMessage.success(t("common.pxm_login_code_sent"))
