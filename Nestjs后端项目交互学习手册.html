@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Nest-Admin-Soybean 后端项目交互学习手册" />
+  <title>NestJS 后端项目交互学习手册</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f6f8;
+      --surface: #ffffff;
+      --surface-2: #eef3f4;
+      --text: #14212b;
+      --muted: #64737e;
+      --line: #d9e2e6;
+      --brand: #087f73;
+      --brand-2: #0b615b;
+      --accent: #f29d49;
+      --danger: #c94f4f;
+      --success: #26805f;
+      --code: #112c32;
+      --code-text: #dff6f2;
+      --shadow: 0 14px 40px rgba(26, 51, 59, 0.09);
+      --radius: 18px;
+      --header-h: 72px;
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0d171b;
+      --surface: #142328;
+      --surface-2: #1a2d33;
+      --text: #e9f2f2;
+      --muted: #9bb0b4;
+      --line: #294047;
+      --brand: #43c6b7;
+      --brand-2: #85e1d6;
+      --accent: #ffb76d;
+      --danger: #ff8585;
+      --success: #65d2a5;
+      --code: #071013;
+      --code-text: #dff6f2;
+      --shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--brand) 10%, transparent), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.65;
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { color: inherit; }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      height: var(--header-h);
+      display: grid;
+      grid-template-columns: minmax(220px, 300px) minmax(240px, 680px) auto;
+      align-items: center;
+      gap: 20px;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark {
+      width: 42px; height: 42px; display: grid; place-items: center; flex: 0 0 auto;
+      border-radius: 13px; color: white;
+      background: linear-gradient(145deg, var(--brand), var(--brand-2));
+      box-shadow: 0 10px 22px color-mix(in srgb, var(--brand) 25%, transparent);
+    }
+    .brand-mark svg { width: 23px; height: 23px; }
+    .brand-copy { min-width: 0; }
+    .brand-copy strong { display: block; font-size: 15px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .brand-copy span { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
+
+    .search-box { position: relative; }
+    .search-box svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+    .search-box input {
+      width: 100%; height: 42px; padding: 0 80px 0 42px;
+      border: 1px solid var(--line); border-radius: 13px; outline: none;
+      color: var(--text); background: var(--surface-2);
+    }
+    .search-box input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 13%, transparent); }
+    .search-box kbd { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); padding: 2px 7px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); background: var(--surface); font-size: 11px; }
+
+    .header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+    .icon-button, .action-button {
+      border: 1px solid var(--line); background: var(--surface); cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .icon-button:hover, .action-button:hover { transform: translateY(-1px); border-color: var(--brand); text-decoration: none; }
+    .icon-button { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; }
+    .action-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 8px 13px; border-radius: 12px; }
+    .action-button.primary { border-color: var(--brand); background: var(--brand); color: #fff; }
+    .action-button.danger { color: var(--danger); }
+    .mobile-menu { display: none; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr) 300px;
+      min-height: calc(100vh - var(--header-h));
+    }
+    .left-sidebar, .right-sidebar { position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); overflow-y: auto; }
+    .left-sidebar { padding: 22px 16px 36px; border-right: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 72%, transparent); }
+    .right-sidebar { padding: 22px 18px 36px; border-left: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 60%, transparent); }
+    .content { min-width: 0; padding: 30px clamp(20px, 4vw, 58px) 80px; }
+    .content-inner { width: min(960px, 100%); margin: 0 auto; }
+
+    .nav-label { margin: 18px 10px 8px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    .nav-list { display: grid; gap: 4px; }
+    .nav-item {
+      width: 100%; display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 8px;
+      padding: 9px 10px; border: 0; border-radius: 11px; background: transparent; text-align: left; cursor: pointer;
+    }
+    .nav-item:hover { background: var(--surface-2); }
+    .nav-item.active { color: var(--brand-2); background: color-mix(in srgb, var(--brand) 13%, var(--surface)); font-weight: 750; }
+    .nav-icon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 9px; color: var(--brand); background: var(--surface); border: 1px solid var(--line); }
+    .nav-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+    .nav-state { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+    .nav-state.learning { background: var(--accent); }
+    .nav-state.done { background: var(--success); box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 15%, transparent); }
+    .search-empty { display: none; margin: 12px; color: var(--muted); font-size: 13px; }
+
+    .hero {
+      position: relative; overflow: hidden; padding: clamp(26px, 5vw, 50px);
+      border: 1px solid var(--line); border-radius: 28px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--surface) 95%, var(--brand)), var(--surface));
+      box-shadow: var(--shadow);
+    }
+    .hero::after { content: ""; position: absolute; width: 280px; height: 280px; right: -100px; top: -130px; border-radius: 50%; background: color-mix(in srgb, var(--brand) 11%, transparent); }
+    .eyebrow { display: inline-flex; align-items: center; gap: 7px; margin-bottom: 12px; color: var(--brand); font-size: 12px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+    h1, h2, h3 { line-height: 1.25; letter-spacing: -.025em; }
+    h1 { max-width: 720px; margin: 0; font-size: clamp(30px, 5vw, 54px); }
+    .hero p { max-width: 700px; margin: 18px 0 0; color: var(--muted); font-size: clamp(15px, 2vw, 18px); }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0 34px; }
+    .stat-card, .panel, .module-card, .concept-card, .stage-card {
+      border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: 0 8px 22px rgba(22, 47, 55, .045);
+    }
+    .stat-card { padding: 18px; }
+    .stat-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 12px; }
+    .stat-value { margin-top: 8px; font-size: 27px; font-weight: 850; }
+    .progress-track { height: 7px; overflow: hidden; margin-top: 12px; border-radius: 999px; background: var(--surface-2); }
+    .progress-bar { height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--brand), #42b99c); transition: width .35s ease; }
+
+    .section { display: none; animation: sectionIn .28s ease; }
+    .section.active { display: block; }
+    @keyframes sectionIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+    .section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin: 0 0 20px; }
+    .section-heading h2 { margin: 0; font-size: clamp(25px, 4vw, 38px); }
+    .section-heading p { max-width: 700px; margin: 9px 0 0; color: var(--muted); }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; color: var(--brand-2); background: color-mix(in srgb, var(--brand) 11%, var(--surface)); font-size: 12px; font-weight: 750; white-space: nowrap; }
+    .panel { padding: 24px; margin-bottom: 18px; }
+    .panel h3 { margin: 0 0 12px; font-size: 19px; }
+    .panel > p:first-of-type { margin-top: 0; }
+
+    .architecture-flow { display: flex; align-items: stretch; gap: 8px; overflow-x: auto; padding: 8px 2px 14px; }
+    .flow-node {
+      min-width: 125px; flex: 1; padding: 15px 13px; border: 1px solid var(--line); border-radius: 14px;
+      background: var(--surface-2); cursor: pointer; text-align: center;
+    }
+    .flow-node:hover, .flow-node.active { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 10%, var(--surface)); }
+    .flow-node svg { display: block; width: 24px; height: 24px; margin: 0 auto 8px; color: var(--brand); }
+    .flow-node strong { display: block; font-size: 13px; }
+    .flow-arrow { display: grid; place-items: center; color: var(--muted); }
+    .flow-detail { min-height: 54px; padding: 13px 15px; border-left: 3px solid var(--brand); border-radius: 0 12px 12px 0; color: var(--muted); background: var(--surface-2); }
+
+    .module-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .module-card { padding: 18px; }
+    .module-head { display: flex; align-items: center; gap: 10px; }
+    .module-head .big-icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: var(--brand); background: color-mix(in srgb, var(--brand) 11%, var(--surface)); }
+    .module-card h3 { margin: 0; font-size: 16px; }
+    .module-card p { margin: 11px 0; color: var(--muted); font-size: 13px; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag { padding: 3px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 11px; }
+
+    .stage-card { overflow: hidden; }
+    .stage-banner { padding: 24px; background: linear-gradient(135deg, color-mix(in srgb, var(--brand) 13%, var(--surface)), var(--surface)); }
+    .stage-title-row { display: flex; align-items: flex-start; gap: 14px; }
+    .stage-number { width: 48px; height: 48px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 15px; color: #fff; background: var(--brand); font-size: 17px; font-weight: 900; }
+    .stage-title-row h2 { margin: 0; font-size: clamp(24px, 4vw, 34px); }
+    .stage-title-row p { margin: 7px 0 0; color: var(--muted); }
+    .stage-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .stage-body { padding: 24px; }
+    .learning-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .learning-block { padding: 18px; border-radius: 15px; background: var(--surface-2); }
+    .learning-block h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: 16px; }
+    .learning-block ul, .learning-block ol { margin: 0; padding-left: 20px; }
+    .learning-block li + li { margin-top: 7px; }
+    .path-link { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; overflow-wrap: anywhere; }
+    .checkpoint-list { display: grid; gap: 9px; margin-top: 18px; }
+    .checkpoint {
+      display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: start;
+      padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+    }
+    .checkpoint input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--brand); }
+    .checkpoint.done span { color: var(--muted); text-decoration: line-through; }
+    .callout { margin-top: 18px; padding: 16px 18px; border: 1px solid color-mix(in srgb, var(--accent) 48%, var(--line)); border-radius: 14px; background: color-mix(in srgb, var(--accent) 9%, var(--surface)); }
+    .callout strong { display: block; margin-bottom: 5px; color: color-mix(in srgb, var(--accent) 76%, var(--text)); }
+
+    .concept-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .concept-card { padding: 20px; }
+    .concept-card h3 { display: flex; align-items: center; gap: 9px; margin: 0 0 8px; }
+    .concept-card p { margin: 0; color: var(--muted); }
+    pre { overflow-x: auto; padding: 18px; border-radius: 14px; color: var(--code-text); background: var(--code); font: 12px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    .side-card { padding: 17px; margin-bottom: 14px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); }
+    .side-card h3 { margin: 0 0 12px; font-size: 14px; }
+    .current-stage { color: var(--brand-2); font-size: 16px; font-weight: 850; }
+    .status-select, .notes-area {
+      width: 100%; border: 1px solid var(--line); border-radius: 11px; outline: none; color: var(--text); background: var(--surface-2);
+    }
+    .status-select { height: 40px; padding: 0 10px; }
+    .notes-area { min-height: 180px; padding: 11px; resize: vertical; line-height: 1.55; }
+    .status-select:focus, .notes-area:focus { border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 12%, transparent); }
+    .save-state { min-height: 18px; margin-top: 7px; color: var(--muted); font-size: 11px; }
+    .side-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .side-actions .action-button { padding-inline: 8px; font-size: 12px; }
+    .legend { display: grid; gap: 7px; color: var(--muted); font-size: 12px; }
+    .legend-row { display: flex; align-items: center; gap: 8px; }
+    .legend-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
+
+    .toast {
+      position: fixed; right: 22px; bottom: 22px; z-index: 100; max-width: min(380px, calc(100vw - 44px));
+      padding: 13px 16px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); box-shadow: var(--shadow);
+      opacity: 0; transform: translateY(12px); pointer-events: none; transition: .22s ease;
+    }
+    .toast.show { opacity: 1; transform: none; }
+    .toast.error { border-color: var(--danger); }
+    .hidden { display: none !important; }
+    .backdrop { display: none; }
+
+    @media (max-width: 1180px) {
+      .layout { grid-template-columns: 230px minmax(0, 1fr); }
+      .right-sidebar { position: static; grid-column: 1 / -1; height: auto; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; border: 0; border-top: 1px solid var(--line); }
+      .right-sidebar .side-card { margin: 0; }
+      .notes-area { min-height: 110px; }
+    }
+
+    @media (max-width: 820px) {
+      :root { --header-h: 64px; }
+      .app-header { grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; padding: 0 12px; }
+      .brand-copy, .search-box kbd, .header-actions .desktop-action { display: none; }
+      .mobile-menu { display: grid; }
+      .layout { display: block; }
+      .left-sidebar { position: fixed; left: 0; top: var(--header-h); z-index: 60; width: min(300px, 86vw); height: calc(100vh - var(--header-h)); transform: translateX(-105%); transition: transform .24s ease; box-shadow: var(--shadow); background: var(--surface); }
+      body.menu-open .left-sidebar { transform: none; }
+      .backdrop { position: fixed; inset: var(--header-h) 0 0; z-index: 55; background: rgba(0,0,0,.35); }
+      body.menu-open .backdrop { display: block; }
+      .content { padding: 20px 14px 55px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .module-grid, .concept-grid, .learning-columns { grid-template-columns: 1fr; }
+      .right-sidebar { display: block; padding: 18px 14px 32px; }
+      .right-sidebar .side-card { margin-bottom: 12px; }
+      .architecture-flow { align-items: center; }
+      .flow-node { min-width: 112px; }
+      .hero { border-radius: 21px; }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .section-heading { display: block; }
+      .section-heading .pill { margin-top: 10px; }
+      .stage-title-row { display: block; }
+      .stage-number { margin-bottom: 12px; }
+      .panel, .stage-body, .stage-banner { padding: 18px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14.4A8.2 8.2 0 0 1 9.6 3.5 8.5 8.5 0 1 0 20.5 14.4Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 21V9M7 14l5-5 5 5M5 3h14"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h3a4 4 0 0 0 4-4v-6a4 4 0 0 1 3-4"/></symbol>
+    <symbol id="i-boxes" viewBox="0 0 24 24"><path d="m12 2 4 2.3v4.6L12 11 8 8.9V4.3L12 2ZM6 13l4 2.3v4.6L6 22l-4-2.1v-4.6L6 13ZM18 13l4 2.3v4.6L18 22l-4-2.1v-4.6l4-2.3Z"/></symbol>
+    <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M3 21v-2a6 6 0 0 1 12 0v2M16 3.2a4 4 0 0 1 0 7.6M18 14a5 5 0 0 1 3 4.6V21"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M17.5 19H6a4 4 0 0 1-.5-8A6.5 6.5 0 0 1 18 9.5 4.8 4.8 0 0 1 17.5 19Z"/><path d="M12 12v6M9.5 14.5 12 12l2.5 2.5"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l2-7 4 14 2-7h6"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 9-4 3 4 3M16 9l4 3-4 3M14 5l-4 14"/></symbol>
+    <symbol id="i-test" viewBox="0 0 24 24"><path d="M9 3h6M10 3v5l-5.5 9.5A2.3 2.3 0 0 0 6.5 21h11a2.3 2.3 0 0 0 2-3.5L14 8V3"/><path d="M7.5 15h9"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></symbol>
+  </svg>
+
+  <header class="app-header">
+    <div class="brand">
+      <button class="icon-button mobile-menu" id="menuButton" aria-label="打开目录"><svg><use href="#i-menu"/></svg></button>
+      <div class="brand-mark"><svg><use href="#i-book"/></svg></div>
+      <div class="brand-copy"><strong>NestJS 后端学习手册</strong><span>Nest-Admin-Soybean · 交互版</span></div>
+    </div>
+    <label class="search-box">
+      <svg><use href="#i-search"/></svg>
+      <input id="searchInput" type="search" placeholder="搜索阶段、模块、概念或源码路径…" autocomplete="off" />
+      <kbd>⌘ K</kbd>
+    </label>
+    <div class="header-actions">
+      <button class="icon-button" id="themeButton" title="切换主题" aria-label="切换主题"><svg><use href="#i-moon"/></svg></button>
+      <button class="action-button desktop-action" id="exportButton"><svg><use href="#i-download"/></svg>导出记录</button>
+      <button class="icon-button desktop-action" id="importButton" title="导入记录"><svg><use href="#i-upload"/></svg></button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="left-sidebar" id="leftSidebar">
+      <div class="nav-label">学习总览</div>
+      <nav class="nav-list" id="overviewNav"></nav>
+      <div class="nav-label">14 个学习阶段</div>
+      <nav class="nav-list" id="stageNav"></nav>
+      <div class="search-empty" id="searchEmpty">没有匹配的学习内容</div>
+    </aside>
+    <div class="backdrop" id="backdrop"></div>
+
+    <main class="content">
+      <div class="content-inner">
+        <section class="section active" id="section-overview"></section>
+        <section class="section" id="section-modules"></section>
+        <section class="section" id="section-concepts"></section>
+        <section class="section" id="section-stages"></section>
+      </div>
+    </main>
+
+    <aside class="right-sidebar">
+      <div class="side-card">
+        <h3>当前学习位置</h3>
+        <div class="current-stage" id="currentStageName">项目总览</div>
+        <div class="save-state" id="lastVisitedText">尚未开始记录</div>
+      </div>
+      <div class="side-card" id="statusCard">
+        <h3>掌握状态</h3>
+        <select class="status-select" id="statusSelect" aria-label="当前阶段掌握状态">
+          <option value="todo">未开始</option>
+          <option value="learning">学习中</option>
+          <option value="done">已掌握</option>
+        </select>
+      </div>
+      <div class="side-card">
+        <h3>本页学习笔记</h3>
+        <textarea class="notes-area" id="notesArea" placeholder="记录疑问、源码位置、自己的理解和下一步…"></textarea>
+        <div class="save-state" id="saveState">输入后自动保存</div>
+      </div>
+      <div class="side-card">
+        <h3>学习数据</h3>
+        <div class="side-actions">
+          <button class="action-button" id="sideExport"><svg><use href="#i-download"/></svg>导出</button>
+          <button class="action-button" id="sideImport"><svg><use href="#i-upload"/></svg>导入</button>
+          <button class="action-button danger" id="resetButton"><svg><use href="#i-reset"/></svg>重置记录</button>
+          <a class="action-button" href="Nestjs后端项目学习梳理交接.md"><svg><use href="#i-note"/></svg>交接文档</a>
+        </div>
+      </div>
+      <div class="side-card">
+        <h3>状态说明</h3>
+        <div class="legend">
+          <div class="legend-row"><span class="legend-dot"></span>未开始</div>
+          <div class="legend-row"><span class="legend-dot" style="background:var(--accent)"></span>学习中</div>
+          <div class="legend-row"><span class="legend-dot" style="background:var(--success)"></span>已掌握</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <input id="importFile" class="hidden" type="file" accept="application/json,.json" />
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const icon = (name) => `<svg aria-hidden="true"><use href="#i-${name}"></use></svg>`;
+    const STORAGE_KEY = 'nest-admin-backend-study-v1';
+    const SCHEMA_VERSION = 1;
+
+    const overviewItems = [
+      { id: 'overview', title: '项目与路线总览', icon: 'route', keywords: '架构 学习路线 总览 请求生命周期' },
+      { id: 'modules', title: '后端模块地图', icon: 'boxes', keywords: 'module system monitor resource creator upload common' },
+      { id: 'concepts', title: '核心架构概念', icon: 'book', keywords: 'CA DDD IoC DI AOP repository domain usecase' }
+    ];
+
+    const stages = [
+      {
+        id: 'stage-0', no: 0, icon: 'book', title: 'NestJS 阅读前置', duration: '0.5～1 天',
+        summary: '先掌握阅读这个仓库所需的框架语言，避免在装饰器和依赖注入上反复卡住。',
+        read: ['Nestjs项目架构学习说明.md（CA、DDD、IoC/DI、AOP 章节）'],
+        focus: ['Module、Provider、Controller 与 Decorator', 'IoC 容器如何创建并注入 Provider', 'Middleware、Guard、Pipe、Interceptor、Filter 的职责', 'DTO、Prisma Model、Repository、Service 的边界'],
+        practice: '用一个最小 Controller → Service 链路解释 imports、providers、controllers、exports。',
+        acceptance: '不看资料画出 Nest 请求生命周期，并解释为什么 Controller 不应该自己 new Service。',
+        checks: ['能解释 @Injectable() 的作用', '能区分 Guard 与 Interceptor', '能区分 Domain Entity 与 Prisma Model', '能读懂 @Module 元数据']
+      },
+      {
+        id: 'stage-1', no: 1, icon: 'settings', title: '启动入口与配置系统', duration: '1 天',
+        summary: '理解应用如何从 bootstrap 走到监听端口，以及所有全局能力在哪里被装配。',
+        read: ['apps/server/src/main.ts', 'apps/server/src/app.module.ts', 'apps/server/src/config/index.ts', 'apps/server/src/config/config.transformer.ts', 'apps/server/src/config/env.validation.ts', 'apps/server/src/config/app-config.service.ts', 'apps/server/src/config/types/'],
+        focus: ['NestFactory 与日志接管', 'Body Parser、限流、压缩和 Helmet', 'API /api 与静态资源 /profile 的差异', 'ValidationPipe、Swagger 与优雅关闭', '环境变量验证与强类型配置'],
+        practice: '选择一个环境变量，从 .env 名称一路追踪到 AppConfigService 的消费位置。',
+        acceptance: '能画出 bootstrap → listen 时间线，并说明配置错误为何应在启动阶段失败。',
+        checks: ['找到全局 API 前缀设置位置', '理解 Creator JSON 的独立 body limit', '理解静态资源目录映射', '能说明 AppModule 是组合根']
+      },
+      {
+        id: 'stage-2', no: 2, icon: 'route', title: '请求生命周期与公共契约', duration: '1～1.5 天',
+        summary: '把一次 HTTP 请求经过的横切机制串成真实执行链。',
+        read: ['apps/server/src/core/guards/', 'apps/server/src/core/interceptors/', 'apps/server/src/core/filters/', 'apps/server/src/core/decorators/', 'apps/server/src/shared/dto/', 'apps/server/src/shared/response/', 'apps/server/src/shared/exceptions/'],
+        focus: ['限流 → JWT → Tenant → Roles → Permission', 'DTO 转换、白名单和非法字段拒绝', '统一响应体与 requestId', '异常到错误码的转换'],
+        practice: '分别追踪一个成功请求、DTO 校验失败和业务异常。',
+        acceptance: '能解释认证、角色、权限和租户校验为何是四个不同问题。',
+        checks: ['能指出全局 Guard 注册顺序', '能解释 ResponseInterceptor', '能定位 GlobalExceptionFilter', '知道公开路由如何跳过认证']
+      },
+      {
+        id: 'stage-3', no: 3, icon: 'boxes', title: '公共技术设施', duration: '1～1.5 天',
+        summary: '理解业务模块共同依赖的 Redis、日志、Prisma、Repository、DataLoader 和缓存实现。',
+        read: ['apps/server/src/module/common/redis/', 'apps/server/src/module/common/axios/', 'apps/server/src/infrastructure/logging/', 'apps/server/src/infrastructure/prisma/', 'apps/server/src/infrastructure/repository/', 'apps/server/src/infrastructure/dataloader/', 'apps/server/src/infrastructure/cache/', 'apps/server/src/shared/services/'],
+        focus: ['全局模块带来的隐式依赖', 'Redis 与缓存管理封装', 'Prisma Client 扩展挂载', 'BaseRepository 与软删除', 'DataLoader 解决 N+1'],
+        practice: '列出 AppModule 已装配与仅存在于源码但未装配的基础设施。',
+        acceptance: '能说明 infrastructure、shared 和 module/common 的边界为何并不完全相同。',
+        checks: ['找到 Redis 全局注册方式', '理解 Pino bufferLogs', '找到软删除扩展', '确认多级缓存是否已接入']
+      },
+      {
+        id: 'stage-4', no: 4, icon: 'database', title: 'Prisma、迁移与多租户', duration: '1.5～2 天',
+        summary: '掌握模型、迁移、客户端和租户隔离之间的关系，这是理解数据问题的核心阶段。',
+        read: ['apps/server/prisma/schema.prisma', 'apps/server/prisma/migrations/', 'apps/server/prisma/seed.ts', 'apps/server/src/infrastructure/prisma/prisma.service.ts', 'apps/server/src/tenant/'],
+        focus: ['Schema 与真实数据库表的关系', 'generate、migrate、deploy、seed 的差异', 'AsyncLocalStorage 中的 TenantContext', 'Prisma Extension 自动附加 tenantId', '软删除与慢查询'],
+        practice: '选一个 Sys* 模型，从 migration → model → repository → service → controller 完整追踪。',
+        acceptance: '遇到 table does not exist 时，能按连接库、migration、schema、client 四层排查。',
+        checks: ['能定位数据库连接配置但不暴露密钥', '理解 tenantId 自动写入', '理解超级租户跳过规则', '能解释 findUnique 后租户校验']
+      },
+      {
+        id: 'stage-5', no: 5, icon: 'code', title: '低依赖 CRUD 样板', duration: '1～1.5 天',
+        summary: '从简单模块学习项目标准写法，再进入复杂组织权限域。',
+        read: ['apps/server/src/module/system/post/', 'apps/server/src/module/system/notice/', 'apps/server/src/module/system/dict/', 'apps/server/src/module/system/config/', 'apps/server/src/module/system/system-config/', 'apps/server/src/module/system/client/', 'apps/server/src/module/system/docs/'],
+        focus: ['Controller/DTO/Service/Repository 最小闭环', '分页、状态与批量操作', '配置读取和缓存', '单实体与双实体模块差异'],
+        practice: '为 post 模块制作一张“路由—DTO—Service—Repository—Model—测试”学习卡。',
+        acceptance: '看到一个新 CRUD 模块时，可以在 15 分钟内识别主要入口和数据流。',
+        checks: ['完成 post 模块链路', '完成 dict 双实体链路', '理解 system-config 的内部角色', '理解 client 为认证铺垫']
+      },
+      {
+        id: 'stage-6', no: 6, icon: 'users', title: '组织、权限与用户', duration: '2～3 天',
+        summary: '按 dept → menu → role → user 的依赖顺序理解后台管理系统的核心领域。',
+        read: ['apps/server/src/module/system/dept/', 'apps/server/src/module/system/menu/', 'apps/server/src/module/system/role/', 'apps/server/src/module/system/user/', 'apps/server/src/shared/services/user-role-bridge.service.ts'],
+        focus: ['部门树与数据范围', '菜单、路由和权限标识', '角色—菜单与角色—部门', '用户 Facade 及 CRUD/Auth/Role/Profile/Batch 子服务', '循环依赖桥接'],
+        practice: '画出用户、角色、菜单、部门、岗位及中间表关系。',
+        acceptance: '能解释功能权限与数据权限的区别，并复述 UserService Facade 的委托关系。',
+        checks: ['理解部门树构建', '理解菜单权限标识', '理解角色数据范围', '完成用户 Facade 调用图']
+      },
+      {
+        id: 'stage-7', no: 7, icon: 'shield', title: '主站认证与安全链路', duration: '1.5～2 天',
+        summary: '将登录、JWT、Redis 会话、租户选择、Token 黑名单和 MFA 串起来。',
+        read: ['apps/server/src/module/system/auth/', 'apps/server/src/module/main/auth.controller.ts', 'apps/server/src/module/main/main.service.ts', 'apps/server/src/module/system/user/services/user-auth.service.ts', 'apps/server/src/security/login/', 'apps/server/src/security/crypto/', 'apps/server/src/security/mfa/', 'apps/server/src/core/guards/auth.guard.ts'],
+        focus: ['登录与已登录请求是两条链路', 'Passport Strategy 与全局 JwtAuthGuard', 'Redis 登录状态、Token Version 和黑名单', '租户上下文建立', '请求加解密与 MFA'],
+        practice: '分别画出登录时序图和携带 Bearer Token 的请求时序图。',
+        acceptance: '能标注数据库、Redis、JWT、TenantContext 各自承担的状态和边界。',
+        checks: ['找到登录 Controller 入口', '找到 JWT 签发位置', '理解 Token 黑名单', '理解 TenantGuard 的前置条件']
+      },
+      {
+        id: 'stage-8', no: 8, icon: 'users', title: '租户业务模块', duration: '1～1.5 天',
+        summary: '把“租户管理业务”与“请求级数据隔离基础设施”分开理解。',
+        read: ['apps/server/src/module/system/tenant-package/', 'apps/server/src/module/system/tenant/', 'apps/server/src/module/system/tenant/dashboard/', 'apps/server/src/module/system/tenant/quota/', 'apps/server/src/module/system/tenant/audit/'],
+        focus: ['租户套餐和菜单授权', '租户生命周期', '仪表盘、配额和审计', '业务 TenantModule 与基础设施 TenantModule 的同名差异'],
+        practice: '从创建租户追踪到套餐授权、默认数据和隔离生效。',
+        acceptance: '能指出套餐、配额、审计与 Prisma 自动隔离分别位于哪一层。',
+        checks: ['理解 tenant-package 先于 tenant', '理解配额模型', '理解租户审计', '区分两个 TenantModule']
+      },
+      {
+        id: 'stage-9', no: 9, icon: 'cloud', title: '通知、通信与文件资源', duration: '2～3 天',
+        summary: '理解短信、邮件、站内信、上传、OSS、文件管理和 SSE 这些外部边界。',
+        read: ['apps/server/src/module/system/notify/', 'apps/server/src/module/system/sms/', 'apps/server/src/module/system/mail/', 'apps/server/src/module/upload/', 'apps/server/src/module/resource/', 'apps/server/src/module/system/file-manager/'],
+        focus: ['template → message', 'channel/account → template → send → log', '文件元数据与真实对象', 'OSS 配置与 OSS 对象', 'SSE 实时推送'],
+        practice: '画出一次文件上传和一次模板消息发送的端到端链路。',
+        acceptance: '能说清同步请求、异步发送、对象存储和数据库记录的边界。',
+        checks: ['理解 UploadModule 全局能力', '理解 OSS config 与对象', '理解 FileManager 权限', '理解 SSE 长连接']
+      },
+      {
+        id: 'stage-10', no: 10, icon: 'activity', title: '监控、任务与运维', duration: '1.5～2 天',
+        summary: '从健康检查到定时任务，理解系统如何观察和维护自己。',
+        read: ['apps/server/src/module/monitor/health/', 'apps/server/src/module/monitor/server/', 'apps/server/src/module/monitor/cache/', 'apps/server/src/module/monitor/online/', 'apps/server/src/module/monitor/loginlog/', 'apps/server/src/module/monitor/operlog/', 'apps/server/src/module/monitor/job/', 'apps/server/src/module/monitor/metrics/'],
+        focus: ['存活与就绪探针', '服务器和 Redis 状态', '在线会话与登录/操作日志', 'Schedule、任务定义与执行日志', 'Prometheus 指标端点'],
+        practice: '追踪一个定时任务从配置、调度到执行日志，并核对 BackupService 的 provider 接入。',
+        acceptance: '能区分日志、指标、追踪、审计和健康检查五类数据。',
+        checks: ['理解 health indicator', '理解 online 数据来源', '找到 job 调度注册', '理解 BackupService 并非完全未接入']
+      },
+      {
+        id: 'stage-11', no: 11, icon: 'code', title: 'Creator 独立业务域', duration: '2～3 天',
+        summary: '用新业务域综合练习独立认证、二进制/JSON 上传、存储抽象和作品发布。',
+        read: ['apps/server/src/module/creator/common/', 'apps/server/src/module/creator/auth/', 'apps/server/src/module/creator/storage/', 'apps/server/src/module/creator/works/', 'apps/server/prisma/schema.prisma（Creator* 模型）', 'apps/server/test/e2e/creator-image-upload.e2e-spec.ts', 'apps/server/test/e2e/creator-json-upload.e2e-spec.ts', 'apps/server/test/e2e/creator-works.e2e-spec.ts'],
+        focus: ['Creator 独立 JWT Guard', 'multipart 图片与 JSON 内容上传', '本地存储接口与实现', '作品、标签、关系和投稿', '作品上传/发布编排'],
+        practice: '从前端上传请求追踪到 Controller、Guard、Service、Storage/Repository、磁盘或数据库。',
+        acceptance: '能解释 Creator 认证为何独立，并独立定位 migration、CORS 和上传格式问题。',
+        checks: ['完成 Creator auth 链路', '完成图片与 JSON 上传对比', '完成 works 数据模型图', '阅读三个 Creator E2E 用例']
+      },
+      {
+        id: 'stage-12', no: 12, icon: 'settings', title: '代码生成、韧性与高级能力', duration: '1～1.5 天',
+        summary: '学习代码生成器、熔断、指标、追踪、审计和尚处于预留状态的事件能力。',
+        read: ['apps/server/src/module/system/tool/', 'apps/server/src/resilience/', 'apps/server/src/observability/', 'apps/server/src/shared/events/'],
+        focus: ['datasource → template → inference/preview → history', 'Circuit Breaker 状态转换', 'Metrics、Tracing、Audit、Health', 'EventEmitter 是实际使用还是预留'],
+        practice: '选择一项高级能力，证明它是否进入 AppModule 的真实运行时依赖图。',
+        acceptance: '能判断一个目录属于业务、基础设施还是横切能力，并识别“有代码但未运行”。',
+        checks: ['完成 tool 子模块地图', '理解熔断触发与恢复', '区分四类 observability 能力', '核实事件 emit/OnEvent 使用情况']
+      },
+      {
+        id: 'stage-13', no: 13, icon: 'test', title: '测试、运行与架构复盘', duration: '1.5～2 天',
+        summary: '用测试和最终图谱闭环学习成果，形成可以独立维护项目的能力。',
+        read: ['apps/server/test/setup.ts', 'apps/server/test/helpers/', 'apps/server/test/mocks/', 'apps/server/test/fixtures/', 'apps/server/test/unit/', 'apps/server/test/integration/', 'apps/server/test/e2e/', 'apps/server/package.json', 'apps/server/scripts/', 'apps/server/monitoring/'],
+        focus: ['unit → integration → e2e', 'Mock、Fixture 与测试应用创建', 'build/test/prisma 脚本', '运行、部署和监控配置', '源码与历史文档偏差'],
+        practice: '产出顶层模块图、请求链图、四条时序图、Prisma 分域图和模块学习卡。',
+        acceptance: '可以从一个新需求判断应修改的模块、横切机制、数据模型和测试层级。',
+        checks: ['理解三层测试边界', '运行安全的静态/单元验证', '完成最终五张图', '建立文档偏差清单']
+      }
+    ];
+
+    const modules = [
+      { icon: 'route', name: 'main', desc: '公共入口与后台认证编排，连接 Controller、UserService、Redis、JWT 和租户上下文。', tags: ['auth', 'routes', 'login'] },
+      { icon: 'boxes', name: 'common', desc: 'Redis 与 Axios 等通用技术客户端；部分模块通过 @Global() 形成隐式依赖。', tags: ['redis', 'axios', 'cache'] },
+      { icon: 'users', name: 'system', desc: '后台管理核心聚合，覆盖用户、角色、菜单、部门、租户、消息、文件和生成器。', tags: ['RBAC', 'tenant', 'CRUD'] },
+      { icon: 'activity', name: 'monitor', desc: '健康、指标、服务器、缓存、在线用户、日志和定时任务。', tags: ['health', 'metrics', 'job'] },
+      { icon: 'cloud', name: 'resource', desc: 'OSS 配置、对象资源和 SSE 实时推送。', tags: ['OSS', 'SSE', 'storage'] },
+      { icon: 'upload', name: 'upload', desc: '全局文件上传与版本处理，供其他业务模块复用。', tags: ['file', 'version', '@Global'] },
+      { icon: 'code', name: 'creator', desc: 'Creator Center 独立业务域：认证、图片/JSON 存储、作品、标签与投稿。', tags: ['JWT', 'works', 'storage'] },
+      { icon: 'settings', name: 'backup', desc: '没有独立装入根模块，但 BackupService 已作为 JobModule provider 使用。', tags: ['job', 'backup', 'provider'] }
+    ];
+
+    const concepts = [
+      { icon: 'boxes', title: '模块化单体', text: '一个部署单元，按业务域拆模块。模块边界有助于理解和演进，但大量 @Global() 会让部分依赖不够显式。' },
+      { icon: 'route', title: '实用型 Clean Architecture', text: '保留 Controller、Service、Repository、Infrastructure 的分层思想，但允许业务层直接依赖 Nest/Prisma；它不是严格依赖向内的 CA。' },
+      { icon: 'users', title: 'DDD 视角', text: '代码先按 system、creator 等业务领域组织，再在模块内部划分职责。当前项目采用领域模块化，但没有完整 Entity/Value Object/Aggregate 体系。' },
+      { icon: 'settings', title: 'IoC 与 DI', text: 'Nest 容器负责创建 Provider，再把依赖注入 Controller 或 Service。@Injectable() 表示该类可由容器管理。' },
+      { icon: 'activity', title: 'AOP 与横切关注点', text: '日志、认证、租户、指标、异常处理不应散落在业务方法中，而由 Guard、Interceptor、Filter 等统一处理。' },
+      { icon: 'database', title: 'Repository 与 Prisma', text: 'Repository 是领域友好的数据访问封装；Prisma 是具体 ORM。当前两种方式并存，属于 Repository 模式逐步落地。' }
+    ];
+
+    const defaultState = () => ({ schemaVersion: SCHEMA_VERSION, theme: 'light', active: 'overview', statuses: {}, checked: {}, notes: {}, updatedAt: null });
+    let state = defaultState();
+    let storageAvailable = true;
+    let saveTimer;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) state = { ...defaultState(), ...JSON.parse(raw) };
+      } catch (error) {
+        storageAvailable = false;
+        showToast('浏览器无法使用本地存储，当前记录仅在本次打开期间有效。', true);
+      }
+    }
+
+    function saveState(message = '已自动保存') {
+      state.updatedAt = new Date().toISOString();
+      if (storageAvailable) {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        catch (error) { storageAvailable = false; showToast('保存失败：本地存储不可用。', true); }
+      }
+      const label = document.getElementById('saveState');
+      if (label) label.textContent = message;
+      renderProgress();
+    }
+
+    function scheduleSave() {
+      clearTimeout(saveTimer);
+      const label = document.getElementById('saveState');
+      if (label) label.textContent = '正在记录…';
+      saveTimer = setTimeout(() => saveState(), 320);
+    }
+
+    function renderNav() {
+      document.getElementById('overviewNav').innerHTML = overviewItems.map(item => `
+        <button class="nav-item" data-target="${item.id}" data-search="${item.title} ${item.keywords}">
+          <span class="nav-icon">${icon(item.icon)}</span><span class="nav-text">${item.title}</span><span></span>
+        </button>`).join('');
+      document.getElementById('stageNav').innerHTML = stages.map(stage => `
+        <button class="nav-item" data-target="${stage.id}" data-search="${stage.title} ${stage.summary} ${stage.read.join(' ')} ${stage.focus.join(' ')}">
+          <span class="nav-icon">${stage.no}</span><span class="nav-text">${stage.title}</span><span class="nav-state" data-state-for="${stage.id}"></span>
+        </button>`).join('');
+      document.querySelectorAll('.nav-item').forEach(button => button.addEventListener('click', () => navigate(button.dataset.target)));
+    }
+
+    function renderOverview() {
+      document.getElementById('section-overview').innerHTML = `
+        <div class="hero">
+          <div class="eyebrow">${icon('route')} Interactive Learning Map</div>
+          <h1>从一次请求出发，读懂整个 NestJS 后端</h1>
+          <p>这不是文件清单，而是一条按依赖关系安排的学习路线：先看运行骨架，再追数据与认证，最后用 Creator 业务域完成综合实战。</p>
+          <div class="hero-actions">
+            <button class="action-button primary" id="continueButton">继续上次学习 ${icon('arrow')}</button>
+            <button class="action-button" data-jump="modules">查看模块地图</button>
+            <a class="action-button" href="Nestjs项目架构学习说明.md">原架构说明</a>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-top"><span>总学习进度</span>${icon('activity')}</div><div class="stat-value" id="progressValue">0%</div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
+          <div class="stat-card"><div class="stat-top"><span>已掌握阶段</span>${icon('check')}</div><div class="stat-value"><span id="doneStages">0</span><small> / 14</small></div></div>
+          <div class="stat-card"><div class="stat-top"><span>知识点完成</span>${icon('test')}</div><div class="stat-value"><span id="doneChecks">0</span><small> / ${stages.reduce((sum, s) => sum + s.checks.length, 0)}</small></div></div>
+          <div class="stat-card"><div class="stat-top"><span>建议周期</span>${icon('clock')}</div><div class="stat-value">19–27<small> 天</small></div></div>
+        </div>
+        <div class="section-heading"><div><h2>项目运行骨架</h2><p>点击任一节点查看它在当前项目里的具体职责。</p></div><span class="pill">模块化单体</span></div>
+        <div class="panel">
+          <div class="architecture-flow" id="architectureFlow">
+            ${flowNode('route', 'HTTP 请求', '请求先进入 Express/Nest 应用，由中间件、全局前缀和参数解析接管。')}
+            <span class="flow-arrow">${icon('arrow')}</span>
+            ${flowNode('settings', 'main.ts', '负责应用创建、Body Parser、限流、压缩、静态资源、Swagger、ValidationPipe 和监听端口。')}
+            <span class="flow-arrow">${icon('arrow')}</span>
+            ${flowNode('boxes', 'AppModule', '组合配置、基础设施、横切机制和全部业务模块，是项目的 Composition Root。')}
+            <span class="flow-arrow">${icon('arrow')}</span>
+            ${flowNode('shield', '请求横切链', 'Guard 决定是否准入，Interceptor 包裹执行，Filter 统一处理异常。')}
+            <span class="flow-arrow">${icon('arrow')}</span>
+            ${flowNode('code', '业务模块', 'Controller 接收请求，Service/Facade 编排用例，Repository/Prisma 访问数据。')}
+            <span class="flow-arrow">${icon('arrow')}</span>
+            ${flowNode('database', '数据与外部设施', 'PostgreSQL 保存业务数据，Redis 保存缓存/会话，Bull 承载异步任务，OSS/文件系统保存对象。')}
+          </div>
+          <div class="flow-detail" id="flowDetail">选择上方节点，查看它在项目中的职责。</div>
+        </div>
+        <div class="panel">
+          <h3>推荐主线</h3>
+          <pre>main.ts → AppModule → core 请求链 → infrastructure/prisma → tenant
+→ 简单 CRUD → dept/menu/role/user → auth → resource/monitor
+→ creator/auth → creator/storage → creator/works → tests</pre>
+          <div class="callout"><strong>阅读原则</strong>历史文档与源码不一致时，以当前 Module 装配、Controller 路由、Provider 依赖、Prisma Schema 和测试为准。</div>
+        </div>`;
+
+      document.getElementById('continueButton').addEventListener('click', () => navigate(state.active === 'overview' ? 'stage-0' : state.active));
+      document.querySelectorAll('[data-jump]').forEach(el => el.addEventListener('click', () => navigate(el.dataset.jump)));
+      document.querySelectorAll('.flow-node').forEach(node => node.addEventListener('click', () => {
+        document.querySelectorAll('.flow-node').forEach(n => n.classList.remove('active'));
+        node.classList.add('active');
+        document.getElementById('flowDetail').textContent = node.dataset.detail;
+      }));
+    }
+
+    function flowNode(iconName, title, detail) {
+      return `<button class="flow-node" data-detail="${detail}">${icon(iconName)}<strong>${title}</strong></button>`;
+    }
+
+    function renderModules() {
+      document.getElementById('section-modules').innerHTML = `
+        <div class="section-heading"><div><div class="eyebrow">${icon('boxes')} Source Map</div><h2>后端模块地图</h2><p>顶层目录按领域和技术职责划分；学习时必须同时查看显式 imports/exports 与 @Global() 带来的隐式依赖。</p></div><span class="pill">apps/server/src</span></div>
+        <div class="module-grid">${modules.map(m => `<article class="module-card"><div class="module-head"><span class="big-icon">${icon(m.icon)}</span><div><h3>module/${m.name}</h3></div></div><p>${m.desc}</p><div class="tag-list">${m.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div></article>`).join('')}</div>
+        <div class="panel" style="margin-top:18px"><h3>非业务顶层目录</h3>
+          <div class="module-grid">
+            ${miniModule('config', '环境变量验证、转换与强类型配置')}
+            ${miniModule('core', 'Guard、Interceptor、Filter、Decorator、Middleware')}
+            ${miniModule('infrastructure', 'Prisma、Repository、日志、缓存、DataLoader')}
+            ${miniModule('tenant', '请求上下文、租户 Guard 与数据隔离')}
+            ${miniModule('security', '登录安全、加解密、MFA')}
+            ${miniModule('observability', '指标、追踪、审计与健康')}
+            ${miniModule('resilience', '熔断和容错')}
+            ${miniModule('shared', '公共 DTO、异常、枚举、响应与工具')}
+          </div>
+        </div>
+        <div class="panel"><h3>System 子模块推荐顺序</h3><pre>post → notice → dict → config/system-config → client
+→ dept → menu → role → user
+→ tenant-package → tenant
+→ notify / sms / mail → file-manager → tool → docs</pre></div>`;
+    }
+
+    function miniModule(name, text) { return `<div class="learning-block"><strong>${name}/</strong><div style="color:var(--muted);font-size:13px;margin-top:5px">${text}</div></div>`; }
+
+    function renderConcepts() {
+      document.getElementById('section-concepts').innerHTML = `
+        <div class="section-heading"><div><div class="eyebrow">${icon('book')} Mental Models</div><h2>核心架构概念</h2><p>用当前项目校准概念：知道理想模型，也要准确描述源码真正采用的方式。</p></div><span class="pill">概念 × 源码</span></div>
+        <div class="concept-grid">${concepts.map(c => `<article class="concept-card"><h3><span class="nav-icon">${icon(c.icon)}</span>${c.title}</h3><p>${c.text}</p></article>`).join('')}</div>
+        <div class="panel" style="margin-top:18px"><h3>依赖方向对照</h3><pre>严格 Clean Architecture：
+Presentation → Application → Domain ← Infrastructure
+
+当前项目常见链路：
+Controller → Service / Facade → Repository 或 PrismaService
+                            ↓
+                  PostgreSQL / Redis / OSS
+
+结论：当前项目按领域模块化，并使用实用分层；不是严格 CA，也不是完整战术 DDD。</pre></div>
+        <div class="panel"><h3>Repository 最容易混淆的点</h3><p>Repository 是“业务需要怎样存取数据”的抽象，不等于数据库。当前项目中既存在 <code>XxxRepository</code>，也允许 Service 直接调用 <code>PrismaService</code>，因此阅读时先判断实际调用路径，不要套用理想架构。</p></div>`;
+    }
+
+    function renderStage(stage) {
+      const status = state.statuses[stage.id] || 'todo';
+      return `<article class="stage-card" data-stage-card="${stage.id}">
+        <div class="stage-banner">
+          <div class="stage-title-row"><div class="stage-number">${stage.no}</div><div><h2>${stage.title}</h2><p>${stage.summary}</p></div></div>
+          <div class="stage-meta"><span class="pill">${icon('clock')} ${stage.duration}</span><span class="pill">${icon('check')} ${stage.checks.length} 个检查点</span><span class="pill">状态：${statusLabel(status)}</span></div>
+        </div>
+        <div class="stage-body">
+          <div class="learning-columns">
+            <div class="learning-block"><h3>${icon('book')} 阅读顺序</h3><ol>${stage.read.map(path => `<li><span class="path-link">${path}</span></li>`).join('')}</ol></div>
+            <div class="learning-block"><h3>${icon('search')} 关注重点</h3><ul>${stage.focus.map(item => `<li>${item}</li>`).join('')}</ul></div>
+          </div>
+          <div class="callout"><strong>动手练习</strong>${stage.practice}</div>
+          <div class="callout" style="border-color:color-mix(in srgb,var(--success) 48%,var(--line));background:color-mix(in srgb,var(--success) 8%,var(--surface))"><strong style="color:var(--success)">阶段验收</strong>${stage.acceptance}</div>
+          <h3 style="margin:24px 0 10px">完成检查</h3>
+          <div class="checkpoint-list">${stage.checks.map((item, index) => {
+            const key = `${stage.id}:${index}`;
+            const checked = Boolean(state.checked[key]);
+            return `<label class="checkpoint ${checked ? 'done' : ''}"><input type="checkbox" data-check="${key}" ${checked ? 'checked' : ''}><span>${item}</span></label>`;
+          }).join('')}</div>
+        </div>
+      </article>`;
+    }
+
+    function renderActiveStage(id) {
+      const stage = stages.find(item => item.id === id) || stages[0];
+      document.getElementById('section-stages').innerHTML = renderStage(stage);
+      document.querySelectorAll('[data-check]').forEach(input => input.addEventListener('change', () => {
+        state.checked[input.dataset.check] = input.checked;
+        input.closest('.checkpoint').classList.toggle('done', input.checked);
+        saveState('检查点已保存');
+      }));
+    }
+
+    function statusLabel(status) { return ({ todo: '未开始', learning: '学习中', done: '已掌握' })[status] || '未开始'; }
+
+    function navigate(target, persist = true) {
+      const isStage = stages.some(stage => stage.id === target);
+      const sectionId = isStage ? 'stages' : (overviewItems.some(item => item.id === target) ? target : 'overview');
+      if (isStage) renderActiveStage(target);
+      document.querySelectorAll('.section').forEach(section => section.classList.toggle('active', section.id === `section-${sectionId}`));
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.target === target));
+      state.active = target;
+      updateRightSidebar();
+      if (persist) saveState('阅读位置已保存');
+      document.body.classList.remove('menu-open');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateRightSidebar() {
+      const stage = stages.find(item => item.id === state.active);
+      const overview = overviewItems.find(item => item.id === state.active);
+      const title = stage?.title || overview?.title || '项目与路线总览';
+      document.getElementById('currentStageName').textContent = stage ? `阶段 ${stage.no} · ${title}` : title;
+      document.getElementById('statusCard').classList.toggle('hidden', !stage);
+      document.getElementById('statusSelect').value = stage ? (state.statuses[stage.id] || 'todo') : 'todo';
+      document.getElementById('notesArea').value = state.notes[state.active] || '';
+      document.getElementById('lastVisitedText').textContent = state.updatedAt ? `最后记录：${new Date(state.updatedAt).toLocaleString('zh-CN')}` : '尚未开始记录';
+    }
+
+    function renderProgress() {
+      const totalChecks = stages.reduce((sum, stage) => sum + stage.checks.length, 0);
+      const doneChecks = Object.entries(state.checked).filter(([, value]) => value).length;
+      const doneStages = stages.filter(stage => state.statuses[stage.id] === 'done').length;
+      const percentage = Math.round(((doneChecks + doneStages * 2) / (totalChecks + stages.length * 2)) * 100);
+      const value = Math.min(100, Number.isFinite(percentage) ? percentage : 0);
+      const progressValue = document.getElementById('progressValue');
+      const progressBar = document.getElementById('progressBar');
+      const doneStagesEl = document.getElementById('doneStages');
+      const doneChecksEl = document.getElementById('doneChecks');
+      if (progressValue) progressValue.textContent = `${value}%`;
+      if (progressBar) progressBar.style.width = `${value}%`;
+      if (doneStagesEl) doneStagesEl.textContent = doneStages;
+      if (doneChecksEl) doneChecksEl.textContent = doneChecks;
+      document.querySelectorAll('[data-state-for]').forEach(dot => {
+        const status = state.statuses[dot.dataset.stateFor] || 'todo';
+        dot.className = `nav-state ${status === 'todo' ? '' : status}`;
+      });
+    }
+
+    function applyTheme(theme) {
+      const resolved = theme === 'dark' ? 'dark' : 'light';
+      state.theme = resolved;
+      document.documentElement.dataset.theme = resolved;
+      document.getElementById('themeButton').innerHTML = icon(resolved === 'dark' ? 'sun' : 'moon');
+    }
+
+    function exportState() {
+      const payload = { ...state, schemaVersion: SCHEMA_VERSION, exportedAt: new Date().toISOString(), app: 'NestJS 后端项目交互学习手册' };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `nestjs-backend-study-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast('学习记录已导出。');
+    }
+
+    function importState(file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (!data || data.schemaVersion !== SCHEMA_VERSION || typeof data.statuses !== 'object' || typeof data.notes !== 'object' || typeof data.checked !== 'object') throw new Error('格式或版本不匹配');
+          state = { ...defaultState(), ...data, schemaVersion: SCHEMA_VERSION };
+          applyTheme(state.theme);
+          saveState('导入记录已保存');
+          renderActiveStage(stages.some(s => s.id === state.active) ? state.active : 'stage-0');
+          navigate(state.active, false);
+          showToast('学习记录导入成功。');
+        } catch (error) { showToast(`导入失败：${error.message}`, true); }
+      };
+      reader.onerror = () => showToast('导入失败：无法读取文件。', true);
+      reader.readAsText(file);
+    }
+
+    function resetState() {
+      if (!confirm('确定清空全部学习进度、笔记和主题设置吗？此操作无法撤销，建议先导出备份。')) return;
+      state = defaultState();
+      if (storageAvailable) localStorage.removeItem(STORAGE_KEY);
+      applyTheme('light');
+      renderActiveStage('stage-0');
+      navigate('overview', false);
+      renderProgress();
+      showToast('学习记录已重置。');
+    }
+
+    function filterNavigation(query) {
+      const normalized = query.trim().toLowerCase();
+      let visible = 0;
+      document.querySelectorAll('.nav-item').forEach(item => {
+        const matched = !normalized || item.dataset.search.toLowerCase().includes(normalized);
+        item.classList.toggle('hidden', !matched);
+        if (matched) visible += 1;
+      });
+      document.getElementById('searchEmpty').style.display = visible ? 'none' : 'block';
+    }
+
+    let toastTimer;
+    function showToast(message, error = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast show ${error ? 'error' : ''}`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.className = 'toast', 2800);
+    }
+
+    function bindEvents() {
+      document.getElementById('themeButton').addEventListener('click', () => { applyTheme(state.theme === 'dark' ? 'light' : 'dark'); saveState('主题已保存'); });
+      document.getElementById('statusSelect').addEventListener('change', event => {
+        const stage = stages.find(item => item.id === state.active);
+        if (!stage) return;
+        state.statuses[stage.id] = event.target.value;
+        renderActiveStage(stage.id);
+        saveState('掌握状态已保存');
+      });
+      document.getElementById('notesArea').addEventListener('input', event => { state.notes[state.active] = event.target.value; scheduleSave(); });
+      document.getElementById('searchInput').addEventListener('input', event => filterNavigation(event.target.value));
+      document.getElementById('menuButton').addEventListener('click', () => document.body.classList.toggle('menu-open'));
+      document.getElementById('backdrop').addEventListener('click', () => document.body.classList.remove('menu-open'));
+      [document.getElementById('exportButton'), document.getElementById('sideExport')].forEach(button => button.addEventListener('click', exportState));
+      [document.getElementById('importButton'), document.getElementById('sideImport')].forEach(button => button.addEventListener('click', () => document.getElementById('importFile').click()));
+      document.getElementById('importFile').addEventListener('change', event => { const [file] = event.target.files; if (file) importState(file); event.target.value = ''; });
+      document.getElementById('resetButton').addEventListener('click', resetState);
+      document.addEventListener('keydown', event => {
+        if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); document.getElementById('searchInput').focus(); }
+        if (event.key === 'Escape') { document.body.classList.remove('menu-open'); document.getElementById('searchInput').blur(); }
+      });
+    }
+
+    function init() {
+      loadState();
+      renderNav();
+      renderOverview();
+      renderModules();
+      renderConcepts();
+      renderActiveStage(stages.some(stage => stage.id === state.active) ? state.active : 'stage-0');
+      applyTheme(state.theme);
+      bindEvents();
+      navigate(state.active, false);
+      renderProgress();
+      if (!storageAvailable) document.getElementById('saveState').textContent = '内存模式：刷新后记录会丢失';
+    }
+
+    init();
+  </script>
+</body>
+</html>
