@@ -74,7 +74,13 @@ async function bootstrap() {
   app.useLogger(app.get(PinoLogger));
   app.flushLogs(); // 刷新缓冲的日志
 
-  // 信任代理（nginx 反向代理时需要，否则 express-rate-limit 会报错）
+  // FIEXED:信任代理（nginx 反向代理时需要，否则 express-rate-limit 会报错）
+  // NestJS 默认底层是 Express，这句就是 Express 原生配置。
+  // 如果做一个限流控制：限流包 `express-rate-limit` 默认获取 `req.ip` 当做用户唯一标识，用来计数。
+  // 但是NestJS 拿到的 `req.ip` = **Nginx 的内网 IP（127.0.0.1）**，导致所有用户都是一个ip
+  // 这里：开启 `trust proxy` 之后，Express 会从请求头 `X‑Forwarded‑For` 取出**真实客户端 IP**。
+  // 1表示一层代理：离服务最近的**第 1 层代理**拿取 `X‑Forwarded‑For` IP。
+  // 2两层代理，例如：Cloudflare → Nginx → NestJS
   app.set('trust proxy', 1);
 
   // 设置全局限流（保留作为后备）
@@ -113,25 +119,30 @@ async function bootstrap() {
   const prefix = config.app.prefix;
 
   const rootPath = process.cwd();
+  // 处理静态资源路径，确保在不同操作系统下路径分隔符一致
   const baseDirPath = path.posix.join(rootPath, config.app.file.location);
+  // 静态资源缓存策略：头像、图片等资源一年缓存，公共资源不缓存
   app.useStaticAssets(baseDirPath, {
     prefix: '/profile/',
     maxAge: 86400000 * 365,
   });
-
+  // 公共资源不缓存，避免前端访问到过期的 js/css 文件
   app.useStaticAssets('public', {
     prefix: '/public/',
     maxAge: 0,
   });
-
+  // 设置全局路由前缀
   app.setGlobalPrefix(prefix);
 
   // API 版本控制已移除，统一使用 /api 前缀（前端 VITE_APP_BASE_API=/api 对齐）
 
-  // 全局验证
+  // 全局验证管道，自动转换请求参数类型，过滤未定义属性
   app.useGlobalPipes(
+    // 全局验证管道，自动转换请求参数类型，过滤未定义属性
     new ValidationPipe({
+      // 自动转换请求参数类型
       transform: true,
+      // 只允许 DTO 中定义的属性，其他属性将被忽略
       whitelist: true,
       forbidNonWhitelisted: true, // 禁止未定义的属性
       transformOptions: {
@@ -142,9 +153,11 @@ async function bootstrap() {
   // GlobalExceptionFilter 和 ResponseInterceptor 已通过 APP_FILTER / APP_INTERCEPTOR
   // 在 AppModule 中注册，享受完整的 DI 注入能力
 
+  // nestjs后端：处理安全相关策略
   // web 安全，防常见漏洞
   // 注意： 开发环境如果开启 nest static module 需要将 crossOriginResourcePolicy 设置为 false 否则 静态资源 跨域不可访问
   app.use(
+    // 安全中间件，防止常见的 web 漏洞
     helmet({
       crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
       crossOriginResourcePolicy: false,
@@ -164,17 +177,20 @@ async function bootstrap() {
         },
       },
       // 其他安全头
+      // 强制 HTTPS，防止中间人攻击
       hsts: {
         maxAge: 31536000, // 1年
         includeSubDomains: true,
         preload: true,
       },
+      // 防止浏览器猜测内容类型，减少 XSS 攻击风险
       noSniff: true, // X-Content-Type-Options
       xssFilter: true, // X-XSS-Protection
       referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
     }),
   );
-  // cookie parser
+
+  // 用于解析请求中的 Cookie，方便在控制器中获取 Cookie 值
   app.use(cookieParser());
 
   const swaggerOptions = new DocumentBuilder()
