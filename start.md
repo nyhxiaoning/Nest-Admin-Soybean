@@ -3,6 +3,7 @@
 - 数据库重新生成：
 pnpm --filter @nest-admin/server prisma:generate 2>&1
 
+## 注意:nestjs项目中pnpm安装包错prisma,需要npm安装,这里记录一下.
 
 
 - docker启动
